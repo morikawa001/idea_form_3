@@ -51,14 +51,17 @@ function startVoice(targetId) {
   if (btn)    btn.classList.add('btn-mic--active');
   if (status) status.style.display = 'flex';
 
-  // interim 表示用 span をテキストエリア直後に挿入
+  // interim 表示用 div を .textarea-mic-wrap の直後（外側）に挿入
   if (ta) {
     if (interimSpan) interimSpan.remove();
     interimSpan = document.createElement('div');
     interimSpan.id = 'voiceInterim';
     interimSpan.style.cssText =
-      'font-size:0.8em;color:#888;min-height:1.2em;padding:2px 4px;';
-    ta.parentNode.insertBefore(interimSpan, ta.nextSibling);
+      'font-size:0.8em;color:#888;min-height:1.2em;padding:2px 4px;margin-top:2px;';
+    // ta.parentNode = .textarea-mic-wrap (flex コンテナ)
+    // その親の nextSibling の前に挿入 = wrap の直後・field-fb の前
+    const wrap = ta.parentNode;
+    wrap.parentNode.insertBefore(interimSpan, wrap.nextSibling);
   }
 
   const baseText = ta ? ta.value : '';
