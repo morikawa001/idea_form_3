@@ -136,7 +136,10 @@
         <label class="card-radio"><input type="radio" name="q3" value="その他" id="q3-other-check" onchange="onRadioChange('q3'); toggleOtherInputRadio('q3-other-check','q3-other-wrap')"><span>📝 その他</span></label>
       </div>
       <div class="other-input-wrap" id="q3-other-wrap">
-        <textarea id="q3-other-text" placeholder="職種を自由に書いてください" oninput="updateProgress()"></textarea>
+        <div class="textarea-mic-wrap">
+          <textarea id="q3-other-text" placeholder="職種を自由に書いてください" oninput="updateProgress()"></textarea>
+          <button type="button" class="btn-mic" onclick="startVoice('q3-other-text')" title="音声入力">🎤</button>
+        </div>
       </div>
       <div class="field-fb" id="fb-q3"></div>
     </div>
@@ -158,7 +161,6 @@
       <div class="pico-label-large"><span class="pico-tag-large">P</span> 誰が、どんなことに困っているか</div>
     </div>
 
-    <!-- Q4 -->
     <div class="field-block">
       <label class="field-label">主に困っているのは？ <span class="opt-badge">任意</span></label>
       <div class="card-radio-group" id="q4">
@@ -169,12 +171,14 @@
         <label class="card-radio card-radio--wide"><input type="radio" name="q4" value="その他" id="q4-other-check" onchange="onRadioChange('q4'); toggleOtherInputRadio('q4-other-check','q4-other-wrap')"><span>📝 その他</span></label>
       </div>
       <div class="other-input-wrap" id="q4-other-wrap">
-        <textarea id="q4-other-text" placeholder="該当するものを自由に書いてください" oninput="updateProgress()"></textarea>
+        <div class="textarea-mic-wrap">
+          <textarea id="q4-other-text" placeholder="該当するものを自由に書いてください" oninput="updateProgress()"></textarea>
+          <button type="button" class="btn-mic" onclick="startVoice('q4-other-text')" title="音声入力">🎤</button>
+        </div>
       </div>
       <div class="field-fb" id="fb-q4"></div>
     </div>
 
-    <!-- Q5 -->
     <div class="field-block">
       <label class="field-label">発生頻度 <span class="opt-badge">任意</span></label>
       <div class="freq-group" id="q5">
@@ -192,7 +196,6 @@
       <div class="field-fb" id="fb-q5"></div>
     </div>
 
-    <!-- Q6 -->
     <div class="field-block">
       <label class="field-label">影響・リスク <span class="opt-badge">任意</span> <span class="multi-tag">複数選択可</span></label>
       <div class="card-check-group" id="q6">
@@ -204,17 +207,20 @@
         <label class="card-check"><input type="checkbox" name="q6" value="その他" id="q6-other-check" onchange="onCheckChange('q6'); toggleOtherInput('q6-other-check','q6-other-wrap')"><span>📝 その他</span></label>
       </div>
       <div class="other-input-wrap" id="q6-other-wrap">
-        <textarea id="q6-other-text" placeholder="具体的にどのような影響があるか記録してください" oninput="updateProgress()"></textarea>
+        <div class="textarea-mic-wrap">
+          <textarea id="q6-other-text" placeholder="具体的にどのような影響があるか記録してください" oninput="updateProgress()"></textarea>
+          <button type="button" class="btn-mic" onclick="startVoice('q6-other-text')" title="音声入力">🎤</button>
+        </div>
       </div>
       <div class="field-fb" id="fb-q6"></div>
     </div>
 
-    <!-- Q7 -->
     <div class="field-block">
       <label class="field-label" for="q7">具体的な場面 <span class="opt-badge">任意</span></label>
-      <textarea id="q7"
-        placeholder="いつ・どこで・何が起きるか（発案者の言葉をそのまま記録）"
-        oninput="onTextareaInput('q7')"></textarea>
+      <div class="textarea-mic-wrap">
+        <textarea id="q7" placeholder="いつ・どこで・何が起きるか（発案者の言葉をそのまま記録）" oninput="onTextareaInput('q7')"></textarea>
+        <button type="button" class="btn-mic" onclick="startVoice('q7')" title="音声入力">🎤</button>
+      </div>
       <div class="field-fb" id="fb-q7"></div>
     </div>
 
@@ -239,16 +245,15 @@
       <div class="pico-label-large"><span class="pico-tag-large">C</span> 今どうやって対応しているか</div>
     </div>
 
-    <!-- Q8 -->
     <div class="field-block">
       <label class="field-label" for="q8">今の対応方法 <span class="opt-badge">任意</span></label>
-      <textarea id="q8"
-        placeholder="例：テープでまとめる、常に付き添う（発案者の言葉をそのまま記録）"
-        oninput="onTextareaInput('q8')"></textarea>
+      <div class="textarea-mic-wrap">
+        <textarea id="q8" placeholder="例：テープでまとめる、常に付き添う（発案者の言葉をそのまま記録）" oninput="onTextareaInput('q8')"></textarea>
+        <button type="button" class="btn-mic" onclick="startVoice('q8')" title="音声入力">🎤</button>
+      </div>
       <div class="field-fb" id="fb-q8"></div>
     </div>
 
-    <!-- Q9 -->
     <div class="field-block">
       <label class="field-label">今の対応の問題点 <span class="multi-tag">複数選択可</span> <span class="opt-badge">任意</span></label>
       <div class="card-check-group" id="q9">
@@ -260,7 +265,10 @@
         <label class="card-check"><input type="checkbox" name="q9" value="その他" id="q9-other-check" onchange="onCheckChange('q9'); toggleOtherInput('q9-other-check','q9-other-wrap')"><span>📝 その他</span></label>
       </div>
       <div class="other-input-wrap" id="q9-other-wrap">
-        <textarea id="q9-other-text" placeholder="その他の問題点を記録してください" oninput="updateProgress()"></textarea>
+        <div class="textarea-mic-wrap">
+          <textarea id="q9-other-text" placeholder="その他の問題点を記録してください" oninput="updateProgress()"></textarea>
+          <button type="button" class="btn-mic" onclick="startVoice('q9-other-text')" title="音声入力">🎤</button>
+        </div>
       </div>
       <div class="field-fb" id="fb-q9"></div>
     </div>
@@ -286,17 +294,18 @@
       <div class="pico-label-large"><span class="pico-tag-large">I</span> 発案者のアイデア</div>
     </div>
 
-    <!-- Q10 メイン自由記述 -->
     <div class="field-block idea-main-block">
       <label class="field-label" for="q10">アイデア・ひらめき <span class="opt-badge">任意</span></label>
-      <textarea id="q10" class="idea-textarea" rows="5"
-        placeholder="発案者の言葉をそのまま記録してください。小さなことでもOK。"
-        oninput="onIdeaInput()"></textarea>
+      <div class="textarea-mic-wrap">
+        <textarea id="q10" class="idea-textarea" rows="5"
+          placeholder="発案者の言葉をそのまま記録してください。小さなことでもOK。"
+          oninput="onIdeaInput()"></textarea>
+        <button type="button" class="btn-mic" onclick="startVoice('q10')" title="音声入力">🎤</button>
+      </div>
       <div class="idea-char-count" id="ideaCharCount">0文字</div>
       <div class="field-fb" id="fb-q10"></div>
     </div>
 
-    <!-- アイデアの形 -->
     <div class="field-block">
       <label class="field-label">解決のアプローチ <span class="multi-tag">複数選択可・任意</span></label>
       <div class="icon-check-group" id="q10_type">
@@ -324,28 +333,28 @@
       </div>
     </div>
 
-    <!-- 具体イメージ -->
     <div class="field-block">
       <label class="field-label" for="q10_detail">形・大きさ・使い方のイメージ <span class="opt-badge">任意</span></label>
-      <textarea id="q10_detail" rows="3"
-        placeholder="例：手のひらサイズ・スマホに通知が来る"
-        oninput="updateProgress()"></textarea>
+      <div class="textarea-mic-wrap">
+        <textarea id="q10_detail" rows="3" placeholder="例：手のひらサイズ・スマホに通知が来る" oninput="updateProgress()"></textarea>
+        <button type="button" class="btn-mic" onclick="startVoice('q10_detail')" title="音声入力">🎤</button>
+      </div>
     </div>
 
-    <!-- 参考 -->
     <div class="field-block">
       <label class="field-label" for="q10_ref">参考・ヒントになったもの <span class="opt-badge">任意</span></label>
-      <textarea id="q10_ref" rows="2"
-        placeholder="例：市販の○○のような形、他病院の取り組みを聞いた"
-        oninput="updateProgress()"></textarea>
+      <div class="textarea-mic-wrap">
+        <textarea id="q10_ref" rows="2" placeholder="例：市販の○○のような形、他病院の取り組みを聞いた" oninput="updateProgress()"></textarea>
+        <button type="button" class="btn-mic" onclick="startVoice('q10_ref')" title="音声入力">🎤</button>
+      </div>
     </div>
 
-    <!-- 懸念 -->
     <div class="field-block">
       <label class="field-label" for="q10_concern">心配な点 <span class="opt-badge">任意</span></label>
-      <textarea id="q10_concern" rows="2"
-        placeholder="例：滅菌が必要・コストが高いかも"
-        oninput="updateProgress()"></textarea>
+      <div class="textarea-mic-wrap">
+        <textarea id="q10_concern" rows="2" placeholder="例：滅菌が必要・コストが高いかも" oninput="updateProgress()"></textarea>
+        <button type="button" class="btn-mic" onclick="startVoice('q10_concern')" title="音声入力">🎤</button>
+      </div>
     </div>
 
     <div class="step-nav">
@@ -369,7 +378,6 @@
       <div class="pico-label-large"><span class="pico-tag-large">O</span> このアイデアで何が変わるか</div>
     </div>
 
-    <!-- Q12 -->
     <div class="field-block">
       <label class="field-label">期待できる改善 <span class="opt-badge">任意</span> <span class="multi-tag">複数選択可</span></label>
       <div class="card-check-group" id="q12">
@@ -381,30 +389,29 @@
         <label class="card-check"><input type="checkbox" name="q12" value="その他" id="q12-other-check" onchange="onCheckChange('q12'); toggleOtherInput('q12-other-check','q12-other-wrap')"><span>📝 その他</span></label>
       </div>
       <div class="other-input-wrap" id="q12-other-wrap">
-        <textarea id="q12-other-text" placeholder="どのような改善が期待できるか記録してください" oninput="updateProgress()"></textarea>
+        <div class="textarea-mic-wrap">
+          <textarea id="q12-other-text" placeholder="どのような改善が期待できるか記録してください" oninput="updateProgress()"></textarea>
+          <button type="button" class="btn-mic" onclick="startVoice('q12-other-text')" title="音声入力">🎤</button>
+        </div>
       </div>
       <div class="field-fb" id="fb-q12"></div>
     </div>
 
-    <!-- Q13 -->
     <div class="field-block">
       <label class="field-label" for="q13">改善規模のイメージ <span class="opt-badge">任意</span></label>
-      <textarea id="q13"
-        placeholder="例：1日30分削減・インシデントが減る"
-        oninput="onTextareaInput('q13')"></textarea>
+      <div class="textarea-mic-wrap">
+        <textarea id="q13" placeholder="例：1日30分削減・インシデントが減る" oninput="onTextareaInput('q13')"></textarea>
+        <button type="button" class="btn-mic" onclick="startVoice('q13')" title="音声入力">🎤</button>
+      </div>
       <div class="field-fb" id="fb-q13"></div>
     </div>
 
-    <!-- Q14: 写真・資料（任意、カメラ撮影可） -->
+    <!-- Q14: 写真（カメラのみ） -->
     <div class="field-block">
-      <label class="field-label">写真・資料があれば <span class="opt-badge">任意</span></label>
-      <p class="field-note">デバイスのカメラで撮影するか、既存のファイル（JPG・PNG・PDF）を選択できます。</p>
+      <label class="field-label">写真があれば <span class="opt-badge">任意</span></label>
+      <p class="field-note">カメラで撮影した写真をメール送信時に添付できます。</p>
       <div class="photo-upload-area">
         <button type="button" class="btn-camera" onclick="openCamera()">📷 カメラで撮影</button>
-        <label class="btn-file-label">
-          📁 ファイルを選択
-          <input type="file" id="q14_file" accept="image/*,application/pdf" multiple onchange="onFileSelect(event)" style="display:none;">
-        </label>
       </div>
       <div id="cameraContainer" style="display:none;" class="camera-container">
         <video id="cameraVideo" autoplay playsinline></video>
@@ -472,10 +479,11 @@
       <button class="btn-action btn-mail"    onclick="actionSendMail()">✉️ メールで送信</button>
       <button class="btn-action btn-pdf"     onclick="actionSavePDF()">🖨️ PDFで保存</button>
       <button class="btn-action btn-analyze" onclick="actionAnalyze()">🔬 分析</button>
-      <button class="btn-action btn-end"     onclick="actionEnd()">🔚 終了</button>
     </div>
-    <div class="modal-btn-row" style="margin-top:12px;">
-      <button class="btn-close" onclick="closePreviewModal()">← 戻る</button>
+    <!-- 戻る（アクティブ色）・終了 -->
+    <div class="modal-footer-row">
+      <button class="btn-back-active" onclick="closePreviewModal()">← 戻る</button>
+      <button class="btn-end-footer"  onclick="actionEnd()">🔚 終了</button>
     </div>
   </div>
 </div>
@@ -487,12 +495,21 @@
   <div class="modal modal--small">
     <h2>✉️ メールで送信</h2>
     <p style="font-size:0.85em;color:#666;margin-bottom:12px;">送信先メールアドレスを入力してください。</p>
-    <input type="email" id="mailTo" placeholder="例：recipient@hospital.jp" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:6px;font-size:1em;box-sizing:border-box;">
+    <input type="email" id="mailTo" placeholder="例：recipient@hospital.jp"
+      style="width:100%;padding:10px;border:1px solid #ccc;border-radius:6px;font-size:1em;box-sizing:border-box;">
+    <div id="photoAttachNote" style="font-size:0.8em;color:#555;margin-top:8px;display:none;">
+      📎 撮影した写真 <span id="photoAttachCount"></span>枚 をHTML形式で本文に埋め込みます。
+    </div>
     <div class="modal-btn-row" style="margin-top:12px;">
       <button class="btn-mail" onclick="doSendMail()">送信する</button>
       <button class="btn-close" onclick="closeMailModal()">キャンセル</button>
     </div>
   </div>
+</div>
+
+<!-- 音声入力ステータス表示 -->
+<div id="voiceStatus" class="voice-status" style="display:none;">
+  <span class="voice-dot"></span> 音声認識中… タップで停止
 </div>
 
 <script src="script.js"></script>

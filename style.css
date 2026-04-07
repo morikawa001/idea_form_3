@@ -971,3 +971,120 @@ textarea { resize: vertical; min-height: 90px; }
 
 /* ---- 終了ボタン ---- */
 .btn-end { background: #eceff1; color: #455a64; }
+
+/* ============================================================
+   idea_form_3 v3.2 追加スタイル
+   ============================================================ */
+
+/* ---- テキストエリア＋マイクラッパー ---- */
+.textarea-mic-wrap {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.textarea-mic-wrap textarea {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ---- マイクボタン ---- */
+.btn-mic {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1.5px solid #4caf88;
+  background: #fff;
+  color: #2e7d58;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, box-shadow 0.15s;
+  margin-top: 4px;
+}
+.btn-mic:hover  { background: #edf7f2; }
+.btn-mic--active {
+  background: #e53935 !important;
+  border-color: #e53935 !important;
+  color: #fff !important;
+  animation: mic-pulse 1s ease-in-out infinite;
+}
+@keyframes mic-pulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(229,57,53,0.4); }
+  50%      { box-shadow: 0 0 0 8px rgba(229,57,53,0); }
+}
+
+/* ---- 音声入力ステータスバー ---- */
+.voice-status {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(30,30,30,0.88);
+  color: #fff;
+  padding: 10px 22px;
+  border-radius: 24px;
+  font-size: 0.88em;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 9999;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+}
+.voice-dot {
+  width: 10px;
+  height: 10px;
+  background: #e53935;
+  border-radius: 50%;
+  animation: mic-pulse 1s ease-in-out infinite;
+}
+
+/* ---- モーダル フッター行（戻る・終了） ---- */
+.modal-footer-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+  justify-content: space-between;
+}
+
+/* ---- 戻るボタン（アクティブ色） ---- */
+.btn-back-active {
+  flex: 1;
+  padding: 12px 18px;
+  background: #4caf88;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.92em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+}
+.btn-back-active:hover  { background: #3d9c76; }
+.btn-back-active:active { transform: scale(0.97); }
+
+/* ---- 終了ボタン（フッター用） ---- */
+.btn-end-footer {
+  flex: 1;
+  padding: 12px 18px;
+  background: #eceff1;
+  color: #455a64;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.92em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+}
+.btn-end-footer:hover  { background: #cfd8dc; }
+.btn-end-footer:active { transform: scale(0.97); }
+
+/* ---- モバイル対応 ---- */
+@media (max-width: 520px) {
+  .modal-footer-row { flex-direction: column; }
+  .btn-mic { width: 36px; height: 36px; font-size: 16px; }
+}
