@@ -406,22 +406,10 @@
       <div class="field-fb" id="fb-q13"></div>
     </div>
 
-    <!-- Q14: 写真（カメラのみ） -->
+    <!-- Q14: 写真・資料（任意） -->
     <div class="field-block">
-      <label class="field-label">写真があれば <span class="opt-badge">任意</span></label>
-      <p class="field-note">カメラで撮影した写真をメール送信時に添付できます。</p>
-      <div class="photo-upload-area">
-        <button type="button" class="btn-camera" onclick="openCamera()">📷 カメラで撮影</button>
-      </div>
-      <div id="cameraContainer" style="display:none;" class="camera-container">
-        <video id="cameraVideo" autoplay playsinline></video>
-        <div class="camera-controls">
-          <button type="button" class="btn-shutter" onclick="capturePhoto()">🔴 撮影</button>
-          <button type="button" class="btn-camera-cancel" onclick="closeCamera()">キャンセル</button>
-        </div>
-      </div>
-      <div id="photoPreviewArea" class="photo-preview-area"></div>
-      <canvas id="photoCanvas" style="display:none;"></canvas>
+      <label class="field-label">写真・資料があれば <span class="opt-badge">任意</span></label>
+      <p class="field-note">写真や資料がある場合は、メール送信時にメーラーから添付してください。</p>
     </div>
 
     <div class="step-nav">
@@ -497,9 +485,7 @@
     <p style="font-size:0.85em;color:#666;margin-bottom:12px;">送信先メールアドレスを入力してください。</p>
     <input type="email" id="mailTo" placeholder="例：recipient@hospital.jp"
       style="width:100%;padding:10px;border:1px solid #ccc;border-radius:6px;font-size:1em;box-sizing:border-box;">
-    <div id="photoAttachNote" style="font-size:0.8em;color:#555;margin-top:8px;display:none;">
-      📎 撮影した写真 <span id="photoAttachCount"></span>枚 をHTML形式で本文に埋め込みます。
-    </div>
+
     <div class="modal-btn-row" style="margin-top:12px;">
       <button class="btn-mail" onclick="doSendMail()">送信する</button>
       <button class="btn-close" onclick="closeMailModal()">キャンセル</button>

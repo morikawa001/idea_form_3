@@ -1,73 +1,8 @@
 // ============================================================
-//  MIT ヒアリングフォーム v3.2 — script.js
+//  MIT ヒアリングフォーム v3.3 — script.js
 // ============================================================
 
 let startTime = null;
-
-// ============================================================
-//  カメラ関連
-// ============================================================
-let cameraStream = null;
-const capturedPhotos = []; // { dataUrl, name }
-
-function openCamera() {
-  const container = document.getElementById('cameraContainer');
-  const video     = document.getElementById('cameraVideo');
-  container.style.display = 'block';
-  navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false })
-    .then(stream => {
-      cameraStream = stream;
-      video.srcObject = stream;
-    })
-    .catch(err => {
-      alert('カメラにアクセスできませんでした。\n' + err.message);
-      container.style.display = 'none';
-    });
-}
-
-function closeCamera() {
-  if (cameraStream) {
-    cameraStream.getTracks().forEach(t => t.stop());
-    cameraStream = null;
-  }
-  document.getElementById('cameraContainer').style.display = 'none';
-}
-
-function capturePhoto() {
-  const video  = document.getElementById('cameraVideo');
-  const canvas = document.getElementById('photoCanvas');
-  canvas.width  = video.videoWidth;
-  canvas.height = video.videoHeight;
-  canvas.getContext('2d').drawImage(video, 0, 0);
-  const dataUrl = canvas.toDataURL('image/jpeg', 0.82);
-  const name    = `photo_${Date.now()}.jpg`;
-  capturedPhotos.push({ dataUrl, name });
-  addPhotoPreview(dataUrl, name, capturedPhotos.length - 1);
-  closeCamera();
-}
-
-function addPhotoPreview(dataUrl, name, idx) {
-  const area = document.getElementById('photoPreviewArea');
-  const wrap = document.createElement('div');
-  wrap.className  = 'photo-thumb';
-  wrap.dataset.idx = String(idx);
-
-  const img = document.createElement('img');
-  img.src = dataUrl;
-  img.alt = name;
-  wrap.appendChild(img);
-
-  const del = document.createElement('button');
-  del.type      = 'button';
-  del.className = 'photo-thumb-del';
-  del.textContent = '✕';
-  del.onclick = () => {
-    capturedPhotos[idx] = null; // null で論理削除（インデックスをずらさない）
-    area.removeChild(wrap);
-  };
-  wrap.appendChild(del);
-  area.appendChild(wrap);
-}
 
 // ============================================================
 //  音声入力（Web Speech API）
@@ -90,8 +25,8 @@ function startVoice(targetId) {
     return;
   }
 
-  const ta    = document.getElementById(targetId);
-  const btn   = document.querySelector(`[onclick="startVoice('${targetId}')"]`);
+  const ta     = document.getElementById(targetId);
+  const btn    = document.querySelector(`[onclick="startVoice('${targetId}')"]`);
   const status = document.getElementById('voiceStatus');
 
   const recognition          = new SpeechRecognition();
@@ -102,62 +37,39 @@ function startVoice(targetId) {
   currentRecognition = recognition;
   currentMicBtn      = btn;
 
-  if (btn) btn.classList.add('btn-mic--active');
+  if (btn)    btn.classList.add('btn-mic--active');
   if (status) status.style.display = 'flex';
 
-  // 認識開始時のカーソル位置を記録
-  const startPos   = ta ? ta.selectionStart : 0;
-  const baseText   = ta ? ta.value : '';
-  let   interimEnd = startPos;
+  const startPos = ta ? ta.selectionStart : 0;
+  const baseText = ta ? ta.value : '';
 
   recognition.onresult = (e) => {
-    let interim  = '';
-    let final    = '';
+    let final = '';
     for (let i = e.resultIndex; i < e.results.length; i++) {
-      const t = e.results[i][0].transcript;
-      if (e.results[i].isFinal) final += t;
-      else interim += t;
+      if (e.results[i].isFinal) final += e.results[i][0].transcript;
     }
-
-    if (ta) {
-      // 確定テキストを挿入
-      if (final) {
-        const before = baseText.slice(0, startPos);
-        const after  = baseText.slice(startPos);
-        ta.value     = before + final + after;
-        interimEnd   = startPos + final.length;
-        updateProgress();
-        // フォームのイベントを手動発火
-        ta.dispatchEvent(new Event('input', { bubbles: true }));
-      }
+    if (final && ta) {
+      ta.value = baseText.slice(0, startPos) + final + baseText.slice(startPos);
+      updateProgress();
+      ta.dispatchEvent(new Event('input', { bubbles: true }));
     }
   };
 
   recognition.onerror = (e) => {
-    if (e.error !== 'aborted') {
-      alert('音声認識エラー：' + e.error);
-    }
+    if (e.error !== 'aborted') alert('音声認識エラー：' + e.error);
     stopVoiceUI();
   };
 
-  recognition.onend = () => {
-    stopVoiceUI();
-  };
+  recognition.onend = () => stopVoiceUI();
 
-  // ステータスをタップで停止
-  if (status) {
-    status.onclick = () => { recognition.stop(); };
-  }
+  if (status) status.onclick = () => recognition.stop();
 
   recognition.start();
 }
 
 function stopVoiceUI() {
   currentRecognition = null;
-  if (currentMicBtn) {
-    currentMicBtn.classList.remove('btn-mic--active');
-    currentMicBtn = null;
-  }
+  if (currentMicBtn) { currentMicBtn.classList.remove('btn-mic--active'); currentMicBtn = null; }
   const status = document.getElementById('voiceStatus');
   if (status) status.style.display = 'none';
 }
@@ -168,16 +80,10 @@ function stopVoiceUI() {
 const FORM_UI_IDS = ['picoRoadmap', 'progressWrap', 'navigator', 'ideaForm'];
 
 function hideFormUI() {
-  FORM_UI_IDS.forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.style.display = 'none';
-  });
+  FORM_UI_IDS.forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
 }
 function showFormUI() {
-  FORM_UI_IDS.forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.style.display = '';
-  });
+  FORM_UI_IDS.forEach(id => { const el = document.getElementById(id); if (el) el.style.display = ''; });
 }
 
 // ============================================================
@@ -195,9 +101,7 @@ const NAV_MESSAGES = [
 ];
 
 function showStep(step) {
-  document.querySelectorAll('.step-section').forEach((s, i) => {
-    s.classList.toggle('active', i === step);
-  });
+  document.querySelectorAll('.step-section').forEach((s, i) => s.classList.toggle('active', i === step));
   for (let i = 0; i < TOTAL_STEPS; i++) {
     const rm = document.getElementById(`rm${i}`);
     if (!rm) continue;
@@ -218,16 +122,11 @@ function showStep(step) {
 // ============================================================
 //  バリデーション（すべて任意）
 // ============================================================
-const STEP_REQUIRED = [
-  () => [], () => [], () => [], () => [], () => []
-];
+const STEP_REQUIRED = [ () => [], () => [], () => [], () => [], () => [] ];
 
 function goNext(step) {
   const errs = STEP_REQUIRED[step]();
-  if (errs.length > 0) {
-    alert('入力内容を確認してください：\n\n' + errs.join('\n'));
-    return;
-  }
+  if (errs.length > 0) { alert('入力内容を確認してください：\n\n' + errs.join('\n')); return; }
   showStep(step + 1);
 }
 function goPrev(step) { showStep(step - 1); }
@@ -239,34 +138,18 @@ function getVal(id)    { return (document.getElementById(id) || { value: '' }).v
 function getRadio(nm)  { const el = document.querySelector(`input[name="${nm}"]:checked`); return el ? el.value : ''; }
 function getChecks(nm) { return [...document.querySelectorAll(`input[name="${nm}"]:checked`)].map(e => e.value); }
 
-function getQ3Value() {
-  const v = getRadio('q3');
-  return v === 'その他' ? (`その他（${getVal('q3-other-text')}）` || 'その他') : (v || '');
-}
-function getQ4Value() {
-  const v = getRadio('q4');
-  return v === 'その他' ? (`その他（${getVal('q4-other-text')}）` || 'その他') : (v || '');
-}
-function getQ6Values() {
-  return getChecks('q6').map(v =>
-    v === 'その他' ? (`その他（${getVal('q6-other-text')}）` || 'その他') : v);
-}
-function getQ9Values() {
-  return getChecks('q9').map(v =>
-    v === 'その他' ? (`その他（${getVal('q9-other-text')}）` || 'その他') : v);
-}
-function getQ12Values() {
-  return getChecks('q12').map(v =>
-    v === 'その他' ? (`その他（${getVal('q12-other-text')}）` || 'その他') : v);
-}
-function getIdeaTypes() { return getChecks('q10_type'); }
+function getQ3Value()  { const v = getRadio('q3');  return v === 'その他' ? `その他（${getVal('q3-other-text')}）`  : (v || ''); }
+function getQ4Value()  { const v = getRadio('q4');  return v === 'その他' ? `その他（${getVal('q4-other-text')}）`  : (v || ''); }
+function getQ6Values() { return getChecks('q6').map(v  => v === 'その他' ? `その他（${getVal('q6-other-text')}）`  : v); }
+function getQ9Values() { return getChecks('q9').map(v  => v === 'その他' ? `その他（${getVal('q9-other-text')}）`  : v); }
+function getQ12Values(){ return getChecks('q12').map(v => v === 'その他' ? `その他（${getVal('q12-other-text')}）` : v); }
+function getIdeaTypes(){ return getChecks('q10_type'); }
 
 // ===== フィードバック =====
 function showFeedback(id, msg, type) {
   const el = document.getElementById(`fb-${id}`);
   if (!el) return;
-  el.textContent = msg;
-  el.className   = `field-fb fb-${type} show`;
+  el.textContent = msg; el.className = `field-fb fb-${type} show`;
 }
 function hideFeedback(id) {
   const el = document.getElementById(`fb-${id}`);
@@ -321,8 +204,7 @@ document.addEventListener('input',  updateProgress);
 // ============================================================
 function onSelectChange(id) {
   const v = getVal(id);
-  if (v) showFeedback(id, `✅ 「${v}」で記録します`, 'good');
-  else   hideFeedback(id);
+  if (v) showFeedback(id, `✅ 「${v}」で記録します`, 'good'); else hideFeedback(id);
 }
 function onTextInput(id) {
   const v = getVal(id);
@@ -331,21 +213,19 @@ function onTextInput(id) {
   showFeedback(id, `✅ ${v} さんの情報を記録します`, 'good');
 }
 function onEmailInput(id) {
-  const v = getVal(id);
+  const v  = getVal(id);
   if (!v) { hideFeedback(id); return; }
   const ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
   if (ok) showFeedback(id, `✅ 「${v}」を記録しました`, 'good');
   else    showFeedback(id, '⚠️ メールアドレスの形式を確認してください', 'warn');
 }
 function onRadioChange(groupId) {
-  highlightSelected(groupId);
-  updateProgress();
+  highlightSelected(groupId); updateProgress();
   const v = getRadio(groupId);
   if (v) showFeedback(groupId, `✅ 「${v}」を選択しました`, 'good');
 }
 function onCheckChange(groupId) {
-  highlightChecked(groupId);
-  updateProgress();
+  highlightChecked(groupId); updateProgress();
   const vals = getChecks(groupId);
   if (vals.length > 0) showFeedback(groupId, `✅ ${vals.length}項目選択中`, 'good');
   else hideFeedback(groupId);
@@ -361,7 +241,7 @@ function onIdeaInput() {
   const v     = getVal('q10');
   const count = document.getElementById('ideaCharCount');
   if (count) count.textContent = `${v.length}文字`;
-  if (v.length >= 20) showFeedback('q10', '✅ 内容が記録されています。', 'tip');
+  if (v.length >= 20)     showFeedback('q10', '✅ 内容が記録されています。', 'tip');
   else if (v.length >= 5) showFeedback('q10', 'さらに詳しく聞き取り、記録してください', 'warn');
   else hideFeedback('q10');
 }
@@ -410,9 +290,6 @@ function buildText() {
     '【O：期待できる効果】',
     `期待される改善：${q12v.join(' / ') || '（未選択）'}`,
     `改善の規模感　：${getVal('q13') || '（未記入）'}`,
-    '',
-    `添付写真　　　：${capturedPhotos.filter(Boolean).length > 0
-      ? capturedPhotos.filter(Boolean).map(p => p.name).join(', ') : 'なし'}`,
     '',
     '━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
     `記録日時　　　　　：${endTime.toLocaleString('ja-JP')}`,
@@ -463,10 +340,8 @@ function actionCopy() {
 }
 function fallbackCopy(text) {
   const ta = document.createElement('textarea');
-  ta.value = text;
-  ta.style.cssText = 'position:fixed;opacity:0';
-  document.body.appendChild(ta);
-  ta.select();
+  ta.value = text; ta.style.cssText = 'position:fixed;opacity:0';
+  document.body.appendChild(ta); ta.select();
   try { document.execCommand('copy'); alert('✅ コピーしました。'); }
   catch (e) { alert('コピーに失敗しました。手動でコピーしてください。'); }
   document.body.removeChild(ta);
@@ -487,84 +362,29 @@ function actionSaveToFolder() {
 }
 
 // ============================================================
-//  アクション：メールで送信（写真添付対応）
+//  アクション：メールで送信（テキストのみ、写真はメーラーから添付）
 // ============================================================
 function actionSendMail() {
-  const photos = capturedPhotos.filter(Boolean);
-  const note   = document.getElementById('photoAttachNote');
-  const cnt    = document.getElementById('photoAttachCount');
-  if (photos.length > 0 && note && cnt) {
-    note.style.display = 'block';
-    cnt.textContent    = photos.length;
-  } else if (note) {
-    note.style.display = 'none';
-  }
   document.getElementById('mailModal').classList.add('active');
 }
-
 function closeMailModal() {
   document.getElementById('mailModal').classList.remove('active');
 }
-
 function doSendMail() {
   const to = document.getElementById('mailTo').value.trim();
   if (!to || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)) {
     alert('有効なメールアドレスを入力してください。');
     return;
   }
-
   const text    = buildText();
   const name    = getVal('q2') || '（未記入）';
   const dept    = getVal('q1') || '';
   const subject = `ヒアリング記録：${name}${dept ? '【' + dept + '】' : ''}のアイデア提案`;
-  const photos  = capturedPhotos.filter(Boolean);
-
-  if (photos.length > 0) {
-    // 写真がある場合：HTMLメールとして新しいウィンドウで mailto を構成
-    // mailto は添付をサポートしないため、写真をHTMLメール本文に base64 img として埋め込む
-    const imgHtml = photos.map((p, i) =>
-      `<p><strong>写真${i+1}：${p.name}</strong></p>` +
-      `<img src="${p.dataUrl}" style="max-width:480px;border-radius:6px;" alt="${p.name}">`
-    ).join('<br>');
-
-    const htmlBody =
-      `<pre style="font-family:monospace;white-space:pre-wrap;">${
-        text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-      }</pre><hr><h3>📎 添付写真</h3>${imgHtml}`;
-
-    // データURIのHTMLファイルをダウンロードし、メーラーで開く補助手段
-    const blob = new Blob([`<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8">
-      <title>${subject}</title></head><body>${htmlBody}</body></html>`],
-      { type: 'text/html;charset=utf-8' });
-    const fileUrl = URL.createObjectURL(blob);
-
-    // まず通常のmailtoで本文テキストを送信
-    const mailtoUrl =
-      'mailto:' + encodeURIComponent(to) +
-      '?subject=' + encodeURIComponent(subject) +
-      '&body='    + encodeURIComponent(
-        text + '\n\n※ 写真はHTMLファイルとして別途ダウンロードされます。'
-      );
-    window.location.href = mailtoUrl;
-
-    // 写真入りHTMLもダウンロード
-    setTimeout(() => {
-      const a = document.createElement('a');
-      a.href = fileUrl;
-      a.download = `ヒアリング記録_写真付き_${getVal('q2') || '匿名'}.html`;
-      a.click();
-      URL.revokeObjectURL(fileUrl);
-    }, 800);
-
-  } else {
-    // 写真なし：通常のmailto
-    const mailtoUrl =
-      'mailto:' + encodeURIComponent(to) +
-      '?subject=' + encodeURIComponent(subject) +
-      '&body='    + encodeURIComponent(text);
-    window.location.href = mailtoUrl;
-  }
-
+  const note    = '\n\n※ 写真・資料がある場合はメーラーから添付してください。';
+  window.location.href =
+    'mailto:' + encodeURIComponent(to) +
+    '?subject=' + encodeURIComponent(subject) +
+    '&body='    + encodeURIComponent(text + note);
   closeMailModal();
 }
 
@@ -573,30 +393,20 @@ function doSendMail() {
 // ============================================================
 function actionSavePDF() {
   const text     = buildText();
-  const photos   = capturedPhotos.filter(Boolean);
   const printWin = window.open('', '_blank');
   if (!printWin) {
     alert('ポップアップがブロックされました。ブラウザの設定でポップアップを許可してください。');
     return;
   }
-  const imgSection = photos.length > 0
-    ? '<hr><h2>📎 添付写真</h2>' + photos.map((p,i) =>
-        `<p><strong>写真${i+1}：${p.name}</strong></p>` +
-        `<img src="${p.dataUrl}" style="max-width:100%;border-radius:6px;" alt="${p.name}">`
-      ).join('<br>')
-    : '';
-
   printWin.document.write(`<!DOCTYPE html>
 <html lang="ja"><head><meta charset="UTF-8"><title>ヒアリング記録</title>
 <style>
   body { font-family:"Noto Sans JP",sans-serif; font-size:13px; padding:30px; color:#222; }
   pre  { white-space:pre-wrap; word-break:break-all; line-height:1.8; }
   h1   { font-size:16px; border-bottom:2px solid #4caf88; padding-bottom:6px; margin-bottom:16px; }
-  img  { page-break-inside: avoid; }
 </style></head><body>
 <h1>Medical Innovation Triage — ヒアリング記録</h1>
 <pre>${text.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</pre>
-${imgSection}
 </body></html>`);
   printWin.document.close();
   printWin.focus();
@@ -646,16 +456,8 @@ function resetForm() {
     const ta = w.querySelector('textarea'); if (ta) ta.value = '';
   });
   document.querySelectorAll('input[name="q10_type"]').forEach(r => r.checked = false);
-
-  // 写真リセット
-  capturedPhotos.length = 0;
-  const area = document.getElementById('photoPreviewArea');
-  if (area) area.innerHTML = '';
-  closeCamera();
-
   const charCount = document.getElementById('ideaCharCount');
   if (charCount) charCount.textContent = '0文字';
-
   startTime = null;
   showFormUI();
   document.getElementById('endScreen').classList.remove('active');
