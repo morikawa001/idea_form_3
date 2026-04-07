@@ -1,5 +1,5 @@
 // ============================================================
-//  MIT アイデア提案フォーム v3 — script.js
+//  MIT ヒアリングフォーム v3 — script.js
 // ============================================================
 
 let startTime = null;
@@ -8,8 +8,7 @@ let startTime = null;
 //  カメラ関連
 // ============================================================
 let cameraStream = null;
-// 撮影・選択された画像を保持（base64 または File URL）
-const capturedPhotos = []; // { dataUrl, name }
+const capturedPhotos = [];
 
 function openCamera() {
   const container = document.getElementById('cameraContainer');
@@ -58,7 +57,6 @@ function onFileSelect(event) {
     };
     reader.readAsDataURL(file);
   });
-  // 同じファイルを再選択できるようリセット
   event.target.value = '';
 }
 
@@ -116,11 +114,11 @@ let currentStep = 0;
 const TOTAL_STEPS = 5;
 
 const NAV_MESSAGES = [
-  'まず<strong>あなたの情報</strong>を入力してください（すべて任意です）。',
-  '<strong>誰が、どのような場面で困っているか</strong>を教えてください。日常の業務で感じていることをそのままで構いません。',
-  '<strong>現在どのように対応しているか</strong>を教えてください。「とりあえずこうしている」という工夫も大切な情報です。',
-  '<strong>あなたのアイデア</strong>を教えてください。思いついたことをそのままで構いません。完成していなくても歓迎です。',
-  'もう少しで完了です。<strong>このアイデアで何が変わりそうか</strong>を教えてください。'
+  'まず<strong>発案者の基本情報</strong>を確認・入力してください（すべて任意）。',
+  '<strong>誰が、どのような場面で困っているか</strong>を発案者から聞き取り、記録してください。',
+  '<strong>現在どのように対応しているか</strong>を発案者から聞き取り、記録してください。',
+  '<strong>発案者のアイデア</strong>を聞き取り、できるだけ原文に忠実に記録してください。',
+  'もう少しで完了です。<strong>このアイデアで何が変わりそうか</strong>を発案者とともに確認してください。'
 ];
 
 function showStep(step) {
@@ -145,33 +143,14 @@ function showStep(step) {
 }
 
 // ============================================================
-//  バリデーション（STEP1は全任意、STEP4はq11削除）
+//  バリデーション（すべて任意）
 // ============================================================
 const STEP_REQUIRED = [
-  // Step 0: 基本情報 — すべて任意
   () => [],
-  // Step 1: 困りごと
-  () => {
-    const errs = [];
-    if (!getRadio('q4'))              errs.push('・困っている対象を選択してください');
-    if (!getRadio('q5'))              errs.push('・発生頻度を選択してください');
-    if (getChecks('q6').length === 0) errs.push('・影響の種類を1つ以上選択してください');
-    return errs;
-  },
-  // Step 2: 今の対応 — 任意
   () => [],
-  // Step 3: アイデア（q11削除済み）
-  () => {
-    const errs = [];
-    if (!getVal('q10')) errs.push('・アイデアを入力してください');
-    return errs;
-  },
-  // Step 4: 期待効果
-  () => {
-    const errs = [];
-    if (getChecks('q12').length === 0) errs.push('・期待できる改善を1つ以上選択してください');
-    return errs;
-  }
+  () => [],
+  () => [],
+  () => []
 ];
 
 function goNext(step) {
@@ -279,7 +258,7 @@ function toggleOtherInputRadio(radioId, wrapId) {
 }
 
 // ============================================================
-//  プログレスバー（11項目：q11削除、基本情報任意）
+//  プログレスバー
 // ============================================================
 function updateProgress() {
   if (!startTime) startTime = new Date();
@@ -296,7 +275,7 @@ function updateProgress() {
   const label = document.getElementById('progress-label');
   const pctEl = document.getElementById('progress-pct');
   const fill  = document.getElementById('progressFill');
-  if (label) label.textContent = filled === 0 ? '入力を始めましょう' : `${filled} / ${items.length} 項目入力済み`;
+  if (label) label.textContent = filled === 0 ? 'ヒアリングを開始してください' : `${filled} / ${items.length} 項目記録済み`;
   if (pctEl) pctEl.textContent = `${pct}%`;
   if (fill)  fill.style.width  = `${pct}%`;
 }
@@ -308,7 +287,7 @@ document.addEventListener('input',  updateProgress);
 // ============================================================
 function onSelectChange(id) {
   const v = getVal(id);
-  if (v) showFeedback(id, `✅ 「${v}」で登録します`, 'good');
+  if (v) showFeedback(id, `✅ 「${v}」で記録します`, 'good');
   else   hideFeedback(id);
 }
 function onTextInput(id) {
@@ -318,14 +297,14 @@ function onTextInput(id) {
     showFeedback(id, 'フルネームでご記入ください', 'warn');
     return;
   }
-  showFeedback(id, `✅ ${v} さん、ありがとうございます`, 'good');
+  showFeedback(id, `✅ ${v} さんの情報を記録します`, 'good');
 }
 function onEmailInput(id) {
   const v = getVal(id);
   if (!v) { hideFeedback(id); return; }
   const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
-  if (isEmail) showFeedback(id, `✅ 「${v}」を登録しました`, 'good');
-  else         showFeedback(id, '⚠️ メールアドレスの形式を確認してください（例：yamada@hospital.jp）', 'warn');
+  if (isEmail) showFeedback(id, `✅ 「${v}」を記録しました`, 'good');
+  else         showFeedback(id, '⚠️ メールアドレスの形式を確認してください', 'warn');
 }
 function onRadioChange(groupId) {
   highlightSelected(groupId);
@@ -343,7 +322,7 @@ function onCheckChange(groupId) {
 function onTextareaInput(id) {
   updateProgress();
   const v = getVal(id);
-  if (v.length >= 10) showFeedback(id, '✅ 具体的な情報が伝わりやすくなります', 'tip');
+  if (v.length >= 10) showFeedback(id, '✅ 具体的な情報が記録されています', 'tip');
   else hideFeedback(id);
 }
 function onIdeaInput() {
@@ -352,16 +331,16 @@ function onIdeaInput() {
   const count = document.getElementById('ideaCharCount');
   if (count) count.textContent = `${v.length}文字`;
   if (v.length >= 20) {
-    showFeedback('q10', '✅ しっかりと伝わります。このまま続けてください。', 'tip');
+    showFeedback('q10', '✅ 内容が記録されています。', 'tip');
   } else if (v.length >= 5) {
-    showFeedback('q10', 'もう少し具体的に書いてもらえると、実現に向けやすくなります', 'warn');
+    showFeedback('q10', 'さらに詳しく聞き取り、記録してください', 'warn');
   } else {
     hideFeedback('q10');
   }
 }
 
 // ============================================================
-//  テキスト生成（q11削除・アンケート削除）
+//  テキスト生成
 // ============================================================
 function buildText() {
   const q6v  = getQ6Values();
@@ -376,10 +355,10 @@ function buildText() {
 
   const lines = [
     '━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
-    '　医療をよくするアイデア提案フォーム　',
+    '　Medical Innovation Triage — ヒアリング記録　',
     '━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
     '',
-    '【基本情報】',
+    '【発案者情報】',
     `所属部署　　　：${getVal('q1') || '（未記入）'}`,
     `氏　　名　　　：${getVal('q2') || '（未記入）'}`,
     `メールアドレス：${getVal('q2b') || '（未記入）'}`,
@@ -409,8 +388,8 @@ function buildText() {
     `添付写真・資料：${capturedPhotos.length > 0 ? capturedPhotos.map(p => p.name).join(', ') : 'なし'}`,
     '',
     '━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
-    `送信日時　　　　：${endTime.toLocaleString('ja-JP')}`,
-    `レポート作成時間：${elapsed}`,
+    `記録日時　　　　：${endTime.toLocaleString('ja-JP')}`,
+    `ヒアリング所要時間：${elapsed}`,
     '━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
   ];
   return lines.join('\n');
@@ -420,11 +399,6 @@ function buildText() {
 //  プレビュー
 // ============================================================
 function showPreview() {
-  const errs = STEP_REQUIRED[4]();
-  if (errs.length > 0) {
-    alert('入力内容を確認してください：\n\n' + errs.join('\n'));
-    return;
-  }
   document.getElementById('previewText').textContent = buildText();
   const idea     = getVal('q10');
   const who      = getQ4Value();
@@ -479,7 +453,7 @@ function fallbackCopy(text) {
 }
 
 // ============================================================
-//  アクション：フォルダに保存（テキストファイルダウンロード）
+//  アクション：フォルダに保存
 // ============================================================
 function actionSaveToFolder() {
   const text = buildText();
@@ -487,7 +461,7 @@ function actionSaveToFolder() {
   const now  = new Date();
   const ts   = now.toISOString().replace(/[-:T.Z]/g,'').slice(0,14);
   const name = getVal('q2') || '匿名';
-  const filename = `アイデア提案_${name}_${ts}.txt`;
+  const filename = `ヒアリング記録_${name}_${ts}.txt`;
   const url  = URL.createObjectURL(blob);
   const a    = document.createElement('a');
   a.href     = url;
@@ -514,7 +488,7 @@ function doSendMail() {
   const text    = buildText();
   const name    = getVal('q2') || '（未記入）';
   const dept    = getVal('q1') || '';
-  const subject = `${name}${dept ? '【' + dept + '】' : ''}のアイデア提案`;
+  const subject = `ヒアリング記録：${name}${dept ? '【' + dept + '】' : ''}のアイデア提案`;
   const mailtoUrl =
     'mailto:' + encodeURIComponent(to) +
     '?subject=' + encodeURIComponent(subject) +
@@ -527,8 +501,6 @@ function doSendMail() {
 //  アクション：PDFで保存
 // ============================================================
 function actionSavePDF() {
-  // 印刷ダイアログを使ってPDF保存 or 印刷
-  // プレビューテキストを印刷用ページに渡す
   const text = buildText();
   const printWin = window.open('', '_blank');
   if (!printWin) {
@@ -539,7 +511,7 @@ function actionSavePDF() {
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>アイデア提案</title>
+<title>ヒアリング記録</title>
 <style>
   body { font-family: "Noto Sans JP", sans-serif; font-size: 13px; padding: 30px; color: #222; }
   pre  { white-space: pre-wrap; word-break: break-all; line-height: 1.8; }
@@ -547,7 +519,7 @@ function actionSavePDF() {
 </style>
 </head>
 <body>
-<h1>Medical Innovation Triage — アイデア提案</h1>
+<h1>Medical Innovation Triage — ヒアリング記録</h1>
 <pre>${text.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</pre>
 </body>
 </html>`);
@@ -557,41 +529,50 @@ function actionSavePDF() {
 }
 
 // ============================================================
-//  アクション：分析（medical_device_idea_2 に内容を渡す）
+//  アクション：分析（medical_device_idea_2 のテキストエリアに自動貼り付け）
 // ============================================================
 function actionAnalyze() {
   const text = buildText();
   const targetUrl = 'https://morikawa001.github.io/medical_device_idea_2/';
-  // テキストをsessionStorageに一時保存し、対象ページを開く
-  try {
-    sessionStorage.setItem('mit_idea_text', text);
-  } catch(e) {}
-  // URLにハッシュとしてエンコードして渡す（sessionStorageが使えない場合の補完）
-  const encoded = encodeURIComponent(text);
   // 対象ページを新しいタブで開く
   const win = window.open(targetUrl, '_blank');
-  // 対象ページがロードされたらテキストを貼り付けるメッセージを送信
   if (win) {
+    // ページのロード完了を待ってから postMessage を送信
+    let attempts = 0;
+    const maxAttempts = 20; // 最大10秒待機（500ms × 20回）
     const timer = setInterval(() => {
+      attempts++;
       try {
-        win.postMessage({ type: 'mit_idea_paste', text: text }, targetUrl);
-      } catch(e) {}
-    }, 800);
-    // 5秒後にタイマー停止
-    setTimeout(() => clearInterval(timer), 5000);
+        win.postMessage({ type: 'mit_idea_paste', text: text }, '*');
+      } catch (e) {
+        // クロスオリジンエラーは無視
+      }
+      if (attempts >= maxAttempts) {
+        clearInterval(timer);
+      }
+    }, 500);
+  } else {
+    // ポップアップブロック時はクリップボードにコピーして誘導
+    actionCopy();
+    alert('ポップアップがブロックされました。\n内容をクリップボードにコピーしました。\n分析ページを手動で開いて貼り付けてください。');
   }
 }
 
-// 外部ページからのpostMessageを受信して貼り付けるリスナー（このページが受信する場合）
-window.addEventListener('message', (event) => {
-  if (event.data && event.data.type === 'mit_idea_paste') {
-    // テキストを入力欄に反映するハンドラ（このページ上で貼り付けが必要な場合）
-    const ta = document.querySelector('textarea') || document.getElementById('q10');
-    if (ta && event.data.text) {
-      ta.value = event.data.text;
-    }
+// ============================================================
+//  アクション：終了
+// ============================================================
+function actionEnd() {
+  if (confirm('ヒアリングを終了しますか？\n入力内容は消去されます。')) {
+    closePreviewModal();
+    // タブ/ウィンドウを閉じる（スクリプトで開かれた場合のみ動作）
+    const closed = window.close();
+    // 閉じられない場合は終了画面へ遷移
+    setTimeout(() => {
+      resetForm();
+      showEndScreen();
+    }, 300);
   }
-});
+}
 
 // ============================================================
 //  リセット・再提案

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MIT アイデア提案フォーム</title>
+  <title>MIT ヒアリングフォーム</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
@@ -22,11 +22,8 @@
       </svg>
       <div>
         <div class="brand-title">Medical Innovation Triage</div>
-        <div class="brand-sub">現場のアイデアを形にする</div>
+        <div class="brand-sub">現場ヒアリング支援ツール</div>
       </div>
-    </div>
-    <div class="header-desc">
-      「こうだったら助かる」と感じたことを、そのまま教えてください。
     </div>
   </div>
 </header>
@@ -64,7 +61,7 @@
 <!-- ===== プログレスバー ===== -->
 <div class="progress-wrap" id="progressWrap">
   <div class="progress-text">
-    <span id="progress-label">入力を始めましょう</span>
+    <span id="progress-label">ヒアリングを開始してください</span>
     <span id="progress-pct">0%</span>
   </div>
   <div class="progress-track">
@@ -76,7 +73,7 @@
 <div class="guide-bar" id="navigator">
   <div class="guide-avatar">💬</div>
   <div class="guide-text" id="navBubble">
-    こんにちは。まず<strong>あなたの情報</strong>を入力してください。
+    まず<strong>発案者の基本情報</strong>を確認・入力してください（すべて任意）。
   </div>
 </div>
 
@@ -92,7 +89,7 @@
       <div class="step-num">1 / 5</div>
       <h2 class="step-title">基本情報</h2>
     </div>
-    <p class="step-note">すべての項目は任意です。入力しなくても次へ進めます。</p>
+    <p class="step-note">すべての項目は任意です。未入力でも次へ進めます。</p>
 
     <div class="field-block">
       <label class="field-label" for="q1">所属部署 <span class="opt-badge">任意</span></label>
@@ -122,7 +119,7 @@
     </div>
 
     <div class="field-block">
-      <label class="field-label" for="q2b">返信先メールアドレス <span class="opt-badge">任意</span></label>
+      <label class="field-label" for="q2b">連絡先メールアドレス <span class="opt-badge">任意</span></label>
       <input type="email" id="q2b" placeholder="hanako@hospital.jp" oninput="onEmailInput('q2b')" autocomplete="email" inputmode="email">
       <div class="field-fb" id="fb-q2b"></div>
     </div>
@@ -146,7 +143,7 @@
 
     <div class="step-nav">
       <button type="button" class="btn-next" onclick="goNext(0)">
-        次へ：困りごとを教える
+        次へ：困りごとを確認する
         <svg viewBox="0 0 20 20" width="18" fill="currentColor"><path d="M7 4l6 6-6 6"/></svg>
       </button>
     </div>
@@ -163,7 +160,7 @@
 
     <!-- Q4 -->
     <div class="field-block">
-      <label class="field-label">主に困っているのは？ <span class="req-badge">必須</span></label>
+      <label class="field-label">主に困っているのは？ <span class="opt-badge">任意</span></label>
       <div class="card-radio-group" id="q4">
         <label class="card-radio card-radio--wide"><input type="radio" name="q4" value="患者さん" onchange="onRadioChange('q4'); toggleOtherInputRadio('q4-other-check','q4-other-wrap')"><span>患者さん</span></label>
         <label class="card-radio card-radio--wide"><input type="radio" name="q4" value="自分自身・自部署のスタッフ" onchange="onRadioChange('q4'); toggleOtherInputRadio('q4-other-check','q4-other-wrap')"><span>自分<br>自部署のスタッフ</span></label>
@@ -179,7 +176,7 @@
 
     <!-- Q5 -->
     <div class="field-block">
-      <label class="field-label">発生頻度 <span class="req-badge">必須</span></label>
+      <label class="field-label">発生頻度 <span class="opt-badge">任意</span></label>
       <div class="freq-group" id="q5">
         <label class="freq-card"><input type="radio" name="q5" value="毎日複数回" onchange="onRadioChange('q5')">
           <div class="freq-dot freq-dot--5"></div><span>毎日複数回</span></label>
@@ -197,7 +194,7 @@
 
     <!-- Q6 -->
     <div class="field-block">
-      <label class="field-label">影響・リスク <span class="req-badge">必須</span> <span class="multi-tag">複数選択可</span></label>
+      <label class="field-label">影響・リスク <span class="opt-badge">任意</span> <span class="multi-tag">複数選択可</span></label>
       <div class="card-check-group" id="q6">
         <label class="card-check"><input type="checkbox" name="q6" value="医療安全の低下（インシデントリスクなど）" onchange="onCheckChange('q6')"><span>⚠️ 医療安全への影響</span></label>
         <label class="card-check"><input type="checkbox" name="q6" value="業務時間の圧迫（残業・無駄な転記作業など）" onchange="onCheckChange('q6')"><span>⏱️ 業務時間の圧迫</span></label>
@@ -207,7 +204,7 @@
         <label class="card-check"><input type="checkbox" name="q6" value="その他" id="q6-other-check" onchange="onCheckChange('q6'); toggleOtherInput('q6-other-check','q6-other-wrap')"><span>📝 その他</span></label>
       </div>
       <div class="other-input-wrap" id="q6-other-wrap">
-        <textarea id="q6-other-text" placeholder="具体的にどのような影響があるか教えてください" oninput="updateProgress()"></textarea>
+        <textarea id="q6-other-text" placeholder="具体的にどのような影響があるか記録してください" oninput="updateProgress()"></textarea>
       </div>
       <div class="field-fb" id="fb-q6"></div>
     </div>
@@ -216,7 +213,7 @@
     <div class="field-block">
       <label class="field-label" for="q7">具体的な場面 <span class="opt-badge">任意</span></label>
       <textarea id="q7"
-        placeholder="いつ・どこで・何が起きるか"
+        placeholder="いつ・どこで・何が起きるか（発案者の言葉をそのまま記録）"
         oninput="onTextareaInput('q7')"></textarea>
       <div class="field-fb" id="fb-q7"></div>
     </div>
@@ -227,7 +224,7 @@
         戻る
       </button>
       <button type="button" class="btn-next" onclick="goNext(1)">
-        次へ：今の対応を教える
+        次へ：今の対応を確認する
         <svg viewBox="0 0 20 20" width="18" fill="currentColor"><path d="M7 4l6 6-6 6"/></svg>
       </button>
     </div>
@@ -246,7 +243,7 @@
     <div class="field-block">
       <label class="field-label" for="q8">今の対応方法 <span class="opt-badge">任意</span></label>
       <textarea id="q8"
-        placeholder="例：テープでまとめる、常に付き添う"
+        placeholder="例：テープでまとめる、常に付き添う（発案者の言葉をそのまま記録）"
         oninput="onTextareaInput('q8')"></textarea>
       <div class="field-fb" id="fb-q8"></div>
     </div>
@@ -263,7 +260,7 @@
         <label class="card-check"><input type="checkbox" name="q9" value="その他" id="q9-other-check" onchange="onCheckChange('q9'); toggleOtherInput('q9-other-check','q9-other-wrap')"><span>📝 その他</span></label>
       </div>
       <div class="other-input-wrap" id="q9-other-wrap">
-        <textarea id="q9-other-text" placeholder="その他の問題点を自由に書いてください" oninput="updateProgress()"></textarea>
+        <textarea id="q9-other-text" placeholder="その他の問題点を記録してください" oninput="updateProgress()"></textarea>
       </div>
       <div class="field-fb" id="fb-q9"></div>
     </div>
@@ -274,32 +271,32 @@
         戻る
       </button>
       <button type="button" class="btn-next" onclick="goNext(2)">
-        次へ：アイデアを教える
+        次へ：アイデアを記録する
         <svg viewBox="0 0 20 20" width="18" fill="currentColor"><path d="M7 4l6 6-6 6"/></svg>
       </button>
     </div>
   </section>
 
   <!-- ==============================
-       STEP 4: アイデア (I) ※担当部署振り分け削除
+       STEP 4: アイデア (I)
   =============================== -->
   <section class="step-section" id="step3">
     <div class="step-header">
       <div class="step-num">4 / 5</div>
-      <div class="pico-label-large"><span class="pico-tag-large">I</span> あなたのアイデア</div>
+      <div class="pico-label-large"><span class="pico-tag-large">I</span> 発案者のアイデア</div>
     </div>
 
     <!-- Q10 メイン自由記述 -->
     <div class="field-block idea-main-block">
-      <label class="field-label" for="q10">アイデア・ひらめき <span class="req-badge">必須</span></label>
+      <label class="field-label" for="q10">アイデア・ひらめき <span class="opt-badge">任意</span></label>
       <textarea id="q10" class="idea-textarea" rows="5"
-        placeholder="小さなことでもOK。思いついたことをそのまま書いてください。"
-        oninput="onIdeaInput()" required></textarea>
+        placeholder="発案者の言葉をそのまま記録してください。小さなことでもOK。"
+        oninput="onIdeaInput()"></textarea>
       <div class="idea-char-count" id="ideaCharCount">0文字</div>
       <div class="field-fb" id="fb-q10"></div>
     </div>
 
-    <!-- アイデアの形（常時表示） -->
+    <!-- アイデアの形 -->
     <div class="field-block">
       <label class="field-label">解決のアプローチ <span class="multi-tag">複数選択可・任意</span></label>
       <div class="icon-check-group" id="q10_type">
@@ -350,7 +347,6 @@
         placeholder="例：滅菌が必要・コストが高いかも"
         oninput="updateProgress()"></textarea>
     </div>
-    <!-- ※担当部門への振り分け（q11）は削除 -->
 
     <div class="step-nav">
       <button type="button" class="btn-prev" onclick="goPrev(3)">
@@ -375,7 +371,7 @@
 
     <!-- Q12 -->
     <div class="field-block">
-      <label class="field-label">期待できる改善 <span class="req-badge">必須</span> <span class="multi-tag">複数選択可</span></label>
+      <label class="field-label">期待できる改善 <span class="opt-badge">任意</span> <span class="multi-tag">複数選択可</span></label>
       <div class="card-check-group" id="q12">
         <label class="card-check"><input type="checkbox" name="q12" value="インシデント件数の減少（医療安全の向上）" onchange="onCheckChange('q12')"><span>🛡️ 医療安全の向上</span></label>
         <label class="card-check"><input type="checkbox" name="q12" value="業務時間・記録時間の短縮" onchange="onCheckChange('q12')"><span>⏱️ 業務・記録時間の短縮</span></label>
@@ -385,7 +381,7 @@
         <label class="card-check"><input type="checkbox" name="q12" value="その他" id="q12-other-check" onchange="onCheckChange('q12'); toggleOtherInput('q12-other-check','q12-other-wrap')"><span>📝 その他</span></label>
       </div>
       <div class="other-input-wrap" id="q12-other-wrap">
-        <textarea id="q12-other-text" placeholder="どのような改善が期待できるか、具体的に教えてください" oninput="updateProgress()"></textarea>
+        <textarea id="q12-other-text" placeholder="どのような改善が期待できるか記録してください" oninput="updateProgress()"></textarea>
       </div>
       <div class="field-fb" id="fb-q12"></div>
     </div>
@@ -404,15 +400,12 @@
       <label class="field-label">写真・資料があれば <span class="opt-badge">任意</span></label>
       <p class="field-note">デバイスのカメラで撮影するか、既存のファイル（JPG・PNG・PDF）を選択できます。</p>
       <div class="photo-upload-area">
-        <!-- カメラ撮影ボタン -->
         <button type="button" class="btn-camera" onclick="openCamera()">📷 カメラで撮影</button>
-        <!-- ファイル選択ボタン -->
         <label class="btn-file-label">
           📁 ファイルを選択
           <input type="file" id="q14_file" accept="image/*,application/pdf" multiple onchange="onFileSelect(event)" style="display:none;">
         </label>
       </div>
-      <!-- カメラビューファインダー（モバイル向け） -->
       <div id="cameraContainer" style="display:none;" class="camera-container">
         <video id="cameraVideo" autoplay playsinline></video>
         <div class="camera-controls">
@@ -420,7 +413,6 @@
           <button type="button" class="btn-camera-cancel" onclick="closeCamera()">キャンセル</button>
         </div>
       </div>
-      <!-- プレビュー表示エリア -->
       <div id="photoPreviewArea" class="photo-preview-area"></div>
       <canvas id="photoCanvas" style="display:none;"></canvas>
     </div>
@@ -437,7 +429,6 @@
 
     <div class="sub-action-row">
       <button type="button" class="btn-secondary" onclick="resetForm()">🔄 最初からやり直す</button>
-      <button type="button" class="btn-secondary" onclick="showEndScreen()">✅ 終了する</button>
     </div>
   </section>
 
@@ -448,13 +439,13 @@
 <div class="end-screen" id="endScreen">
   <div class="end-inner">
     <div class="end-icon">🌿</div>
-    <h2 class="end-title">ありがとうございました</h2>
+    <h2 class="end-title">ヒアリング完了</h2>
     <p class="end-body">
-      現場からの声が<strong>医療をよりよくする第一歩</strong>になります。<br>
-      担当部署で内容を確認し、<strong>検討結果をメールでご連絡</strong>します。
+      記録内容を保存・共有してください。<br>
+      <strong>「分析」から AI による詳細分析</strong>も行えます。
     </p>
     <button type="button" class="btn-restart" onclick="restartFromEnd()">
-      💡 新しいアイデアを提案する
+      💡 新しいヒアリングを開始する
     </button>
   </div>
 </div>
@@ -464,23 +455,24 @@
 ====================================================== -->
 <div class="modal-overlay" id="previewModal">
   <div class="modal">
-    <h2>📋 入力内容の確認</h2>
-    <p style="font-size:0.85em;color:#666;margin-bottom:12px;">以下の内容を確認し、アクションを選択してください。</p>
+    <h2>📋 ヒアリング内容の確認</h2>
+    <p style="font-size:0.85em;color:#666;margin-bottom:12px;">記録内容を確認し、アクションを選択してください。</p>
     <pre id="previewText"></pre>
     <div id="picoBox" style="margin-top:14px; padding:14px; background:#edf7f2; border-radius:8px;
          font-size:0.83em; line-height:1.9; border-left:4px solid #4caf88; display:none;">
       <strong>🔬 自動まとめ：アイデア実現のためのたたき台（PICO）</strong><br>
-      <span style="font-size:0.82em;color:#555;">※ あなたの入力内容をもとに自動で整理しました。</span><br><br>
+      <span style="font-size:0.82em;color:#555;">※ 入力内容をもとに自動で整理しました。</span><br><br>
       <span id="picoContent"></span>
     </div>
 
     <!-- アクションボタン群 -->
     <div class="modal-action-grid">
-      <button class="btn-action btn-copy"   onclick="actionCopy()">📋 内容をコピー</button>
-      <button class="btn-action btn-save"   onclick="actionSaveToFolder()">💾 フォルダに保存</button>
-      <button class="btn-action btn-mail"   onclick="actionSendMail()">✉️ メールで送信</button>
-      <button class="btn-action btn-pdf"    onclick="actionSavePDF()">🖨️ PDFで保存</button>
+      <button class="btn-action btn-copy"    onclick="actionCopy()">📋 内容をコピー</button>
+      <button class="btn-action btn-save"    onclick="actionSaveToFolder()">💾 フォルダに保存</button>
+      <button class="btn-action btn-mail"    onclick="actionSendMail()">✉️ メールで送信</button>
+      <button class="btn-action btn-pdf"     onclick="actionSavePDF()">🖨️ PDFで保存</button>
       <button class="btn-action btn-analyze" onclick="actionAnalyze()">🔬 分析</button>
+      <button class="btn-action btn-end"     onclick="actionEnd()">🔚 終了</button>
     </div>
     <div class="modal-btn-row" style="margin-top:12px;">
       <button class="btn-close" onclick="closePreviewModal()">← 戻る</button>

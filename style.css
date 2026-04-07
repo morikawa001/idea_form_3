@@ -968,3 +968,6 @@ textarea { resize: vertical; min-height: 90px; }
   }
   .photo-thumb { width: 72px; height: 72px; }
 }
+
+/* ---- 終了ボタン ---- */
+.btn-end { background: #eceff1; color: #455a64; }
