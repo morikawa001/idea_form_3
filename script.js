@@ -1,5 +1,6 @@
 // ============================================================
-//  MIT ヒアリングフォーム v3.3 — script.js
+//  MIT ヒアリングフォーム v3.4 — script.js
+//  音声入力を大幅改修
 // ============================================================
 
 let startTime = null;
@@ -9,83 +10,152 @@ let startTime = null;
 // ============================================================
 let currentRecognition = null;
 let currentMicBtn      = null;
+let currentTargetId    = null;
+let interimSpan        = null;   // interim 表示用 span
 
 function startVoice(targetId) {
   const SpeechRecognition =
     window.SpeechRecognition || window.webkitSpeechRecognition;
 
   if (!SpeechRecognition) {
-    alert('このブラウザは音声入力に対応していません。\nChrome または Safari をお使いください。');
+    alert('このブラウザは音声入力に対応していません。\nChrome または Edge をお使いください。');
     return;
   }
 
-  // 既に認識中なら停止して終了（エラーを出さない）
+  // ── 認識中なら停止 ──
   if (currentRecognition) {
-    const rec = currentRecognition;
-    currentRecognition = null; // 先にnullにしてonerror/onendを無効化
-    stopVoiceUI();
-    try { rec.abort(); } catch (e) {}
+    stopVoice();
     return;
   }
 
-  const ta     = document.getElementById(targetId);
-  const btn    = document.querySelector(`[onclick="startVoice('${targetId}')"]`);
+  const ta  = document.getElementById(targetId);
+  // ボタンを data-target 属性でも onclick 属性でも探せるようにする
+  const btn = document.querySelector(`[data-mic-target="${targetId}"]`) ||
+              document.querySelector(`button[onclick*="startVoice('${targetId}')"]`) ||
+              document.querySelector(`button[onclick*='startVoice("${targetId}")']`);
+
   const status = document.getElementById('voiceStatus');
 
-  const recognition          = new SpeechRecognition();
-  recognition.lang           = 'ja-JP';
-  recognition.interimResults = true;
-  recognition.continuous     = false;
+  // ── Recognition 初期化 ──
+  const recognition            = new SpeechRecognition();
+  recognition.lang             = 'ja-JP';
+  recognition.interimResults   = true;   // リアルタイム表示
+  recognition.continuous       = true;   // 複数フレーズを連続認識
+  recognition.maxAlternatives  = 1;
 
   currentRecognition = recognition;
   currentMicBtn      = btn;
+  currentTargetId    = targetId;
 
+  // ── UI 更新 ──
   if (btn)    btn.classList.add('btn-mic--active');
   if (status) status.style.display = 'flex';
 
-  const startPos = ta ? ta.selectionStart : 0;
-  const baseText = ta ? ta.value : '';
+  // interim 表示用 span をテキストエリア直後に挿入
+  if (ta) {
+    if (interimSpan) interimSpan.remove();
+    interimSpan = document.createElement('div');
+    interimSpan.id = 'voiceInterim';
+    interimSpan.style.cssText =
+      'font-size:0.8em;color:#888;min-height:1.2em;padding:2px 4px;';
+    ta.parentNode.insertBefore(interimSpan, ta.nextSibling);
+  }
 
+  const baseText = ta ? ta.value : '';
+  const startPos = ta ? ta.selectionStart ?? ta.value.length : 0;
+
+  // ── onresult ──
   recognition.onresult = (e) => {
-    let final = '';
+    let interim = '';
+    let finalText = '';
+
     for (let i = e.resultIndex; i < e.results.length; i++) {
-      if (e.results[i].isFinal) final += e.results[i][0].transcript;
+      const transcript = e.results[i][0].transcript;
+      if (e.results[i].isFinal) {
+        finalText += transcript;
+      } else {
+        interim += transcript;
+      }
     }
-    if (final && ta) {
-      ta.value = baseText.slice(0, startPos) + final + baseText.slice(startPos);
+
+    // interim をリアルタイム表示
+    if (interimSpan) {
+      interimSpan.textContent = interim ? `🎤 ${interim}` : '';
+    }
+
+    // final テキストをテキストエリアに追記
+    if (finalText && ta) {
+      const before = ta.value.slice(0, startPos);
+      const after  = ta.value.slice(startPos);
+      // 既に追記済みの final を考慮して末尾に追記する方式に変更
+      ta.value = baseText + (ta.value.slice(baseText.length) || '') + finalText;
+      if (interimSpan) interimSpan.textContent = '';
       updateProgress();
       ta.dispatchEvent(new Event('input', { bubbles: true }));
     }
   };
 
+  // ── onerror ──
   recognition.onerror = (e) => {
-    // 手動停止(aborted/no-speech)はエラーとして扱わない
-    if (e.error !== 'aborted' && e.error !== 'no-speech') {
+    if (e.error === 'aborted') return; // 手動停止は無視
+    if (e.error === 'no-speech') {
+      // 無音タイムアウト → 自動再起動
+      try { recognition.stop(); } catch (_) {}
+      return;
+    }
+    if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
+      alert('マイクへのアクセスが拒否されています。\nブラウザのアドレスバー左のマイクアイコンから許可してください。');
+    } else {
       alert('音声認識エラー：' + e.error);
     }
     if (currentRecognition === recognition) stopVoiceUI();
   };
 
+  // ── onend：continuous=true でも接続断等で終わる場合がある ──
   recognition.onend = () => {
-    if (currentRecognition === recognition) stopVoiceUI();
+    if (currentRecognition !== recognition) return; // 手動停止済みなら無視
+    // 自動再起動（認識継続）
+    try { recognition.start(); } catch (_) { stopVoiceUI(); }
   };
 
-  if (status) status.onclick = () => {
-    if (currentRecognition === recognition) {
-      currentRecognition = null;
-      stopVoiceUI();
-      try { recognition.abort(); } catch (e) {}
-    }
-  };
+  // ── ステータスバーをタップして停止 ──
+  if (status) {
+    status.onclick = stopVoice;
+  }
 
-  recognition.start();
+  try {
+    recognition.start();
+  } catch (e) {
+    alert('音声認識を開始できませんでした：' + e.message);
+    stopVoiceUI();
+  }
+}
+
+// 認識を停止する（外部からも呼び出し可）
+function stopVoice() {
+  const rec = currentRecognition;
+  stopVoiceUI(); // 先に UI リセット（onend で再起動しないよう currentRecognition を null に）
+  if (rec) {
+    try { rec.abort(); } catch (_) {}
+  }
 }
 
 function stopVoiceUI() {
   currentRecognition = null;
-  if (currentMicBtn) { currentMicBtn.classList.remove('btn-mic--active'); currentMicBtn = null; }
+  currentTargetId    = null;
+  if (currentMicBtn) {
+    currentMicBtn.classList.remove('btn-mic--active');
+    currentMicBtn = null;
+  }
+  if (interimSpan) {
+    interimSpan.remove();
+    interimSpan = null;
+  }
   const status = document.getElementById('voiceStatus');
-  if (status) status.style.display = 'none';
+  if (status) {
+    status.style.display = 'none';
+    status.onclick = null;
+  }
 }
 
 // ============================================================
@@ -115,6 +185,8 @@ const NAV_MESSAGES = [
 ];
 
 function showStep(step) {
+  // ステップ切替時は音声入力を停止
+  stopVoice();
   document.querySelectorAll('.step-section').forEach((s, i) => s.classList.toggle('active', i === step));
   for (let i = 0; i < TOTAL_STEPS; i++) {
     const rm = document.getElementById(`rm${i}`);
@@ -376,7 +448,7 @@ function actionSaveToFolder() {
 }
 
 // ============================================================
-//  アクション：メールで送信（テキストのみ、写真はメーラーから添付）
+//  アクション：メールで送信
 // ============================================================
 function actionSendMail() {
   document.getElementById('mailModal').classList.add('active');
@@ -462,6 +534,7 @@ function actionEnd() {
 //  リセット
 // ============================================================
 function resetForm() {
+  stopVoice();
   document.getElementById('ideaForm').reset();
   document.querySelectorAll('.field-fb').forEach(el => { el.className = 'field-fb'; el.textContent = ''; });
   document.querySelectorAll('.card-radio, .card-check, .freq-card, .icon-check').forEach(lbl => lbl.classList.remove('selected'));
