@@ -19,9 +19,12 @@ function startVoice(targetId) {
     return;
   }
 
-  // 既に認識中なら停止
+  // 既に認識中なら停止して終了（エラーを出さない）
   if (currentRecognition) {
-    currentRecognition.stop();
+    const rec = currentRecognition;
+    currentRecognition = null; // 先にnullにしてonerror/onendを無効化
+    stopVoiceUI();
+    try { rec.abort(); } catch (e) {}
     return;
   }
 
@@ -56,13 +59,24 @@ function startVoice(targetId) {
   };
 
   recognition.onerror = (e) => {
-    if (e.error !== 'aborted') alert('音声認識エラー：' + e.error);
-    stopVoiceUI();
+    // 手動停止(aborted/no-speech)はエラーとして扱わない
+    if (e.error !== 'aborted' && e.error !== 'no-speech') {
+      alert('音声認識エラー：' + e.error);
+    }
+    if (currentRecognition === recognition) stopVoiceUI();
   };
 
-  recognition.onend = () => stopVoiceUI();
+  recognition.onend = () => {
+    if (currentRecognition === recognition) stopVoiceUI();
+  };
 
-  if (status) status.onclick = () => recognition.stop();
+  if (status) status.onclick = () => {
+    if (currentRecognition === recognition) {
+      currentRecognition = null;
+      stopVoiceUI();
+      try { recognition.abort(); } catch (e) {}
+    }
+  };
 
   recognition.start();
 }
