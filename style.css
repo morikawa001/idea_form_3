@@ -559,6 +559,30 @@ textarea { resize: vertical; min-height: 90px; }
 }
 .btn-secondary:hover { background: var(--green-pale); border-color: var(--green-mid); }
 
+/* 入力クリアボタン */
+.btn-clear-step {
+  background: var(--bg-card);
+  color: #7a5c52;
+  border: 1.5px solid #ddc9c4;
+  border-radius: var(--radius-sm);
+  padding: 10px 18px;
+  font-family: inherit;
+  font-size: 0.88em;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background var(--transition), border-color var(--transition), color var(--transition);
+}
+.btn-clear-step:hover  { background: #fdf0ed; border-color: #c0897a; color: #5a3a2e; }
+.btn-clear-step:active { transform: scale(.97); }
+
+/* ステップ5の sub-action-row：2ボタン並び */
+.sub-action-row--step5 {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
 /* ===== 終了画面 ===== */
 .end-screen {
   display: none; max-width: 680px; margin: 0 auto;
@@ -787,6 +811,8 @@ textarea { resize: vertical; min-height: 90px; }
   }
   .sub-action-row { flex-direction: column; gap: 8px; }
   .btn-secondary { width: 100%; text-align: center; }
+  .btn-clear-step { width: 100%; text-align: center; }
+  .sub-action-row--step5 { flex-direction: column; }
 
   /* モーダル */
   .modal, .survey-modal { padding: 18px 14px; border-radius: 12px; }
