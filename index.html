@@ -482,9 +482,15 @@
 <div class="modal-overlay" id="mailModal">
   <div class="modal modal--small">
     <h2>✉️ メールで送信</h2>
-    <p style="font-size:0.85em;color:#666;margin-bottom:12px;">送信先メールアドレスを入力してください。</p>
+    <div class="mail-default-info" id="mailDefaultInfo">
+      <span class="mail-default-label">📬 送信先（固定）：</span>
+      <span class="mail-default-addr" id="mailDefaultDisplay"></span>
+    </div>
+    <p style="font-size:0.85em;color:#666;margin:10px 0 6px;">追加の送信先があれば入力してください（任意）。</p>
     <input type="email" id="mailTo" placeholder="例：recipient@hospital.jp"
-      style="width:100%;padding:10px;border:1px solid #ccc;border-radius:6px;font-size:1em;box-sizing:border-box;">
+      style="width:100%;padding:10px;border:1px solid #ccc;border-radius:6px;font-size:1em;box-sizing:border-box;"
+      oninput="onMailToInput()">
+    <div id="mailToFb" style="font-size:0.82em;margin-top:4px;min-height:1.2em;"></div>
 
     <div class="modal-btn-row" style="margin-top:12px;">
       <button class="btn-mail" onclick="doSendMail()">送信する</button>
