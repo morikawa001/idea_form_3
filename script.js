@@ -4,7 +4,7 @@
 // ============================================================
 
 // デフォルト送信先（お好みのアドレスに変更してください）
-const DEFAULT_MAIL_TO = 'ns.morizo@gmail.com';
+const DEFAULT_MAIL_TO = 'admin@hospital.jp';
 
 let startTime = null;
 
@@ -588,6 +588,78 @@ function showEndScreen() {
 function restartFromEnd() {
   document.getElementById('endScreen').classList.remove('active');
   resetForm();
+}
+
+// ============================================================
+//  ステップ単位の入力クリア
+// ============================================================
+
+// 共通ヘルパー：ラジオグループをリセット
+function clearRadioGroup(name) {
+  document.querySelectorAll(`input[name="${name}"]`).forEach(r => r.checked = false);
+  document.querySelectorAll(`#${name} label`).forEach(l => l.classList.remove('selected'));
+}
+// 共通ヘルパー：チェックボックスグループをリセット
+function clearCheckGroup(name, otherCheckId, otherWrapId) {
+  document.querySelectorAll(`input[name="${name}"]`).forEach(c => c.checked = false);
+  document.querySelectorAll(`#${name} label, [id^="${name}"] label`).forEach(l => l.classList.remove('selected'));
+  if (otherWrapId) {
+    const wrap = document.getElementById(otherWrapId);
+    if (wrap) { wrap.classList.remove('show'); const ta = wrap.querySelector('textarea'); if (ta) ta.value = ''; }
+  }
+}
+// 共通ヘルパー：ラジオのother-wrapをリセット
+function clearRadioOtherWrap(wrapId) {
+  const wrap = document.getElementById(wrapId);
+  if (wrap) { wrap.classList.remove('show'); const ta = wrap.querySelector('textarea'); if (ta) ta.value = ''; }
+}
+// 共通ヘルパー：フィードバック一括非表示
+function clearFeedbacks(...ids) {
+  ids.forEach(id => hideFeedback(id));
+}
+
+function clearStep(step) {
+  if (!confirm('このステップの入力内容をクリアしますか？')) return;
+  switch (step) {
+    case 0: // 基本情報
+      document.getElementById('q1').value = '';
+      document.getElementById('q2').value = '';
+      document.getElementById('q2b').value = '';
+      clearRadioGroup('q3');
+      clearRadioOtherWrap('q3-other-wrap');
+      clearFeedbacks('q1', 'q2', 'q2b', 'q3');
+      break;
+    case 1: // 困りごと
+      clearRadioGroup('q4');
+      clearRadioOtherWrap('q4-other-wrap');
+      clearRadioGroup('q5');
+      clearCheckGroup('q6', 'q6-other-check', 'q6-other-wrap');
+      document.getElementById('q7').value = '';
+      clearFeedbacks('q4', 'q5', 'q6', 'q7');
+      break;
+    case 2: // 今の対応
+      document.getElementById('q8').value = '';
+      clearCheckGroup('q9', 'q9-other-check', 'q9-other-wrap');
+      clearFeedbacks('q8', 'q9');
+      break;
+    case 3: // アイデア
+      document.getElementById('q10').value = '';
+      const charCount = document.getElementById('ideaCharCount');
+      if (charCount) charCount.textContent = '0文字';
+      document.querySelectorAll('input[name="q10_type"]').forEach(c => c.checked = false);
+      document.querySelectorAll('#q10_type label').forEach(l => l.classList.remove('selected'));
+      document.getElementById('q10_detail').value = '';
+      document.getElementById('q10_ref').value = '';
+      document.getElementById('q10_concern').value = '';
+      clearFeedbacks('q10');
+      break;
+    case 4: // 期待効果
+      clearCheckGroup('q12', 'q12-other-check', 'q12-other-wrap');
+      document.getElementById('q13').value = '';
+      clearFeedbacks('q12', 'q13');
+      break;
+  }
+  updateProgress();
 }
 
 // ============================================================
