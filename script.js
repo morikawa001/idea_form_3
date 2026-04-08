@@ -1,7 +1,10 @@
 // ============================================================
-//  MIT ヒアリングフォーム v3.4 — script.js
+//  MIT ヒアリングフォーム v3.5 — script.js
 //  音声入力を大幅改修
 // ============================================================
+
+// デフォルト送信先（お好みのアドレスに変更してください）
+const DEFAULT_MAIL_TO = 'admin@hospital.jp';
 
 let startTime = null;
 
@@ -454,24 +457,46 @@ function actionSaveToFolder() {
 //  アクション：メールで送信
 // ============================================================
 function actionSendMail() {
+  // デフォルト送信先を画面に表示
+  const dispEl = document.getElementById('mailDefaultDisplay');
+  if (dispEl) dispEl.textContent = DEFAULT_MAIL_TO;
+  // 入力欄とフィードバックをリセット
+  const input = document.getElementById('mailTo');
+  if (input) input.value = '';
+  const fb = document.getElementById('mailToFb');
+  if (fb) { fb.textContent = ''; fb.style.color = ''; }
   document.getElementById('mailModal').classList.add('active');
 }
 function closeMailModal() {
   document.getElementById('mailModal').classList.remove('active');
 }
+function onMailToInput() {
+  const v  = document.getElementById('mailTo').value.trim();
+  const fb = document.getElementById('mailToFb');
+  if (!fb) return;
+  if (!v) { fb.textContent = ''; return; }
+  const ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+  fb.style.color = ok ? '#2e8b5f' : '#c0392b';
+  fb.textContent = ok ? `✅ 追加送信先：${v}` : '⚠️ メールアドレスの形式を確認してください';
+}
 function doSendMail() {
-  const to = document.getElementById('mailTo').value.trim();
-  if (!to || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)) {
-    alert('有効なメールアドレスを入力してください。');
+  const extra = document.getElementById('mailTo').value.trim();
+  // 追加送信先が入力されている場合は形式チェック
+  if (extra && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(extra)) {
+    alert('追加送信先のメールアドレスの形式を確認してください。');
     return;
   }
+  // 送信先を組み立てる：デフォルト + 追加
+  const toList = [DEFAULT_MAIL_TO];
+  if (extra) toList.push(extra);
+  const toStr  = toList.join(',');
   const text    = buildText();
   const name    = getVal('q2') || '（未記入）';
   const dept    = getVal('q1') || '';
   const subject = `ヒアリング記録：${name}${dept ? '【' + dept + '】' : ''}のアイデア提案`;
   const note    = '\n\n※ 写真・資料がある場合はメーラーから添付してください。';
   window.location.href =
-    'mailto:' + encodeURIComponent(to) +
+    'mailto:' + encodeURIComponent(toStr) +
     '?subject=' + encodeURIComponent(subject) +
     '&body='    + encodeURIComponent(text + note);
   closeMailModal();
@@ -564,6 +589,19 @@ function restartFromEnd() {
   document.getElementById('endScreen').classList.remove('active');
   resetForm();
 }
+
+// ============================================================
+//  ロードマップ クリックナビゲーション
+// ============================================================
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.roadmap-step').forEach(step => {
+    step.style.cursor = 'pointer';
+    step.addEventListener('click', () => {
+      const target = parseInt(step.getAttribute('data-step'), 10);
+      if (!isNaN(target)) showStep(target);
+    });
+  });
+});
 
 // ============================================================
 //  初期化
