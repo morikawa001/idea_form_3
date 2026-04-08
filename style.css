@@ -101,10 +101,13 @@ body {
 .roadmap-step {
   display: flex; flex-direction: column; align-items: center;
   gap: 4px; flex: 1; min-width: 52px;
-  cursor: default;
+  cursor: pointer;
   opacity: .45;
-  transition: opacity var(--transition);
+  transition: opacity var(--transition), transform var(--transition);
+  -webkit-tap-highlight-color: transparent;
 }
+.roadmap-step:hover   { opacity: .75; transform: translateY(-1px); }
+.roadmap-step:active  { transform: scale(.95); }
 .roadmap-step.active  { opacity: 1; }
 .roadmap-step.done    { opacity: .75; }
 .rm-icon {
@@ -611,9 +614,23 @@ textarea { resize: vertical; min-height: 90px; }
 }
 .modal-btn-row { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
 .btn-mail  { background: var(--green-mid); color: white; padding: 12px 20px; border: none; border-radius: 8px; font-family: inherit; font-size: .95em; font-weight: 700; cursor: pointer; }
-.btn-close { background: #b2c5ba; color: white; padding: 12px 20px; border: none; border-radius: 8px; font-family: inherit; font-size: .95em; font-weight: 700; cursor: pointer; }
+.btn-close { background: #6b8c7a; color: white; padding: 12px 20px; border: none; border-radius: 8px; font-family: inherit; font-size: .95em; font-weight: 700; cursor: pointer; }
 .btn-mail:hover  { background: var(--green-dark); }
-.btn-close:hover { opacity: .8; }
+.btn-close:hover { background: #4a6b58; }
+
+/* メールモーダル内のデフォルト送信先表示 */
+.mail-default-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--green-pale);
+  border: 1px solid var(--green-border);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  font-size: 0.88em;
+}
+.mail-default-label { color: var(--text-sub); font-weight: 500; white-space: nowrap; }
+.mail-default-addr  { color: var(--green-dark); font-weight: 700; word-break: break-all; }
 
 /* ===== アンケートモーダル ===== */
 .survey-modal-overlay {
@@ -779,6 +796,7 @@ textarea { resize: vertical; min-height: 90px; }
   .thank-body  { font-size: .86em; }
   .btn-mail, .btn-close { padding: 12px 16px; font-size: .88em; width: 100%; }
   .modal-btn-row { flex-direction: column; gap: 8px; }
+  .mail-default-info { flex-direction: column; align-items: flex-start; gap: 2px; }
   .end-inner { padding: 32px 18px; }
 }
 
