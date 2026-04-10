@@ -4,7 +4,7 @@
 // ============================================================
 
 // デフォルト送信先（お好みのアドレスに変更してください）
-const DEFAULT_MAIL_TO = 'admin@hospital.jp';
+const DEFAULT_MAIL_TO = 'ns.morizo@gmail.com';
 
 let startTime = null;
 
