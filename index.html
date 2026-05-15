@@ -43,12 +43,11 @@
     <div class="panel-main-text">
       <div class="panel-main-title">基本情報から聞く</div>
       <div class="panel-main-sub">発案者・所属などの背景を軽く確認します</div>
-      <!-- 基本情報の進捗 -->
       <div class="panel-main-progress" id="panelProgress0">0%</div>
     </div>
   </button>
 
-  <!-- 下：P / C / I / O を 2×2 + レポート で配置 -->
+  <!-- 下：P / C / I / O を 2×2 で配置 -->
   <div class="panel-grid">
     <button class="panel-item" data-step="1" type="button">
       <div class="panel-emoji">🔍</div>
@@ -56,7 +55,6 @@
         <span class="pico-tag">P</span> 困りごと
       </div>
       <div class="panel-desc">誰が・どんな場面で困っているか</div>
-      <!-- Pの進捗 -->
       <div class="panel-item-progress" id="panelProgress1">0%</div>
     </button>
 
@@ -66,7 +64,6 @@
         <span class="pico-tag">C</span> 今の対応
       </div>
       <div class="panel-desc">今どうやってしのいでいるか</div>
-      <!-- Cの進捗 -->
       <div class="panel-item-progress" id="panelProgress2">0%</div>
     </button>
 
@@ -76,7 +73,6 @@
         <span class="pico-tag">I</span> アイデア
       </div>
       <div class="panel-desc">発案者のひらめき・工夫</div>
-      <!-- Iの進捗 -->
       <div class="panel-item-progress" id="panelProgress3">0%</div>
     </button>
 
@@ -86,15 +82,7 @@
         <span class="pico-tag">O</span> 期待効果
       </div>
       <div class="panel-desc">このアイデアで何が変わりそうか</div>
-      <!-- Oの進捗 -->
       <div class="panel-item-progress" id="panelProgress4">0%</div>
-    </button>
-
-    <!-- 追加：レポート概要カード -->
-    <button class="panel-item panel-item--report" type="button" onclick="showReportView()">
-      <div class="panel-emoji">📄</div>
-      <div class="panel-label">レポート概要</div>
-      <div class="panel-desc">これまでの入力内容を一目で確認できます</div>
     </button>
   </div>
 
@@ -165,7 +153,9 @@
         <div class="step-num">1 / 5</div>
         <h2 class="step-title">基本情報</h2>
       </div>
-      <p class="step-note">すべての項目は任意です。未入力でも次へ進めます。</p>
+      <p class="step-note">
+        すべての項目は任意です。未入力でも次へ進めます。
+      </p>
 
       <div class="field-block">
         <label class="field-label" for="q1">
@@ -287,7 +277,8 @@
       <div class="step-header">
         <div class="step-num">2 / 5</div>
         <div class="pico-label-large">
-          <span class="pico-tag-large">P</span> 誰が、どんなことに困っているか
+          <span class="pico-tag-large">P</span>
+          誰が、どんなことに困っているか
         </div>
       </div>
 
@@ -502,7 +493,8 @@
       <div class="step-header">
         <div class="step-num">3 / 5</div>
         <div class="pico-label-large">
-          <span class="pico-tag-large">C</span> 今どうやって対応しているか
+          <span class="pico-tag-large">C</span>
+          今どうやって対応しているか
         </div>
       </div>
 
@@ -953,26 +945,6 @@
     </section>
 
   </form>
-
-  <!-- ===== レポート概要ビュー ===== -->
-  <section class="report-section" id="reportView">
-    <div class="report-header">
-      <div class="report-title">レポート概要</div>
-      <div class="report-sub">
-        これまでに入力された内容を、P / C / I / O の流れに沿って一覧できます。
-      </div>
-    </div>
-
-    <div class="report-body">
-      <pre id="reportSummary"></pre>
-    </div>
-
-    <div class="report-footer">
-      <button type="button" class="btn-prev" onclick="hideReportView()">
-        入力画面に戻る
-      </button>
-    </div>
-  </section>
 </main>
 
 <!-- ===== プレビュー用モーダル ===== -->
