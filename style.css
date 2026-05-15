@@ -1134,7 +1134,7 @@ textarea { resize: vertical; min-height: 90px; }
 }
 
 /* ============================================================
-   中央放射状メニュー（さらに余裕をもたせた版）
+   中央放射状メニュー（ボタンが絶対に重ならない配置）
 ============================================================ */
 
 .radial-menu-wrap {
@@ -1146,10 +1146,10 @@ textarea { resize: vertical; min-height: 90px; }
 
 .radial-menu {
   position: relative;
-  width: 380px;   /* 340 → 380 に拡大 */
-  height: 380px;
+  width: 420px;   /* 十分広いキャンバス */
+  height: 260px;
   margin: 0 auto;
-  border-radius: 50%;
+  border-radius: 24px;
   background: radial-gradient(circle at 50% 50%, #ffffff 0, #f4faf7 45%, #e0f3eb 100%);
   box-shadow: 0 8px 24px rgba(0,0,0,.08);
 }
@@ -1160,8 +1160,8 @@ textarea { resize: vertical; min-height: 90px; }
   left: 50%;
   top: 50%;
   transform: translate(-50%,-50%);
-  width: 120px;   /* 130 → 120 に少しだけ縮小 */
-  height: 120px;
+  width: 140px;
+  height: 140px;
   border-radius: 50%;
   border: 2px solid var(--green-mid);
   background: var(--green-pale);
@@ -1177,10 +1177,10 @@ textarea { resize: vertical; min-height: 90px; }
   transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
 }
 .radial-center-icon {
-  font-size: 1.8em;
+  font-size: 1.9em;
 }
 .radial-center-label {
-  font-size: 0.90em;
+  font-size: 0.92em;
   font-weight: 700;
   white-space: nowrap;
 }
@@ -1194,9 +1194,10 @@ textarea { resize: vertical; min-height: 90px; }
 }
 
 /* 放射状ボタン（P / C / I / O） */
+/* 4 つを上下 2 行 × 左右 2 列に配置して、絶対に重ならないようにする */
 .radial-item {
   position: absolute;
-  width: 170px;   /* 160 → 170 に拡大 */
+  width: 160px;
   height: 64px;
   border-radius: 999px;
   border: 2px solid var(--green-border);
@@ -1205,14 +1206,14 @@ textarea { resize: vertical; min-height: 90px; }
   align-items: center;
   justify-content: center;
   gap: 6px;
-  padding: 8px 16px;
+  padding: 8px 14px;
   font-family: inherit;
-  font-size: 0.86em;
+  font-size: 0.84em;
   color: var(--text-sub);
   cursor: pointer;
   box-shadow: 0 2px 8px rgba(0,0,0,.08);
   transition: transform .18s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease;
-  white-space: nowrap;   /* 途中で改行させない */
+  white-space: nowrap;
 }
 .radial-item .radial-emoji {
   font-size: 1.3em;
@@ -1226,26 +1227,22 @@ textarea { resize: vertical; min-height: 90px; }
   font-size: 0.72em;
 }
 
-/* 位置：円のかなり外側に寄せる */
-.radial-item-top {
-  left: 50%;
-  top: 16px;                   /* 上端から少し離す */
-  transform: translateX(-50%);
+/* 位置指定：上段左右 / 下段左右（中央の円の対角線の外側に置く） */
+.radial-item-top {      /* P 困りごと（左上） */
+  left: 12%;
+  top: 16px;
 }
-.radial-item-right {
-  top: 50%;
-  right: 16px;                 /* 右端から少し離す */
-  transform: translateY(-50%);
+.radial-item-right {    /* C 今の対応（右上） */
+  right: 12%;
+  top: 16px;
 }
-.radial-item-bottom {
-  left: 50%;
-  bottom: 16px;                /* 下端から少し離す */
-  transform: translateX(-50%);
+.radial-item-bottom {   /* I アイデア（右下） */
+  right: 12%;
+  bottom: 16px;
 }
-.radial-item-left {
-  top: 50%;
-  left: 16px;                  /* 左端から少し離す */
-  transform: translateY(-50%);
+.radial-item-left {     /* O 期待効果（左下） */
+  left: 12%;
+  bottom: 16px;
 }
 
 .radial-item:hover {
@@ -1268,17 +1265,26 @@ textarea { resize: vertical; min-height: 90px; }
 /* スマホ向け（幅が狭い場合） */
 @media (max-width: 480px) {
   .radial-menu {
-    width: 300px;
-    height: 300px;
+    width: 100%;
+    max-width: 340px;
+    height: 260px;
   }
   .radial-center {
-    width: 110px;
-    height: 110px;
+    width: 120px;
+    height: 120px;
   }
   .radial-item {
-    width: 150px;
+    width: 140px;
     height: 60px;
     font-size: 0.80em;
+  }
+  .radial-item-top,
+  .radial-item-right {
+    top: 12px;
+  }
+  .radial-item-bottom,
+  .radial-item-left {
+    bottom: 12px;
   }
 }
 
