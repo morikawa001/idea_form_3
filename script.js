@@ -1,12 +1,12 @@
 // ============================================================
-//  MIT ヒアリングフォーム v3.6 — script.js（放射状メニュー対応）
+// MIT ヒアリングフォーム v3.6 — script.js（パズルメニュー対応）
 // ============================================================
 
 const DEFAULT_MAIL_TO = 'ns.morizo@gmail.com';
 let startTime = null;
 
 // ============================================================
-//  音声入力（Web Speech API）
+// 音声入力（Web Speech API）
 // ============================================================
 let currentRecognition = null;
 let currentMicBtn      = null;
@@ -58,7 +58,6 @@ function startVoice(targetId) {
   }
 
   const baseText = ta ? ta.value : '';
-  const startPos = ta ? ta.selectionStart ?? ta.value.length : 0;
 
   recognition.onresult = (e) => {
     let interim = '';
@@ -143,7 +142,7 @@ function stopVoiceUI() {
 }
 
 // ============================================================
-//  UI ヘルパー
+// UI ヘルパー
 // ============================================================
 const FORM_UI_IDS = ['picoRoadmap', 'progressWrap', 'navigator', 'ideaForm'];
 
@@ -155,7 +154,7 @@ function showFormUI() {
 }
 
 // ============================================================
-//  ステップ管理
+// ステップ管理
 // ============================================================
 let currentStep = 0;
 const TOTAL_STEPS = 5;
@@ -170,6 +169,7 @@ const NAV_MESSAGES = [
 
 function showStep(step) {
   stopVoice();
+
   document.querySelectorAll('.step-section').forEach((s, i) => s.classList.toggle('active', i === step));
 
   for (let i = 0; i < TOTAL_STEPS; i++) {
@@ -186,6 +186,7 @@ function showStep(step) {
 
   const bubble = document.getElementById('navBubble');
   if (bubble) bubble.innerHTML = NAV_MESSAGES[step];
+
   window.scrollTo({ top: 0, behavior: 'smooth' });
   currentStep = step;
 }
@@ -200,7 +201,7 @@ function goNext(step) {
 function goPrev(step) { showStep(step - 1); }
 
 // ============================================================
-//  ユーティリティ
+// ユーティリティ
 // ============================================================
 function getVal(id)    { return (document.getElementById(id) || { value: '' }).value.trim(); }
 function getRadio(nm)  { const el = document.querySelector(`input[name="${nm}"]:checked`); return el ? el.value : ''; }
@@ -245,7 +246,7 @@ function toggleOtherInputRadio(radioId, wrapId) {
 }
 
 // ============================================================
-//  プログレスバー
+// プログレスバー
 // ============================================================
 function updateProgress() {
   if (!startTime) startTime = new Date();
@@ -271,7 +272,7 @@ document.addEventListener('change', updateProgress);
 document.addEventListener('input',  updateProgress);
 
 // ============================================================
-//  フィードバック関数
+// フィードバック関数
 // ============================================================
 function onSelectChange(id) {
   const v = getVal(id);
@@ -321,7 +322,7 @@ function onIdeaInput() {
 }
 
 // ============================================================
-//  テキスト生成
+// テキスト生成
 // ============================================================
 function buildText() {
   const q6v       = getQ6Values();
@@ -373,21 +374,253 @@ function buildText() {
 }
 
 // ============================================================
-//  プレビューなど（元ファイルと同じ）
+// プレビュー
 // ============================================================
-// ※ ここから下は、元の idea_form_3_script_js_0515-3.txt の
-//    showPreview / actionCopy / actionSaveToFolder / actionSendMail /
-//    actionSavePDF / actionAnalyze / actionEnd / resetForm / clearStep などを
-//    そのまま続けてください（内容変更なし）。
-
-// ・・・（元ファイルの残りをそのまま貼り付け）・・・
-
+function showPreview() {
+  document.getElementById('previewText').textContent = buildText();
+  const idea     = getVal('q10');
+  const who      = getQ4Value();
+  const freq     = getRadio('q5');
+  const outcomes = getQ12Values();
+  if (idea && who && outcomes.length > 0) {
+    document.getElementById('picoContent').innerHTML = [
+      `<b>P</b>（対象・背景）：${who}が${freq || '（頻度未記入）'}`,
+      `<b>I</b>（介入・アイデア）：${idea.slice(0,120)}${idea.length>120?'…':''}`,
+      `<b>C</b>（比較・現状）：${getVal('q8') || '現在の対応'}`,
+      `<b>O</b>（期待する成果）：${outcomes.join('、')}`
+    ].join('<br><br>');
+    document.getElementById('picoBox').style.display = 'block';
+  } else {
+    document.getElementById('picoBox').style.display = 'none';
+  }
+  document.getElementById('previewModal').classList.add('active');
+}
+function closePreviewModal() {
+  document.getElementById('previewModal').classList.remove('active');
+}
 
 // ============================================================
-//  ロードマップ + 放射状メニュー クリックナビ
+// アクション各種
+// ============================================================
+function actionCopy() {
+  const text = buildText();
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text)
+      .then(() => alert('✅ 内容をクリップボードにコピーしました。'))
+      .catch(() => fallbackCopy(text));
+  } else {
+    fallbackCopy(text);
+  }
+}
+function fallbackCopy(text) {
+  const ta = document.createElement('textarea');
+  ta.value = text; ta.style.cssText = 'position:fixed;opacity:0';
+  document.body.appendChild(ta); ta.select();
+  try { document.execCommand('copy'); alert('✅ コピーしました。'); }
+  catch (e) { alert('コピーに失敗しました。手動でコピーしてください。'); }
+  document.body.removeChild(ta);
+}
+
+function actionSaveToFolder() {
+  const text     = buildText();
+  const blob     = new Blob([text], { type: 'text/plain;charset=utf-8' });
+  const ts       = new Date().toISOString().replace(/[-:T.Z]/g,'').slice(0,14);
+  const filename = `ヒアリング記録_${getVal('q2') || '匿名'}_${ts}.txt`;
+  const url      = URL.createObjectURL(blob);
+  const a        = document.createElement('a');
+  a.href = url; a.download = filename; a.click();
+  URL.revokeObjectURL(url);
+}
+
+function actionSendMail() {
+  const dispEl = document.getElementById('mailDefaultDisplay');
+  if (dispEl) dispEl.textContent = DEFAULT_MAIL_TO;
+  const input = document.getElementById('mailTo');
+  if (input) input.value = '';
+  const fb = document.getElementById('mailToFb');
+  if (fb) { fb.textContent = ''; fb.style.color = ''; }
+  document.getElementById('mailModal').classList.add('active');
+}
+function closeMailModal() {
+  document.getElementById('mailModal').classList.remove('active');
+}
+function onMailToInput() {
+  const v  = document.getElementById('mailTo').value.trim();
+  const fb = document.getElementById('mailToFb');
+  if (!fb) return;
+  if (!v) { fb.textContent = ''; return; }
+  const ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+  fb.style.color = ok ? '#2e8b5f' : '#c0392b';
+  fb.textContent = ok ? `✅ 追加送信先：${v}` : '⚠️ メールアドレスの形式を確認してください';
+}
+function doSendMail() {
+  const extra = document.getElementById('mailTo').value.trim();
+  if (extra && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(extra)) {
+    alert('追加送信先のメールアドレスの形式を確認してください。');
+    return;
+  }
+  const toList = [DEFAULT_MAIL_TO];
+  if (extra) toList.push(extra);
+  const toStr  = toList.join(',');
+  const text    = buildText();
+  const name    = getVal('q2') || '（未記入）';
+  const dept    = getVal('q1') || '';
+  const subject = `ヒアリング記録：${name}${dept ? '【' + dept + '】' : ''}のアイデア提案`;
+  const note    = '\n\n※ 写真・資料がある場合はメーラーから添付してください。';
+  window.location.href =
+    'mailto:' + encodeURIComponent(toStr) +
+    '?subject=' + encodeURIComponent(subject) +
+    '&body='    + encodeURIComponent(text + note);
+  closeMailModal();
+}
+
+function actionSavePDF() {
+  const text     = buildText();
+  const printWin = window.open('', '_blank');
+  if (!printWin) {
+    alert('ポップアップがブロックされました。ブラウザの設定でポップアップを許可してください。');
+    return;
+  }
+  printWin.document.write(`<!DOCTYPE html>
+<html lang="ja"><head><meta charset="UTF-8"><title>ヒアリング記録</title>
+<style>
+  body { font-family:"Noto Sans JP",sans-serif; font-size:13px; padding:30px; color:#222; }
+  pre  { white-space:pre-wrap; word-break:break-all; line-height:1.8; }
+  h1   { font-size:16px; border-bottom:2px solid #4caf88; padding-bottom:6px; margin-bottom:16px; }
+</style></head><body>
+<h1>Medical Innovation Triage — ヒアリング記録</h1>
+<pre>${text.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</pre>
+</body></html>`);
+  printWin.document.close();
+  printWin.focus();
+  setTimeout(() => { printWin.print(); }, 400);
+}
+
+function actionAnalyze() {
+  const text      = buildText();
+  const targetUrl = 'https://morikawa001.github.io/medical_device_idea_2/';
+  const win       = window.open(targetUrl, '_blank');
+  if (win) {
+    let attempts = 0;
+    const timer = setInterval(() => {
+      attempts++;
+      try { win.postMessage({ type: 'mit_idea_paste', text }, '*'); } catch (e) {}
+      if (attempts >= 20) clearInterval(timer);
+    }, 500);
+  } else {
+    actionCopy();
+    alert('ポップアップがブロックされました。\n内容をクリップボードにコピーしました。\n分析ページを手動で開いて貼り付けてください。');
+  }
+}
+
+function actionEnd() {
+  if (confirm('ヒアリングを終了しますか？\n入力内容は消去されます。')) {
+    closePreviewModal();
+    window.close();
+    setTimeout(() => { resetForm(); showEndScreen(); }, 300);
+  }
+}
+
+function resetForm() {
+  stopVoice();
+  document.getElementById('ideaForm').reset();
+  document.querySelectorAll('.field-fb').forEach(el => { el.className = 'field-fb'; el.textContent = ''; });
+  document.querySelectorAll('.card-radio, .card-check, .freq-card, .icon-check').forEach(lbl => lbl.classList.remove('selected'));
+  document.querySelectorAll('.other-input-wrap').forEach(w => {
+    w.classList.remove('show');
+    const ta = w.querySelector('textarea'); if (ta) ta.value = '';
+  });
+  document.querySelectorAll('input[name="q10_type"]').forEach(r => r.checked = false);
+  const charCount = document.getElementById('ideaCharCount');
+  if (charCount) charCount.textContent = '0文字';
+  startTime = null;
+  showFormUI();
+  document.getElementById('endScreen').classList.remove('active');
+  showStep(0);
+  updateProgress();
+}
+
+function showEndScreen() {
+  hideFormUI();
+  document.getElementById('endScreen').classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+function restartFromEnd() {
+  document.getElementById('endScreen').classList.remove('active');
+  resetForm();
+}
+
+// ============================================================
+// ステップ単位の入力クリア
+// ============================================================
+function clearRadioGroup(name) {
+  document.querySelectorAll(`input[name="${name}"]`).forEach(r => r.checked = false);
+  document.querySelectorAll(`#${name} label`).forEach(l => l.classList.remove('selected'));
+}
+function clearCheckGroup(name, otherCheckId, otherWrapId) {
+  document.querySelectorAll(`input[name="${name}"]`).forEach(c => c.checked = false);
+  document.querySelectorAll(`#${name} label, [id^="${name}"] label`).forEach(l => l.classList.remove('selected'));
+  if (otherWrapId) {
+    const wrap = document.getElementById(otherWrapId);
+    if (wrap) { wrap.classList.remove('show'); const ta = wrap.querySelector('textarea'); if (ta) ta.value = ''; }
+  }
+}
+function clearRadioOtherWrap(wrapId) {
+  const wrap = document.getElementById(wrapId);
+  if (wrap) { wrap.classList.remove('show'); const ta = wrap.querySelector('textarea'); if (ta) ta.value = ''; }
+}
+function clearFeedbacks(...ids) {
+  ids.forEach(id => hideFeedback(id));
+}
+
+function clearStep(step) {
+  if (!confirm('このステップの入力内容をクリアしますか？')) return;
+  switch (step) {
+    case 0:
+      document.getElementById('q1').value = '';
+      document.getElementById('q2').value = '';
+      document.getElementById('q2b').value = '';
+      clearRadioGroup('q3');
+      clearRadioOtherWrap('q3-other-wrap');
+      clearFeedbacks('q1', 'q2', 'q2b', 'q3');
+      break;
+    case 1:
+      clearRadioGroup('q4');
+      clearRadioOtherWrap('q4-other-wrap');
+      clearRadioGroup('q5');
+      clearCheckGroup('q6', 'q6-other-check', 'q6-other-wrap');
+      document.getElementById('q7').value = '';
+      clearFeedbacks('q4', 'q5', 'q6', 'q7');
+      break;
+    case 2:
+      document.getElementById('q8').value = '';
+      clearCheckGroup('q9', 'q9-other-check', 'q9-other-wrap');
+      clearFeedbacks('q8', 'q9');
+      break;
+    case 3:
+      document.getElementById('q10').value = '';
+      const charCount = document.getElementById('ideaCharCount');
+      if (charCount) charCount.textContent = '0文字';
+      document.querySelectorAll('input[name="q10_type"]').forEach(c => c.checked = false);
+      document.querySelectorAll('#q10_type label').forEach(l => l.classList.remove('selected'));
+      document.getElementById('q10_detail').value = '';
+      document.getElementById('q10_ref').value = '';
+      document.getElementById('q10_concern').value = '';
+      clearFeedbacks('q10');
+      break;
+    case 4:
+      clearCheckGroup('q12', 'q12-other-check', 'q12-other-wrap');
+      document.getElementById('q13').value = '';
+      clearFeedbacks('q12', 'q13');
+      break;
+  }
+  updateProgress();
+}
+
+// ============================================================
+// ロードマップ + パズルメニュー クリックナビ
 // ============================================================
 document.addEventListener('DOMContentLoaded', () => {
-  // 上部ロードマップ（そのまま）
   document.querySelectorAll('.roadmap-step').forEach(stepEl => {
     stepEl.style.cursor = 'pointer';
     stepEl.addEventListener('click', () => {
@@ -396,7 +629,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // 中央パズルメニュー（基本情報＋周囲4ピース）
   document.querySelectorAll('.puzzle-center, .puzzle-item').forEach(btn => {
     btn.addEventListener('click', () => {
       const step = parseInt(btn.getAttribute('data-step'), 10);
@@ -405,7 +637,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // 初期表示
   updateProgress();
   showStep(0);
 });
