@@ -4,8 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MIT ヒアリングフォーム</title>
+
+  <!-- フォント最適化 -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -15,9 +19,12 @@
   <div class="header-inner">
     <div class="header-brand">
       <svg class="brand-logo" viewBox="0 0 44 44" fill="none" aria-label="MITロゴ">
-        <circle cx="22" cy="22" r="20" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.5)" stroke-width="1.5"/>
-        <path d="M12 31 L22 13 L32 31" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M15.5 25 L28.5 25" stroke="white" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="22" cy="22" r="20" fill="rgba(255,255,255,0.15)"
+                stroke="rgba(255,255,255,0.5)" stroke-width="1.5"/>
+        <path d="M12 31 L22 13 L32 31" stroke="white" stroke-width="2.5"
+              stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M15.5 25 L28.5 25" stroke="white" stroke-width="2"
+              stroke-linecap="round"/>
         <circle cx="22" cy="9" r="2.5" fill="white"/>
       </svg>
       <div>
@@ -31,7 +38,7 @@
 <!-- ===== 中央パネルメニュー ===== -->
 <div class="puzzle-menu-wrap">
   <!-- 上：横長の基本情報パネル -->
-  <button class="panel-main" data-step="0">
+  <button class="panel-main" data-step="0" type="button">
     <div class="panel-main-emoji">👤</div>
     <div class="panel-main-text">
       <div class="panel-main-title">基本情報から聞く</div>
@@ -41,9 +48,9 @@
     </div>
   </button>
 
-  <!-- 下：P / C / I / O を 2×2 で配置 -->
+  <!-- 下：P / C / I / O を 2×2 + レポート で配置 -->
   <div class="panel-grid">
-    <button class="panel-item" data-step="1">
+    <button class="panel-item" data-step="1" type="button">
       <div class="panel-emoji">🔍</div>
       <div class="panel-label">
         <span class="pico-tag">P</span> 困りごと
@@ -53,7 +60,7 @@
       <div class="panel-item-progress" id="panelProgress1">0%</div>
     </button>
 
-    <button class="panel-item" data-step="2">
+    <button class="panel-item" data-step="2" type="button">
       <div class="panel-emoji">🔄</div>
       <div class="panel-label">
         <span class="pico-tag">C</span> 今の対応
@@ -63,7 +70,7 @@
       <div class="panel-item-progress" id="panelProgress2">0%</div>
     </button>
 
-    <button class="panel-item" data-step="3">
+    <button class="panel-item" data-step="3" type="button">
       <div class="panel-emoji">💡</div>
       <div class="panel-label">
         <span class="pico-tag">I</span> アイデア
@@ -73,7 +80,7 @@
       <div class="panel-item-progress" id="panelProgress3">0%</div>
     </button>
 
-    <button class="panel-item" data-step="4">
+    <button class="panel-item" data-step="4" type="button">
       <div class="panel-emoji">📊</div>
       <div class="panel-label">
         <span class="pico-tag">O</span> 期待効果
@@ -81,6 +88,13 @@
       <div class="panel-desc">このアイデアで何が変わりそうか</div>
       <!-- Oの進捗 -->
       <div class="panel-item-progress" id="panelProgress4">0%</div>
+    </button>
+
+    <!-- 追加：レポート概要カード -->
+    <button class="panel-item panel-item--report" type="button" onclick="showReportView()">
+      <div class="panel-emoji">📄</div>
+      <div class="panel-label">レポート概要</div>
+      <div class="panel-desc">これまでの入力内容を一目で確認できます</div>
     </button>
   </div>
 
@@ -123,7 +137,9 @@
 <!-- ===== プログレスバー ===== -->
 <div class="progress-wrap" id="progressWrap">
   <div class="progress-text">
-    <span id="progress-label">書きやすいところから少しずつ記録を始めてください</span>
+    <span id="progress-label">
+      書きやすいところから少しずつ記録を始めてください
+    </span>
     <span id="progress-pct">0%</span>
   </div>
   <div class="progress-track">
@@ -141,416 +157,822 @@
 
 <!-- ===== メインコンテンツ ===== -->
 <main class="main-wrap">
-<form id="ideaForm" novalidate>
+  <form id="ideaForm" novalidate>
 
-  <!-- STEP 0: 基本情報 -->
-  <section class="step-section active" id="step0">
-    <div class="step-header">
-      <div class="step-num">1 / 5</div>
-      <h2 class="step-title">基本情報</h2>
-    </div>
-    <p class="step-note">すべての項目は任意です。未入力でも次へ進めます。</p>
-
-    <div class="field-block">
-      <label class="field-label" for="q1">所属部署 <span class="opt-badge">任意</span></label>
-      <select id="q1" onchange="onSelectChange('q1')">
-        <option value="">▼ 選択してください</option>
-        <option>医局</option>
-        <option>GICU</option>
-        <option>手術室</option>
-        <option>外来</option>
-        <option>病棟</option>
-        <option>リハビリテーション科</option>
-        <option>薬剤部</option>
-        <option>放射線科</option>
-        <option>臨床検査部</option>
-        <option>医療情報・システム部門</option>
-        <option>臨床研究支援センター</option>
-        <option>事務部門</option>
-        <option>その他</option>
-      </select>
-      <div class="field-fb" id="fb-q1"></div>
-    </div>
-
-    <div class="field-block">
-      <label class="field-label" for="q2">氏名 <span class="opt-badge">任意</span></label>
-      <input type="text" id="q2" placeholder="山田 花子" oninput="onTextInput('q2')" autocomplete="name">
-      <div class="field-fb" id="fb-q2"></div>
-    </div>
-
-    <div class="field-block">
-      <label class="field-label" for="q2b">連絡先メールアドレス <span class="opt-badge">任意</span></label>
-      <input type="email" id="q2b" placeholder="hanako@hospital.jp" oninput="onEmailInput('q2b')" autocomplete="email" inputmode="email">
-      <div class="field-fb" id="fb-q2b"></div>
-    </div>
-
-    <div class="field-block">
-      <label class="field-label">職種 <span class="opt-badge">任意</span></label>
-      <div class="card-radio-group" id="q3">
-        <label class="card-radio"><input type="radio" name="q3" value="医師" onchange="onRadioChange('q3'); toggleOtherInputRadio('q3-other-check','q3-other-wrap')"><span>医師</span></label>
-        <label class="card-radio"><input type="radio" name="q3" value="看護師" onchange="onRadioChange('q3'); toggleOtherInputRadio('q3-other-check','q3-other-wrap')"><span>看護師</span></label>
-        <label class="card-radio"><input type="radio" name="q3" value="薬剤師" onchange="onRadioChange('q3'); toggleOtherInputRadio('q3-other-check','q3-other-wrap')"><span>薬剤師</span></label>
-        <label class="card-radio"><input type="radio" name="q3" value="臨床工学技士" onchange="onRadioChange('q3'); toggleOtherInputRadio('q3-other-check','q3-other-wrap')"><span>臨床工学技士</span></label>
-        <label class="card-radio"><input type="radio" name="q3" value="理学療法士・作業療法士" onchange="onRadioChange('q3'); toggleOtherInputRadio('q3-other-check','q3-other-wrap')"><span>理学・作業療法士</span></label>
-        <label class="card-radio"><input type="radio" name="q3" value="事務職" onchange="onRadioChange('q3'); toggleOtherInputRadio('q3-other-check','q3-other-wrap')"><span>事務職</span></label>
-        <label class="card-radio"><input type="radio" name="q3" value="その他" id="q3-other-check" onchange="onRadioChange('q3'); toggleOtherInputRadio('q3-other-check','q3-other-wrap')"><span>📝 その他</span></label>
+    <!-- STEP 0: 基本情報 -->
+    <section class="step-section active" id="step0">
+      <div class="step-header">
+        <div class="step-num">1 / 5</div>
+        <h2 class="step-title">基本情報</h2>
       </div>
-      <div class="other-input-wrap" id="q3-other-wrap">
-        <div class="textarea-mic-wrap">
-          <textarea id="q3-other-text" placeholder="職種を自由に書いてください" oninput="updateProgress()"></textarea>
-          <button type="button" class="btn-mic" data-mic-target="q3-other-text" onclick="startVoice('q3-other-text')" title="音声入力">🎤</button>
+      <p class="step-note">すべての項目は任意です。未入力でも次へ進めます。</p>
+
+      <div class="field-block">
+        <label class="field-label" for="q1">
+          所属部署 <span class="opt-badge">任意</span>
+        </label>
+        <select id="q1" onchange="onSelectChange()">
+          <option value="">▼ 選択してください</option>
+          <option>医局</option>
+          <option>GICU</option>
+          <option>手術室</option>
+          <option>外来</option>
+          <option>病棟</option>
+          <option>リハビリテーション科</option>
+          <option>薬剤部</option>
+          <option>放射線科</option>
+          <option>臨床検査部</option>
+          <option>医療情報・システム部門</option>
+          <option>臨床研究支援センター</option>
+          <option>事務部門</option>
+          <option>その他</option>
+        </select>
+        <div class="field-fb" id="fb-q1"></div>
+      </div>
+
+      <div class="field-block">
+        <label class="field-label" for="q2">
+          氏名 <span class="opt-badge">任意</span>
+        </label>
+        <input type="text" id="q2" placeholder="山田 花子"
+               oninput="onTextInput()" autocomplete="name">
+        <div class="field-fb" id="fb-q2"></div>
+      </div>
+
+      <div class="field-block">
+        <label class="field-label" for="q2b">
+          連絡先メールアドレス <span class="opt-badge">任意</span>
+        </label>
+        <input type="email" id="q2b" placeholder="hanako@hospital.jp"
+               oninput="onEmailInput()" autocomplete="email" inputmode="email">
+        <div class="field-fb" id="fb-q2b"></div>
+      </div>
+
+      <div class="field-block">
+        <label class="field-label">
+          職種 <span class="opt-badge">任意</span>
+        </label>
+        <div class="card-radio-group" id="q3">
+          <label class="card-radio">
+            <input type="radio" name="q3" value="医師"
+                   onchange="onRadioChange('q3')">
+            <span>医師</span>
+          </label>
+          <label class="card-radio">
+            <input type="radio" name="q3" value="看護師"
+                   onchange="onRadioChange('q3')">
+            <span>看護師</span>
+          </label>
+          <label class="card-radio">
+            <input type="radio" name="q3" value="薬剤師"
+                   onchange="onRadioChange('q3')">
+            <span>薬剤師</span>
+          </label>
+          <label class="card-radio">
+            <input type="radio" name="q3" value="臨床工学技士"
+                   onchange="onRadioChange('q3')">
+            <span>臨床工学技士</span>
+          </label>
+          <label class="card-radio">
+            <input type="radio" name="q3"
+                   value="理学療法士・作業療法士"
+                   onchange="onRadioChange('q3')">
+            <span>理学・作業療法士</span>
+          </label>
+          <label class="card-radio">
+            <input type="radio" name="q3" value="事務職"
+                   onchange="onRadioChange('q3')">
+            <span>事務職</span>
+          </label>
+          <label class="card-radio">
+            <input type="radio" name="q3" value="その他"
+                   id="q3-other-check"
+                   onchange="onRadioChange('q3')">
+            <span>📝 その他</span>
+          </label>
+        </div>
+        <div class="other-input-wrap" id="q3-other-wrap">
+          <div class="textarea-mic-wrap">
+            <textarea id="q3-other-text"
+                      placeholder="職種を自由に書いてください"
+                      oninput="onTextareaInput()"></textarea>
+            <button type="button" class="btn-mic"
+                    data-mic-target="q3-other-text"
+                    onclick="startVoice('q3-other-text')"
+                    title="音声入力" aria-label="音声入力">
+              🎤
+            </button>
+          </div>
+        </div>
+        <div class="field-fb" id="fb-q3"></div>
+      </div>
+
+      <div class="step-nav">
+        <button type="button" class="btn-next" onclick="goNext(0)">
+          別の観点（困りごと）も聞いてみる
+          <svg viewBox="0 0 20 20" width="18" fill="currentColor">
+            <path d="M7 4l6 6-6 6"></path>
+          </svg>
+        </button>
+      </div>
+      <div class="sub-action-row">
+        <button type="button" class="btn-clear-step" onclick="clearStep(0)">
+          🗑️ 入力をクリア
+        </button>
+      </div>
+    </section>
+
+    <!-- STEP 1: 困りごと (P) -->
+    <section class="step-section" id="step1">
+      <div class="step-header">
+        <div class="step-num">2 / 5</div>
+        <div class="pico-label-large">
+          <span class="pico-tag-large">P</span> 誰が、どんなことに困っているか
         </div>
       </div>
-      <div class="field-fb" id="fb-q3"></div>
-    </div>
 
-    <div class="step-nav">
-      <button type="button" class="btn-next" onclick="goNext(0)">
-        別の観点（困りごと）も聞いてみる
-        <svg viewBox="0 0 20 20" width="18" fill="currentColor"><path d="M7 4l6 6-6 6"/></svg>
-      </button>
-    </div>
-    <div class="sub-action-row">
-      <button type="button" class="btn-clear-step" onclick="clearStep(0)">🗑️ 入力をクリア</button>
-    </div>
-  </section>
-
-  <!-- STEP 1: 困りごと (P) -->
-  <section class="step-section" id="step1">
-    <div class="step-header">
-      <div class="step-num">2 / 5</div>
-      <div class="pico-label-large"><span class="pico-tag-large">P</span> 誰が、どんなことに困っているか</div>
-    </div>
-
-    <div class="field-block">
-      <label class="field-label">主に困っているのは？ <span class="opt-badge">任意</span></label>
-      <div class="card-radio-group" id="q4">
-        <label class="card-radio card-radio--wide"><input type="radio" name="q4" value="患者さん" onchange="onRadioChange('q4'); toggleOtherInputRadio('q4-other-check','q4-other-wrap')"><span>患者さん</span></label>
-        <label class="card-radio card-radio--wide"><input type="radio" name="q4" value="自分自身・自部署のスタッフ" onchange="onRadioChange('q4'); toggleOtherInputRadio('q4-other-check','q4-other-wrap')"><span>自分<br>自部署のスタッフ</span></label>
-        <label class="card-radio card-radio--wide"><input type="radio" name="q4" value="他部署のスタッフ" onchange="onRadioChange('q4'); toggleOtherInputRadio('q4-other-check','q4-other-wrap')"><span>他部署のスタッフ</span></label>
-        <label class="card-radio card-radio--wide"><input type="radio" name="q4" value="病院全体" onchange="onRadioChange('q4'); toggleOtherInputRadio('q4-other-check','q4-other-wrap')"><span>病院全体</span></label>
-        <label class="card-radio card-radio--wide"><input type="radio" name="q4" value="その他" id="q4-other-check" onchange="onRadioChange('q4'); toggleOtherInputRadio('q4-other-check','q4-other-wrap')"><span>📝 その他</span></label>
-      </div>
-      <div class="other-input-wrap" id="q4-other-wrap">
-        <div class="textarea-mic-wrap">
-          <textarea id="q4-other-text" placeholder="該当するものを自由に書いてください" oninput="updateProgress()"></textarea>
-          <button type="button" class="btn-mic" data-mic-target="q4-other-text" onclick="startVoice('q4-other-text')" title="音声入力">🎤</button>
+      <div class="field-block">
+        <label class="field-label">
+          主に困っているのは？ <span class="opt-badge">任意</span>
+        </label>
+        <div class="card-radio-group" id="q4">
+          <label class="card-radio card-radio--wide">
+            <input type="radio" name="q4" value="患者さん"
+                   onchange="onRadioChange('q4')">
+            <span>患者さん</span>
+          </label>
+          <label class="card-radio card-radio--wide">
+            <input type="radio" name="q4"
+                   value="自分自身・自部署のスタッフ"
+                   onchange="onRadioChange('q4')">
+            <span>自分<br>自部署のスタッフ</span>
+          </label>
+          <label class="card-radio card-radio--wide">
+            <input type="radio" name="q4" value="他部署のスタッフ"
+                   onchange="onRadioChange('q4')">
+            <span>他部署のスタッフ</span>
+          </label>
+          <label class="card-radio card-radio--wide">
+            <input type="radio" name="q4" value="病院全体"
+                   onchange="onRadioChange('q4')">
+            <span>病院全体</span>
+          </label>
+          <label class="card-radio card-radio--wide">
+            <input type="radio" name="q4" value="その他"
+                   id="q4-other-check"
+                   onchange="onRadioChange('q4')">
+            <span>📝 その他</span>
+          </label>
         </div>
-      </div>
-      <div class="field-fb" id="fb-q4"></div>
-    </div>
-
-    <div class="field-block">
-      <label class="field-label">発生頻度 <span class="opt-badge">任意</span></label>
-      <div class="freq-group" id="q5">
-        <label class="freq-card"><input type="radio" name="q5" value="毎日複数回" onchange="onRadioChange('q5')">
-          <div class="freq-dot freq-dot--5"></div><span>毎日複数回</span></label>
-        <label class="freq-card"><input type="radio" name="q5" value="毎日1回程度" onchange="onRadioChange('q5')">
-          <div class="freq-dot freq-dot--4"></div><span>毎日1回</span></label>
-        <label class="freq-card"><input type="radio" name="q5" value="週に数回" onchange="onRadioChange('q5')">
-          <div class="freq-dot freq-dot--3"></div><span>週に数回</span></label>
-        <label class="freq-card"><input type="radio" name="q5" value="月に数回" onchange="onRadioChange('q5')">
-          <div class="freq-dot freq-dot--2"></div><span>月に数回</span></label>
-        <label class="freq-card"><input type="radio" name="q5" value="稀だが発生すると重大" onchange="onRadioChange('q5')">
-          <div class="freq-dot freq-dot--alert"></div><span>稀だが重大</span></label>
-      </div>
-      <div class="field-fb" id="fb-q5"></div>
-    </div>
-
-    <div class="field-block">
-      <label class="field-label">影響・リスク <span class="opt-badge">任意</span> <span class="multi-tag">複数選択可</span></label>
-      <div class="card-check-group" id="q6">
-        <label class="card-check"><input type="checkbox" name="q6" value="医療安全の低下（インシデントリスクなど）" onchange="onCheckChange('q6')"><span>⚠️ 医療安全への影響</span></label>
-        <label class="card-check"><input type="checkbox" name="q6" value="業務時間の圧迫（残業・無駄な転記作業など）" onchange="onCheckChange('q6')"><span>⏱️ 業務時間の圧迫</span></label>
-        <label class="card-check"><input type="checkbox" name="q6" value="患者さんの苦痛・QOL低下（痛み、離床の遅れなど）" onchange="onCheckChange('q6')"><span>🏥 患者さんへの影響</span></label>
-        <label class="card-check"><input type="checkbox" name="q6" value="スタッフの身体的・精神的負担" onchange="onCheckChange('q6')"><span>😓 スタッフの負担</span></label>
-        <label class="card-check"><input type="checkbox" name="q6" value="物品やコストの無駄" onchange="onCheckChange('q6')"><span>💴 コスト・物品の無駄</span></label>
-        <label class="card-check"><input type="checkbox" name="q6" value="その他" id="q6-other-check" onchange="onCheckChange('q6'); toggleOtherInput('q6-other-check','q6-other-wrap')"><span>📝 その他</span></label>
-      </div>
-      <div class="other-input-wrap" id="q6-other-wrap">
-        <div class="textarea-mic-wrap">
-          <textarea id="q6-other-text" placeholder="具体的にどのような影響があるか記録してください" oninput="updateProgress()"></textarea>
-          <button type="button" class="btn-mic" data-mic-target="q6-other-text" onclick="startVoice('q6-other-text')" title="音声入力">🎤</button>
+        <div class="other-input-wrap" id="q4-other-wrap">
+          <div class="textarea-mic-wrap">
+            <textarea id="q4-other-text"
+                      placeholder="該当するものを自由に書いてください"
+                      oninput="onTextareaInput()"></textarea>
+            <button type="button" class="btn-mic"
+                    data-mic-target="q4-other-text"
+                    onclick="startVoice('q4-other-text')"
+                    title="音声入力" aria-label="音声入力">
+              🎤
+            </button>
+          </div>
         </div>
+        <div class="field-fb" id="fb-q4"></div>
       </div>
-      <div class="field-fb" id="fb-q6"></div>
-    </div>
 
-    <div class="field-block">
-      <label class="field-label" for="q7">具体的な場面 <span class="opt-badge">任意</span></label>
-      <div class="textarea-mic-wrap">
-        <textarea id="q7" placeholder="いつ・どこで・何が起きるか（発案者の言葉をそのまま記録）" oninput="onTextareaInput('q7')"></textarea>
-        <button type="button" class="btn-mic" data-mic-target="q7" onclick="startVoice('q7')" title="音声入力">🎤</button>
+      <div class="field-block">
+        <label class="field-label">
+          発生頻度 <span class="opt-badge">任意</span>
+        </label>
+        <div class="freq-group" id="q5">
+          <label class="freq-card">
+            <input type="radio" name="q5" value="毎日複数回"
+                   onchange="onRadioChange('q5')">
+            <div class="freq-dot freq-dot--5"></div>
+            <span>毎日複数回</span>
+          </label>
+          <label class="freq-card">
+            <input type="radio" name="q5" value="毎日1回程度"
+                   onchange="onRadioChange('q5')">
+            <div class="freq-dot freq-dot--4"></div>
+            <span>毎日1回</span>
+          </label>
+          <label class="freq-card">
+            <input type="radio" name="q5" value="週に数回"
+                   onchange="onRadioChange('q5')">
+            <div class="freq-dot freq-dot--3"></div>
+            <span>週に数回</span>
+          </label>
+          <label class="freq-card">
+            <input type="radio" name="q5" value="月に数回"
+                   onchange="onRadioChange('q5')">
+            <div class="freq-dot freq-dot--2"></div>
+            <span>月に数回</span>
+          </label>
+          <label class="freq-card">
+            <input type="radio" name="q5" value="稀だが発生すると重大"
+                   onchange="onRadioChange('q5')">
+            <div class="freq-dot freq-dot--alert"></div>
+            <span>稀だが重大</span>
+          </label>
+        </div>
+        <div class="field-fb" id="fb-q5"></div>
       </div>
-      <div class="field-fb" id="fb-q7"></div>
-    </div>
 
-    <!-- P用 その場メモ -->
-    <div class="field-block">
-      <div class="step-memo">
-        <div class="step-memo-label">このPのステップに関するメモ（任意）</div>
+      <div class="field-block">
+        <label class="field-label">
+          影響・リスク <span class="opt-badge">任意</span>
+          <span class="multi-tag">複数選択可</span>
+        </label>
+        <div class="card-check-group" id="q6">
+          <label class="card-check">
+            <input type="checkbox" name="q6"
+                   value="医療安全の低下（インシデントリスクなど）"
+                   onchange="onCheckChange('q6')">
+            <span>⚠️ 医療安全への影響</span>
+          </label>
+          <label class="card-check">
+            <input type="checkbox" name="q6"
+                   value="業務時間の圧迫（残業・無駄な転記作業など）"
+                   onchange="onCheckChange('q6')">
+            <span>⏱️ 業務時間の圧迫</span>
+          </label>
+          <label class="card-check">
+            <input type="checkbox" name="q6"
+                   value="患者さんの苦痛・QOL低下（痛み、離床の遅れなど）"
+                   onchange="onCheckChange('q6')">
+            <span>🏥 患者さんへの影響</span>
+          </label>
+          <label class="card-check">
+            <input type="checkbox" name="q6"
+                   value="スタッフの身体的・精神的負担"
+                   onchange="onCheckChange('q6')">
+            <span>😓 スタッフの負担</span>
+          </label>
+          <label class="card-check">
+            <input type="checkbox" name="q6"
+                   value="物品やコストの無駄"
+                   onchange="onCheckChange('q6')">
+            <span>💴 コスト・物品の無駄</span>
+          </label>
+          <label class="card-check">
+            <input type="checkbox" name="q6" value="その他"
+                   id="q6-other-check"
+                   onchange="onCheckChange('q6')">
+            <span>📝 その他</span>
+          </label>
+        </div>
+        <div class="other-input-wrap" id="q6-other-wrap">
+          <div class="textarea-mic-wrap">
+            <textarea id="q6-other-text"
+                      placeholder="具体的にどのような影響があるか記録してください"
+                      oninput="onTextareaInput()"></textarea>
+            <button type="button" class="btn-mic"
+                    data-mic-target="q6-other-text"
+                    onclick="startVoice('q6-other-text')"
+                    title="音声入力" aria-label="音声入力">
+              🎤
+            </button>
+          </div>
+        </div>
+        <div class="field-fb" id="fb-q6"></div>
+      </div>
+
+      <div class="field-block">
+        <label class="field-label" for="q7">
+          具体的な場面 <span class="opt-badge">任意</span>
+        </label>
         <div class="textarea-mic-wrap">
-          <textarea id="memo_p" class="step-memo-textarea"
-            placeholder="Pに関するラフなメモや、その場で出た補足を自由にメモしてください。"
-            oninput="updateProgress()"></textarea>
+          <textarea id="q7"
+                    placeholder="いつ・どこで・何が起きるか（発案者の言葉をそのまま記録）"
+                    oninput="onTextareaInput()"></textarea>
           <button type="button" class="btn-mic"
-            data-mic-target="memo_p"
-            onclick="startVoice('memo_p')"
-            title="音声入力">🎤</button>
+                  data-mic-target="q7"
+                  onclick="startVoice('q7')"
+                  title="音声入力" aria-label="音声入力">
+            🎤
+          </button>
+        </div>
+        <div class="field-fb" id="fb-q7"></div>
+      </div>
+
+      <!-- P用 その場メモ -->
+      <div class="field-block">
+        <div class="step-memo">
+          <div class="step-memo-label">
+            このPのステップに関するメモ（任意）
+          </div>
+          <div class="textarea-mic-wrap">
+            <textarea id="memo_p" class="step-memo-textarea"
+                      placeholder="Pに関するラフなメモや、その場で出た補足を自由にメモしてください。"
+                      oninput="onTextareaInput()"></textarea>
+            <button type="button" class="btn-mic"
+                    data-mic-target="memo_p"
+                    onclick="startVoice('memo_p')"
+                    title="音声入力" aria-label="音声入力">
+              🎤
+            </button>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div class="step-nav">
-      <button type="button" class="btn-prev" onclick="goPrev(1)">
-        <svg viewBox="0 0 20 20" width="18" fill="currentColor"><path d="M13 4L7 10l6 6"/></svg>
-        戻る
-      </button>
-      <button type="button" class="btn-next" onclick="goNext(1)">
-        今の対応も聞いてみる
-        <svg viewBox="0 0 20 20" width="18" fill="currentColor"><path d="M7 4l6 6-6 6"/></svg>
-      </button>
-    </div>
-    <div class="sub-action-row">
-      <button type="button" class="btn-clear-step" onclick="clearStep(1)">🗑️ 入力をクリア</button>
-    </div>
-  </section>
-
-  <!-- STEP 2: 今の対応 (C) -->
-  <section class="step-section" id="step2">
-    <div class="step-header">
-      <div class="step-num">3 / 5</div>
-      <div class="pico-label-large"><span class="pico-tag-large">C</span> 今どうやって対応しているか</div>
-    </div>
-
-    <div class="field-block">
-      <label class="field-label" for="q8">今の対応方法 <span class="opt-badge">任意</span></label>
-      <div class="textarea-mic-wrap">
-        <textarea id="q8" placeholder="例：テープでまとめる、常に付き添う（発案者の言葉をそのまま記録）" oninput="onTextareaInput('q8')"></textarea>
-        <button type="button" class="btn-mic" data-mic-target="q8" onclick="startVoice('q8')" title="音声入力">🎤</button>
+      <div class="step-nav">
+        <button type="button" class="btn-prev" onclick="goPrev(1)">
+          <svg viewBox="0 0 20 20" width="18" fill="currentColor">
+            <path d="M13 4L7 10l6 6"></path>
+          </svg>
+          戻る
+        </button>
+        <button type="button" class="btn-next" onclick="goNext(1)">
+          今の対応も聞いてみる
+          <svg viewBox="0 0 20 20" width="18" fill="currentColor">
+            <path d="M7 4l6 6-6 6"></path>
+          </svg>
+        </button>
       </div>
-      <div class="field-fb" id="fb-q8"></div>
-    </div>
-
-    <div class="field-block">
-      <label class="field-label">今の対応の問題点 <span class="multi-tag">複数選択可</span> <span class="opt-badge">任意</span></label>
-      <div class="card-check-group" id="q9">
-        <label class="card-check"><input type="checkbox" name="q9" value="手作業が多くて時間がかかる" onchange="onCheckChange('q9')"><span>⏰ 手作業が多くて時間がかかる</span></label>
-        <label class="card-check"><input type="checkbox" name="q9" value="人によってやり方や精度にばらつきが出る" onchange="onCheckChange('q9')"><span>📉 やり方にばらつきが出る</span></label>
-        <label class="card-check"><input type="checkbox" name="q9" value="根本的な解決（安全確保など）になっていない" onchange="onCheckChange('q9')"><span>🔓 根本的な解決になっていない</span></label>
-        <label class="card-check"><input type="checkbox" name="q9" value="消耗品費などのコストがかかる" onchange="onCheckChange('q9')"><span>💸 コストがかかる</span></label>
-        <label class="card-check"><input type="checkbox" name="q9" value="スタッフへの教育コストが高い" onchange="onCheckChange('q9')"><span>📚 教育・引き継ぎに手間がかかる</span></label>
-        <label class="card-check"><input type="checkbox" name="q9" value="その他" id="q9-other-check" onchange="onCheckChange('q9'); toggleOtherInput('q9-other-check','q9-other-wrap')"><span>📝 その他</span></label>
+      <div class="sub-action-row">
+        <button type="button" class="btn-clear-step" onclick="clearStep(1)">
+          🗑️ 入力をクリア
+        </button>
       </div>
-      <div class="other-input-wrap" id="q9-other-wrap">
-        <div class="textarea-mic-wrap">
-          <textarea id="q9-other-text" placeholder="その他の問題点を記録してください" oninput="updateProgress()"></textarea>
-          <button type="button" class="btn-mic" data-mic-target="q9-other-text" onclick="startVoice('q9-other-text')" title="音声入力">🎤</button>
+    </section>
+
+    <!-- STEP 2: 今の対応 (C) -->
+    <section class="step-section" id="step2">
+      <div class="step-header">
+        <div class="step-num">3 / 5</div>
+        <div class="pico-label-large">
+          <span class="pico-tag-large">C</span> 今どうやって対応しているか
         </div>
       </div>
-      <div class="field-fb" id="fb-q9"></div>
-    </div>
 
-    <!-- C用 その場メモ -->
-    <div class="field-block">
-      <div class="step-memo">
-        <div class="step-memo-label">このCのステップに関するメモ（任意）</div>
+      <div class="field-block">
+        <label class="field-label" for="q8">
+          今の対応方法 <span class="opt-badge">任意</span>
+        </label>
         <div class="textarea-mic-wrap">
-          <textarea id="memo_c" class="step-memo-textarea"
-            placeholder="今の対応についての補足や、その場で出た気づきをメモしておけます。"
-            oninput="updateProgress()"></textarea>
+          <textarea id="q8"
+                    placeholder="例：テープでまとめる、常に付き添う（発案者の言葉をそのまま記録）"
+                    oninput="onTextareaInput()"></textarea>
           <button type="button" class="btn-mic"
-            data-mic-target="memo_c"
-            onclick="startVoice('memo_c')"
-            title="音声入力">🎤</button>
+                  data-mic-target="q8"
+                  onclick="startVoice('q8')"
+                  title="音声入力" aria-label="音声入力">
+            🎤
+          </button>
+        </div>
+        <div class="field-fb" id="fb-q8"></div>
+      </div>
+
+      <div class="field-block">
+        <label class="field-label">
+          今の対応の問題点
+          <span class="multi-tag">複数選択可</span>
+          <span class="opt-badge">任意</span>
+        </label>
+        <div class="card-check-group" id="q9">
+          <label class="card-check">
+            <input type="checkbox" name="q9"
+                   value="手作業が多くて時間がかかる"
+                   onchange="onCheckChange('q9')">
+            <span>⏰ 手作業が多くて時間がかかる</span>
+          </label>
+          <label class="card-check">
+            <input type="checkbox" name="q9"
+                   value="人によってやり方や精度にばらつきが出る"
+                   onchange="onCheckChange('q9')">
+            <span>📉 やり方にばらつきが出る</span>
+          </label>
+          <label class="card-check">
+            <input type="checkbox" name="q9"
+                   value="根本的な解決（安全確保など）になっていない"
+                   onchange="onCheckChange('q9')">
+            <span>🔓 根本的な解決になっていない</span>
+          </label>
+          <label class="card-check">
+            <input type="checkbox" name="q9"
+                   value="消耗品費などのコストがかかる"
+                   onchange="onCheckChange('q9')">
+            <span>💸 コストがかかる</span>
+          </label>
+          <label class="card-check">
+            <input type="checkbox" name="q9"
+                   value="スタッフへの教育コストが高い"
+                   onchange="onCheckChange('q9')">
+            <span>📚 教育・引き継ぎに手間がかかる</span>
+          </label>
+          <label class="card-check">
+            <input type="checkbox" name="q9" value="その他"
+                   id="q9-other-check"
+                   onchange="onCheckChange('q9')">
+            <span>📝 その他</span>
+          </label>
+        </div>
+        <div class="other-input-wrap" id="q9-other-wrap">
+          <div class="textarea-mic-wrap">
+            <textarea id="q9-other-text"
+                      placeholder="その他の問題点を記録してください"
+                      oninput="onTextareaInput()"></textarea>
+            <button type="button" class="btn-mic"
+                    data-mic-target="q9-other-text"
+                    onclick="startVoice('q9-other-text')"
+                    title="音声入力" aria-label="音声入力">
+              🎤
+            </button>
+          </div>
+        </div>
+        <div class="field-fb" id="fb-q9"></div>
+      </div>
+
+      <!-- C用 その場メモ -->
+      <div class="field-block">
+        <div class="step-memo">
+          <div class="step-memo-label">
+            このCのステップに関するメモ（任意）
+          </div>
+          <div class="textarea-mic-wrap">
+            <textarea id="memo_c" class="step-memo-textarea"
+                      placeholder="今の対応についての補足や、その場で出た気づきをメモしておけます。"
+                      oninput="onTextareaInput()"></textarea>
+            <button type="button" class="btn-mic"
+                    data-mic-target="memo_c"
+                    onclick="startVoice('memo_c')"
+                    title="音声入力" aria-label="音声入力">
+              🎤
+            </button>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div class="step-nav">
-      <button type="button" class="btn-prev" onclick="goPrev(2)">
-        <svg viewBox="0 0 20 20" width="18" fill="currentColor"><path d="M13 4L7 10l6 6"/></svg>
-        戻る
-      </button>
-      <button type="button" class="btn-next" onclick="goNext(2)">
-        アイデアの内容を聞いてみる
-        <svg viewBox="0 0 20 20" width="18" fill="currentColor"><path d="M7 4l6 6-6 6"/></svg>
-      </button>
-    </div>
-    <div class="sub-action-row">
-      <button type="button" class="btn-clear-step" onclick="clearStep(2)">🗑️ 入力をクリア</button>
-    </div>
-  </section>
-
-  <!-- STEP 3: アイデア (I) -->
-  <section class="step-section" id="step3">
-    <div class="step-header">
-      <div class="step-num">4 / 5</div>
-      <div class="pico-label-large"><span class="pico-tag-large">I</span> 発案者のアイデア</div>
-    </div>
-
-    <div class="field-block idea-main-block">
-      <label class="field-label" for="q10">アイデア・ひらめき <span class="opt-badge">任意</span></label>
-      <div class="textarea-mic-wrap">
-        <textarea id="q10" class="idea-textarea" rows="5"
-          placeholder="発案者の言葉をそのまま記録してください。小さなことでもOK。"
-          oninput="onIdeaInput()"></textarea>
-        <button type="button" class="btn-mic" data-mic-target="q10" onclick="startVoice('q10')" title="音声入力">🎤</button>
+      <div class="step-nav">
+        <button type="button" class="btn-prev" onclick="goPrev(2)">
+          <svg viewBox="0 0 20 20" width="18" fill="currentColor">
+            <path d="M13 4L7 10l6 6"></path>
+          </svg>
+          戻る
+        </button>
+        <button type="button" class="btn-next" onclick="goNext(2)">
+          アイデアの内容を聞いてみる
+          <svg viewBox="0 0 20 20" width="18" fill="currentColor">
+            <path d="M7 4l6 6-6 6"></path>
+          </svg>
+        </button>
       </div>
-      <div class="idea-char-count" id="ideaCharCount">0文字</div>
-      <div class="field-fb" id="fb-q10"></div>
-    </div>
-
-    <div class="field-block">
-      <label class="field-label">解決のアプローチ <span class="multi-tag">複数選択可・任意</span></label>
-      <div class="icon-check-group" id="q10_type">
-        <label class="icon-check"><input type="checkbox" name="q10_type" value="新しいモノ・デバイスを作る" onchange="highlightChecked('q10_type')">
-          <div class="icon-check-inner"><div class="ic-emoji">🔧</div><div class="ic-text">新しいモノ<br>デバイスを作る</div></div>
-        </label>
-        <label class="icon-check"><input type="checkbox" name="q10_type" value="既存のモノを改良・改造する" onchange="highlightChecked('q10_type')">
-          <div class="icon-check-inner"><div class="ic-emoji">🔩</div><div class="ic-text">既存品を改良する</div></div>
-        </label>
-        <label class="icon-check"><input type="checkbox" name="q10_type" value="アプリ・ソフトウェアで解決する" onchange="highlightChecked('q10_type')">
-          <div class="icon-check-inner"><div class="ic-emoji">💻</div><div class="ic-text">アプリ<br>ソフトで解決</div></div>
-        </label>
-        <label class="icon-check"><input type="checkbox" name="q10_type" value="仕組み・ルール・手順を変える" onchange="highlightChecked('q10_type')">
-          <div class="icon-check-inner"><div class="ic-emoji">📋</div><div class="ic-text">仕組み<br>手順を変える</div></div>
-        </label>
-        <label class="icon-check"><input type="checkbox" name="q10_type" value="AI・データを活用する" onchange="highlightChecked('q10_type')">
-          <div class="icon-check-inner"><div class="ic-emoji">🤖</div><div class="ic-text">AI・データを活用</div></div>
-        </label>
-        <label class="icon-check"><input type="checkbox" name="q10_type" value="他の分野・製品のアイデアを医療に取り入れる" onchange="highlightChecked('q10_type')">
-          <div class="icon-check-inner"><div class="ic-emoji">♻️</div><div class="ic-text">他分野のアイデアを転用</div></div>
-        </label>
-        <label class="icon-check"><input type="checkbox" name="q10_type" value="まだよくわからない" onchange="highlightChecked('q10_type')">
-          <div class="icon-check-inner"><div class="ic-emoji">🤔</div><div class="ic-text">まだわからない</div></div>
-        </label>
+      <div class="sub-action-row">
+        <button type="button" class="btn-clear-step" onclick="clearStep(2)">
+          🗑️ 入力をクリア
+        </button>
       </div>
-    </div>
+    </section>
 
-    <div class="field-block">
-      <label class="field-label" for="q10_detail">形・大きさ・使い方のイメージ <span class="opt-badge">任意</span></label>
-      <div class="textarea-mic-wrap">
-        <textarea id="q10_detail" rows="3" placeholder="例：手のひらサイズ・スマホに通知が来る" oninput="updateProgress()"></textarea>
-        <button type="button" class="btn-mic" data-mic-target="q10_detail" onclick="startVoice('q10_detail')" title="音声入力">🎤</button>
+    <!-- STEP 3: アイデア (I) -->
+    <section class="step-section" id="step3">
+      <div class="step-header">
+        <div class="step-num">4 / 5</div>
+        <div class="pico-label-large">
+          <span class="pico-tag-large">I</span> 発案者のアイデア
+        </div>
       </div>
-    </div>
 
-    <div class="field-block">
-      <label class="field-label" for="q10_ref">参考・ヒントになったもの <span class="opt-badge">任意</span></label>
-      <div class="textarea-mic-wrap">
-        <textarea id="q10_ref" rows="2" placeholder="例：市販の○○のような形、他病院の取り組みを聞いた" oninput="updateProgress()"></textarea>
-        <button type="button" class="btn-mic" data-mic-target="q10_ref" onclick="startVoice('q10_ref')" title="音声入力">🎤</button>
-      </div>
-    </div>
-
-    <div class="field-block">
-      <label class="field-label" for="q10_concern">心配な点 <span class="opt-badge">任意</span></label>
-      <div class="textarea-mic-wrap">
-        <textarea id="q10_concern" rows="2" placeholder="例：滅菌が必要・コストが高いかも" oninput="updateProgress()"></textarea>
-        <button type="button" class="btn-mic" data-mic-target="q10_concern" onclick="startVoice('q10_concern')" title="音声入力">🎤</button>
-      </div>
-    </div>
-
-    <!-- I用 その場メモ -->
-    <div class="field-block">
-      <div class="step-memo">
-        <div class="step-memo-label">このIのステップに関するメモ（任意）</div>
+      <div class="field-block idea-main-block">
+        <label class="field-label" for="q10">
+          アイデア・ひらめき <span class="opt-badge">任意</span>
+        </label>
         <div class="textarea-mic-wrap">
-          <textarea id="memo_i" class="step-memo-textarea"
-            placeholder="アイデアに関する懸念・別案・メモしておきたいことを書いておけます。"
-            oninput="updateProgress()"></textarea>
+          <textarea id="q10" class="idea-textarea" rows="5"
+                    placeholder="発案者の言葉をそのまま記録してください。小さなことでもOK。"
+                    oninput="onIdeaInput()"></textarea>
           <button type="button" class="btn-mic"
-            data-mic-target="memo_i"
-            onclick="startVoice('memo_i')"
-            title="音声入力">🎤</button>
+                  data-mic-target="q10"
+                  onclick="startVoice('q10')"
+                  title="音声入力" aria-label="音声入力">
+            🎤
+          </button>
+        </div>
+        <div class="idea-char-count" id="ideaCharCount">0文字</div>
+        <div class="field-fb" id="fb-q10"></div>
+      </div>
+
+      <div class="field-block">
+        <label class="field-label">
+          解決のアプローチ
+          <span class="multi-tag">複数選択可・任意</span>
+        </label>
+        <div class="icon-check-group" id="q10_type">
+          <label class="icon-check">
+            <input type="checkbox" name="q10_type"
+                   value="新しいモノ・デバイスを作る"
+                   onchange="highlightChecked('q10_type')">
+            <div class="icon-check-inner">
+              <div class="ic-emoji">🔧</div>
+              <div class="ic-text">新しいモノ<br>デバイスを作る</div>
+            </div>
+          </label>
+          <label class="icon-check">
+            <input type="checkbox" name="q10_type"
+                   value="既存のモノを改良・改造する"
+                   onchange="highlightChecked('q10_type')">
+            <div class="icon-check-inner">
+              <div class="ic-emoji">🔩</div>
+              <div class="ic-text">既存品を改良する</div>
+            </div>
+          </label>
+          <label class="icon-check">
+            <input type="checkbox" name="q10_type"
+                   value="アプリ・ソフトウェアで解決する"
+                   onchange="highlightChecked('q10_type')">
+            <div class="icon-check-inner">
+              <div class="ic-emoji">💻</div>
+              <div class="ic-text">アプリ<br>ソフトで解決</div>
+            </div>
+          </label>
+          <label class="icon-check">
+            <input type="checkbox" name="q10_type"
+                   value="仕組み・ルール・手順を変える"
+                   onchange="highlightChecked('q10_type')">
+            <div class="icon-check-inner">
+              <div class="ic-emoji">📋</div>
+              <div class="ic-text">仕組み<br>手順を変える</div>
+            </div>
+          </label>
+          <label class="icon-check">
+            <input type="checkbox" name="q10_type"
+                   value="AI・データを活用する"
+                   onchange="highlightChecked('q10_type')">
+            <div class="icon-check-inner">
+              <div class="ic-emoji">🤖</div>
+              <div class="ic-text">AI・データを活用</div>
+            </div>
+          </label>
+          <label class="icon-check">
+            <input type="checkbox" name="q10_type"
+                   value="他の分野・製品のアイデアを医療に取り入れる"
+                   onchange="highlightChecked('q10_type')">
+            <div class="icon-check-inner">
+              <div class="ic-emoji">♻️</div>
+              <div class="ic-text">他分野のアイデアを転用</div>
+            </div>
+          </label>
+          <label class="icon-check">
+            <input type="checkbox" name="q10_type"
+                   value="まだよくわからない"
+                   onchange="highlightChecked('q10_type')">
+            <div class="icon-check-inner">
+              <div class="ic-emoji">🤔</div>
+              <div class="ic-text">まだわからない</div>
+            </div>
+          </label>
         </div>
       </div>
-    </div>
 
-    <div class="step-nav">
-      <button type="button" class="btn-prev" onclick="goPrev(3)">
-        <svg viewBox="0 0 20 20" width="18" fill="currentColor"><path d="M13 4L7 10l6 6"/></svg>
-        戻る
-      </button>
-      <button type="button" class="btn-next" onclick="goNext(3)">
-        期待される効果も整理してみる
-        <svg viewBox="0 0 20 20" width="18" fill="currentColor"><path d="M7 4l6 6-6 6"/></svg>
-      </button>
-    </div>
-    <div class="sub-action-row">
-      <button type="button" class="btn-clear-step" onclick="clearStep(3)">🗑️ 入力をクリア</button>
-    </div>
-  </section>
-
-  <!-- STEP 4: 期待効果 (O) -->
-  <section class="step-section" id="step4">
-    <div class="step-header">
-      <div class="step-num">5 / 5</div>
-      <div class="pico-label-large"><span class="pico-tag-large">O</span> このアイデアで何が変わるか</div>
-    </div>
-
-    <div class="field-block">
-      <label class="field-label">期待される改善 <span class="multi-tag">複数選択可</span> <span class="opt-badge">任意</span></label>
-      <div class="card-check-group" id="q12">
-        <label class="card-check"><input type="checkbox" name="q12" value="インシデント・アクシデントの減少" onchange="onCheckChange('q12')"><span>⚠️ インシデント・アクシデントの減少</span></label>
-        <label class="card-check"><input type="checkbox" name="q12" value="業務時間の短縮・残業削減" onchange="onCheckChange('q12')"><span>⏱️ 業務時間の短縮・残業削減</span></label>
-        <label class="card-check"><input type="checkbox" name="q12" value="患者さんの安心感・満足度向上" onchange="onCheckChange('q12')"><span>😊 患者さんの安心感・満足度向上</span></label>
-        <label class="card-check"><input type="checkbox" name="q12" value="スタッフの身体的・精神的負担の軽減" onchange="onCheckChange('q12')"><span>😌 スタッフ負担の軽減</span></label>
-        <label class="card-check"><input type="checkbox" name="q12" value="材料費・維持コストの削減" onchange="onCheckChange('q12')"><span>💴 材料費・維持コストの削減</span></label>
-        <label class="card-check"><input type="checkbox" name="q12" value="データの見える化・共有のしやすさ向上" onchange="onCheckChange('q12')"><span>📊 データの見える化・共有のしやすさ</span></label>
-        <label class="card-check"><input type="checkbox" name="q12" value="その他" id="q12-other-check" onchange="onCheckChange('q12'); toggleOtherInput('q12-other-check','q12-other-wrap')"><span>📝 その他</span></label>
-      </div>
-      <div class="other-input-wrap" id="q12-other-wrap">
+      <div class="field-block">
+        <label class="field-label" for="q10_detail">
+          形・大きさ・使い方のイメージ <span class="opt-badge">任意</span>
+        </label>
         <div class="textarea-mic-wrap">
-          <textarea id="q12-other-text" placeholder="その他の効果を自由に記載してください" oninput="updateProgress()"></textarea>
-          <button type="button" class="btn-mic" data-mic-target="q12-other-text" onclick="startVoice('q12-other-text')" title="音声入力">🎤</button>
-        </div>
-      </div>
-      <div class="field-fb" id="fb-q12"></div>
-    </div>
-
-    <div class="field-block">
-      <label class="field-label" for="q13">効果の規模感・インパクト <span class="opt-badge">任意</span></label>
-      <div class="textarea-mic-wrap">
-        <textarea id="q13" rows="2" placeholder="例：病棟全体で1日○時間短縮・年間○件のインシデント減少 など" oninput="onTextareaInput('q13')"></textarea>
-        <button type="button" class="btn-mic" data-mic-target="q13" onclick="startVoice('q13')" title="音声入力">🎤</button>
-      </div>
-      <div class="field-fb" id="fb-q13"></div>
-    </div>
-
-    <!-- O用 その場メモ -->
-    <div class="field-block">
-      <div class="step-memo">
-        <div class="step-memo-label">このOのステップに関するメモ（任意）</div>
-        <div class="textarea-mic-wrap">
-          <textarea id="memo_o" class="step-memo-textarea"
-            placeholder="期待効果に関して、迷っている点や次に確認したいことなどをメモしておけます。"
-            oninput="updateProgress()"></textarea>
+          <textarea id="q10_detail" rows="3"
+                    placeholder="例：手のひらサイズ・スマホに通知が来る"
+                    oninput="onTextareaInput()"></textarea>
           <button type="button" class="btn-mic"
-            data-mic-target="memo_o"
-            onclick="startVoice('memo_o')"
-            title="音声入力">🎤</button>
+                  data-mic-target="q10_detail"
+                  onclick="startVoice('q10_detail')"
+                  title="音声入力" aria-label="音声入力">
+            🎤
+          </button>
         </div>
+      </div>
+
+      <div class="field-block">
+        <label class="field-label" for="q10_ref">
+          参考・ヒントになったもの <span class="opt-badge">任意</span>
+        </label>
+        <div class="textarea-mic-wrap">
+          <textarea id="q10_ref" rows="2"
+                    placeholder="例：市販の○○のような形、他病院の取り組みを聞いた"
+                    oninput="onTextareaInput()"></textarea>
+          <button type="button" class="btn-mic"
+                  data-mic-target="q10_ref"
+                  onclick="startVoice('q10_ref')"
+                  title="音声入力" aria-label="音声入力">
+            🎤
+          </button>
+        </div>
+      </div>
+
+      <div class="field-block">
+        <label class="field-label" for="q10_concern">
+          心配な点 <span class="opt-badge">任意</span>
+        </label>
+        <div class="textarea-mic-wrap">
+          <textarea id="q10_concern" rows="2"
+                    placeholder="例：滅菌が必要・コストが高いかも"
+                    oninput="onTextareaInput()"></textarea>
+          <button type="button" class="btn-mic"
+                  data-mic-target="q10_concern"
+                  onclick="startVoice('q10_concern')"
+                  title="音声入力" aria-label="音声入力">
+            🎤
+          </button>
+        </div>
+      </div>
+
+      <!-- I用 その場メモ -->
+      <div class="field-block">
+        <div class="step-memo">
+          <div class="step-memo-label">
+            このIのステップに関するメモ（任意）
+          </div>
+          <div class="textarea-mic-wrap">
+            <textarea id="memo_i" class="step-memo-textarea"
+                      placeholder="アイデアに関する懸念・別案・メモしておきたいことを書いておけます。"
+                      oninput="onTextareaInput()"></textarea>
+            <button type="button" class="btn-mic"
+                    data-mic-target="memo_i"
+                    onclick="startVoice('memo_i')"
+                    title="音声入力" aria-label="音声入力">
+              🎤
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="step-nav">
+        <button type="button" class="btn-prev" onclick="goPrev(3)">
+          <svg viewBox="0 0 20 20" width="18" fill="currentColor">
+            <path d="M13 4L7 10l6 6"></path>
+          </svg>
+          戻る
+        </button>
+        <button type="button" class="btn-next" onclick="goNext(3)">
+          期待される効果も整理してみる
+          <svg viewBox="0 0 20 20" width="18" fill="currentColor">
+            <path d="M7 4l6 6-6 6"></path>
+          </svg>
+        </button>
+      </div>
+      <div class="sub-action-row">
+        <button type="button" class="btn-clear-step" onclick="clearStep(3)">
+          🗑️ 入力をクリア
+        </button>
+      </div>
+    </section>
+
+    <!-- STEP 4: 期待効果 (O) -->
+    <section class="step-section" id="step4">
+      <div class="step-header">
+        <div class="step-num">5 / 5</div>
+        <div class="pico-label-large">
+          <span class="pico-tag-large">O</span> このアイデアで何が変わるか
+        </div>
+      </div>
+
+      <div class="field-block">
+        <label class="field-label">
+          期待される改善
+          <span class="multi-tag">複数選択可</span>
+          <span class="opt-badge">任意</span>
+        </label>
+        <div class="card-check-group" id="q12">
+          <label class="card-check">
+            <input type="checkbox" name="q12"
+                   value="インシデント・アクシデントの減少"
+                   onchange="onCheckChange('q12')">
+            <span>⚠️ インシデント・アクシデントの減少</span>
+          </label>
+          <label class="card-check">
+            <input type="checkbox" name="q12"
+                   value="業務時間の短縮・残業削減"
+                   onchange="onCheckChange('q12')">
+            <span>⏱️ 業務時間の短縮・残業削減</span>
+          </label>
+          <label class="card-check">
+            <input type="checkbox" name="q12"
+                   value="患者さんの安心感・満足度向上"
+                   onchange="onCheckChange('q12')">
+            <span>😊 患者さんの安心感・満足度向上</span>
+          </label>
+          <label class="card-check">
+            <input type="checkbox" name="q12"
+                   value="スタッフの身体的・精神的負担の軽減"
+                   onchange="onCheckChange('q12')">
+            <span>😌 スタッフ負担の軽減</span>
+          </label>
+          <label class="card-check">
+            <input type="checkbox" name="q12"
+                   value="材料費・維持コストの削減"
+                   onchange="onCheckChange('q12')">
+            <span>💴 材料費・維持コストの削減</span>
+          </label>
+          <label class="card-check">
+            <input type="checkbox" name="q12"
+                   value="データの見える化・共有のしやすさ向上"
+                   onchange="onCheckChange('q12')">
+            <span>📊 データの見える化・共有のしやすさ</span>
+          </label>
+          <label class="card-check">
+            <input type="checkbox" name="q12"
+                   value="その他"
+                   id="q12-other-check"
+                   onchange="onCheckChange('q12')">
+            <span>📝 その他</span>
+          </label>
+        </div>
+        <div class="other-input-wrap" id="q12-other-wrap">
+          <div class="textarea-mic-wrap">
+            <textarea id="q12-other-text"
+                      placeholder="その他の効果を自由に記載してください"
+                      oninput="onTextareaInput()"></textarea>
+            <button type="button" class="btn-mic"
+                    data-mic-target="q12-other-text"
+                    onclick="startVoice('q12-other-text')"
+                    title="音声入力" aria-label="音声入力">
+              🎤
+            </button>
+          </div>
+        </div>
+        <div class="field-fb" id="fb-q12"></div>
+      </div>
+
+      <div class="field-block">
+        <label class="field-label" for="q13">
+          効果の規模感・インパクト <span class="opt-badge">任意</span>
+        </label>
+        <div class="textarea-mic-wrap">
+          <textarea id="q13" rows="2"
+                    placeholder="例：病棟全体で1日○時間短縮・年間○件のインシデント減少 など"
+                    oninput="onTextareaInput()"></textarea>
+          <button type="button" class="btn-mic"
+                  data-mic-target="q13"
+                  onclick="startVoice('q13')"
+                  title="音声入力" aria-label="音声入力">
+            🎤
+          </button>
+        </div>
+        <div class="field-fb" id="fb-q13"></div>
+      </div>
+
+      <!-- O用 その場メモ -->
+      <div class="field-block">
+        <div class="step-memo">
+          <div class="step-memo-label">
+            このOのステップに関するメモ（任意）
+          </div>
+          <div class="textarea-mic-wrap">
+            <textarea id="memo_o" class="step-memo-textarea"
+                      placeholder="期待効果に関して、迷っている点や次に確認したいことなどをメモしておけます。"
+                      oninput="onTextareaInput()"></textarea>
+            <button type="button" class="btn-mic"
+                    data-mic-target="memo_o"
+                    onclick="startVoice('memo_o')"
+                    title="音声入力" aria-label="音声入力">
+              🎤
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="step-nav">
+        <button type="button" class="btn-prev" onclick="goPrev(4)">
+          <svg viewBox="0 0 20 20" width="18" fill="currentColor">
+            <path d="M13 4L7 10l6 6"></path>
+          </svg>
+          戻る
+        </button>
+        <button type="button" class="btn-preview" onclick="showPreview()">
+          内容をプレビュー・送信する
+          <svg viewBox="0 0 20 20" width="18" fill="currentColor">
+            <path d="M7 4l6 6-6 6"></path>
+          </svg>
+        </button>
+      </div>
+      <div class="sub-action-row sub-action-row--step5">
+        <button type="button" class="btn-clear-step" onclick="clearStep(4)">
+          🗑️ 入力をクリア
+        </button>
+      </div>
+    </section>
+
+  </form>
+
+  <!-- ===== レポート概要ビュー ===== -->
+  <section class="report-section" id="reportView">
+    <div class="report-header">
+      <div class="report-title">レポート概要</div>
+      <div class="report-sub">
+        これまでに入力された内容を、P / C / I / O の流れに沿って一覧できます。
       </div>
     </div>
 
-    <div class="step-nav">
-      <button type="button" class="btn-prev" onclick="goPrev(4)">
-        <svg viewBox="0 0 20 20" width="18" fill="currentColor"><path d="M13 4L7 10l6 6"/></svg>
-        戻る
-      </button>
-      <button type="button" class="btn-preview" onclick="showPreview()">
-        内容をプレビュー・送信する
-        <svg viewBox="0 0 20 20" width="18" fill="currentColor"><path d="M7 4l6 6-6 6"/></svg>
-      </button>
+    <div class="report-body">
+      <pre id="reportSummary"></pre>
     </div>
-    <div class="sub-action-row sub-action-row--step5">
-      <button type="button" class="btn-clear-step" onclick="clearStep(4)">🗑️ 入力をクリア</button>
+
+    <div class="report-footer">
+      <button type="button" class="btn-prev" onclick="hideReportView()">
+        入力画面に戻る
+      </button>
     </div>
   </section>
-
-</form>
 </main>
 
 <!-- ===== プレビュー用モーダル ===== -->
@@ -563,16 +985,30 @@
     <pre id="previewText"></pre>
 
     <div id="picoBox" style="display:none;margin-top:16px;">
-      <h3 style="font-size:0.9em;color:#2e8b5f;margin-bottom:6px;">PICOの要約（参考）</h3>
-      <div id="picoContent" style="font-size:0.82em;color:#333;line-height:1.7;"></div>
+      <h3 style="font-size:0.9em;color:#2e8b5f;margin-bottom:6px;">
+        PICOの要約（参考）
+      </h3>
+      <div id="picoContent"
+           style="font-size:0.82em;color:#333;line-height:1.7;"></div>
     </div>
 
     <div class="modal-btn-row">
-      <button type="button" class="btn-mail" onclick="actionSendMail()">📧 メールで送る</button>
-      <button type="button" class="btn-mail" onclick="actionSaveToFolder()">💾 テキストとして保存</button>
-      <button type="button" class="btn-mail" onclick="actionSavePDF()">🖨️ PDF/印刷</button>
-      <button type="button" class="btn-mail" onclick="actionAnalyze()">📊 別ページで分析</button>
-      <button type="button" class="btn-close" onclick="closePreviewModal()">閉じる</button>
+      <button type="button" class="btn-mail" onclick="actionSendMail()">
+        📧 メールで送る
+      </button>
+      <button type="button" class="btn-mail" onclick="actionSaveToFolder()">
+        💾 テキストとして保存
+      </button>
+      <button type="button" class="btn-mail" onclick="actionSavePDF()">
+        🖨️ PDF/印刷
+      </button>
+      <button type="button" class="btn-mail" onclick="actionAnalyze()">
+        📊 別ページで分析
+      </button>
+      <button type="button" class="btn-close"
+              onclick="closePreviewModal()">
+        閉じる
+      </button>
     </div>
   </div>
 </div>
@@ -588,12 +1024,18 @@
     <p style="font-size:0.82em;color:#555;margin:10px 0 6px;">
       必要に応じて、追加の送信先メールアドレスを入力してください（任意）。
     </p>
-    <input type="email" id="mailTo" placeholder="追加の送信先メールアドレス（任意）" oninput="onMailToInput()">
+    <input type="email" id="mailTo"
+           placeholder="追加の送信先メールアドレス（任意）"
+           oninput="onMailToInput()">
     <div id="mailToFb" style="font-size:0.8em;margin-top:4px;"></div>
 
     <div class="modal-btn-row">
-      <button type="button" class="btn-mail" onclick="doSendMail()">📧 メールを作成する</button>
-      <button type="button" class="btn-close" onclick="closeMailModal()">閉じる</button>
+      <button type="button" class="btn-mail" onclick="doSendMail()">
+        📧 メールを作成する
+      </button>
+      <button type="button" class="btn-close" onclick="closeMailModal()">
+        閉じる
+      </button>
     </div>
   </div>
 </div>
@@ -612,7 +1054,9 @@
       入力内容はクリアされました。<br>
       再度ヒアリングを行う場合は、下のボタンからフォームを再開してください。
     </div>
-    <button type="button" class="btn-restart" onclick="restartFromEnd()">フォームを再開する</button>
+    <button type="button" class="btn-restart" onclick="restartFromEnd()">
+      フォームを再開する
+    </button>
   </div>
 </div>
 
