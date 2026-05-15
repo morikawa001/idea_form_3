@@ -264,6 +264,16 @@
       <div class="field-fb" id="fb-q7"></div>
     </div>
 
+    <!-- P用 その場メモ（ふせん） -->
+    <div class="field-block">
+      <div class="step-memo">
+        <div class="step-memo-label">このPのステップに関するメモ（任意）</div>
+        <textarea id="memo_p" class="step-memo-textarea"
+          placeholder="Pに関するラフなメモや、その場で出た補足を自由にメモしてください。"
+          oninput="updateProgress()"></textarea>
+      </div>
+    </div>
+
     <div class="step-nav">
       <button type="button" class="btn-prev" onclick="goPrev(1)">
         <svg viewBox="0 0 20 20" width="18" fill="currentColor"><path d="M13 4L7 10l6 6"/></svg>
@@ -314,6 +324,16 @@
         </div>
       </div>
       <div class="field-fb" id="fb-q9"></div>
+    </div>
+
+    <!-- C用 その場メモ -->
+    <div class="field-block">
+      <div class="step-memo">
+        <div class="step-memo-label">このCのステップに関するメモ（任意）</div>
+        <textarea id="memo_c" class="step-memo-textarea"
+          placeholder="今の対応についての補足や、その場で出た気づきをメモしておけます。"
+          oninput="updateProgress()"></textarea>
+      </div>
     </div>
 
     <div class="step-nav">
@@ -403,6 +423,16 @@
       </div>
     </div>
 
+    <!-- I用 その場メモ -->
+    <div class="field-block">
+      <div class="step-memo">
+        <div class="step-memo-label">このIのステップに関するメモ（任意）</div>
+        <textarea id="memo_i" class="step-memo-textarea"
+          placeholder="アイデアに関する懸念・別案・メモしておきたいことを書いておけます。"
+          oninput="updateProgress()"></textarea>
+      </div>
+    </div>
+
     <div class="step-nav">
       <button type="button" class="btn-prev" onclick="goPrev(3)">
         <svg viewBox="0 0 20 20" width="18" fill="currentColor"><path d="M13 4L7 10l6 6"/></svg>
@@ -428,18 +458,19 @@
     </div>
 
     <div class="field-block">
-      <label class="field-label">期待できる改善 <span class="opt-badge">任意</span> <span class="multi-tag">複数選択可</span></label>
+      <label class="field-label">期待される改善 <span class="multi-tag">複数選択可</span> <span class="opt-badge">任意</span></label>
       <div class="card-check-group" id="q12">
-        <label class="card-check"><input type="checkbox" name="q12" value="インシデント件数の減少（医療安全の向上）" onchange="onCheckChange('q12')"><span>🛡️ 医療安全の向上</span></label>
-        <label class="card-check"><input type="checkbox" name="q12" value="業務時間・記録時間の短縮" onchange="onCheckChange('q12')"><span>⏱️ 業務・記録時間の短縮</span></label>
-        <label class="card-check"><input type="checkbox" name="q12" value="患者さんの回復促進（早期離床・QOL向上など）" onchange="onCheckChange('q12')"><span>🏃 患者さんの回復促進</span></label>
-        <label class="card-check"><input type="checkbox" name="q12" value="コスト削減（物品費・人件費など）" onchange="onCheckChange('q12')"><span>💴 コスト削減</span></label>
-        <label class="card-check"><input type="checkbox" name="q12" value="スタッフの負担軽減・満足度向上" onchange="onCheckChange('q12')"><span>😊 スタッフの負担軽減</span></label>
+        <label class="card-check"><input type="checkbox" name="q12" value="インシデント・アクシデントの減少" onchange="onCheckChange('q12')"><span>⚠️ インシデント・アクシデントの減少</span></label>
+        <label class="card-check"><input type="checkbox" name="q12" value="業務時間の短縮・残業削減" onchange="onCheckChange('q12')"><span>⏱️ 業務時間の短縮・残業削減</span></label>
+        <label class="card-check"><input type="checkbox" name="q12" value="患者さんの安心感・満足度向上" onchange="onCheckChange('q12')"><span>😊 患者さんの安心感・満足度向上</span></label>
+        <label class="card-check"><input type="checkbox" name="q12" value="スタッフの身体的・精神的負担の軽減" onchange="onCheckChange('q12')"><span>😌 スタッフ負担の軽減</span></label>
+        <label class="card-check"><input type="checkbox" name="q12" value="材料費・維持コストの削減" onchange="onCheckChange('q12')"><span>💴 材料費・維持コストの削減</span></label>
+        <label class="card-check"><input type="checkbox" name="q12" value="データの見える化・共有のしやすさ向上" onchange="onCheckChange('q12')"><span>📊 データの見える化・共有のしやすさ</span></label>
         <label class="card-check"><input type="checkbox" name="q12" value="その他" id="q12-other-check" onchange="onCheckChange('q12'); toggleOtherInput('q12-other-check','q12-other-wrap')"><span>📝 その他</span></label>
       </div>
       <div class="other-input-wrap" id="q12-other-wrap">
         <div class="textarea-mic-wrap">
-          <textarea id="q12-other-text" placeholder="どのような改善が期待できるか記録してください" oninput="updateProgress()"></textarea>
+          <textarea id="q12-other-text" placeholder="その他の効果を自由に記載してください" oninput="updateProgress()"></textarea>
           <button type="button" class="btn-mic" data-mic-target="q12-other-text" onclick="startVoice('q12-other-text')" title="音声入力">🎤</button>
         </div>
       </div>
@@ -447,17 +478,22 @@
     </div>
 
     <div class="field-block">
-      <label class="field-label" for="q13">改善規模のイメージ <span class="opt-badge">任意</span></label>
+      <label class="field-label" for="q13">効果の規模感・インパクト <span class="opt-badge">任意</span></label>
       <div class="textarea-mic-wrap">
-        <textarea id="q13" placeholder="例：1日30分削減・インシデントが減る" oninput="onTextareaInput('q13')"></textarea>
+        <textarea id="q13" rows="2" placeholder="例：病棟全体で1日○時間短縮・年間○件のインシデント減少 など" oninput="onTextareaInput('q13')"></textarea>
         <button type="button" class="btn-mic" data-mic-target="q13" onclick="startVoice('q13')" title="音声入力">🎤</button>
       </div>
       <div class="field-fb" id="fb-q13"></div>
     </div>
 
+    <!-- O用 その場メモ -->
     <div class="field-block">
-      <label class="field-label">写真・資料があれば <span class="opt-badge">任意</span></label>
-      <p class="field-note">写真や資料がある場合は、メール送信時にメーラーから添付してください。</p>
+      <div class="step-memo">
+        <div class="step-memo-label">このOのステップに関するメモ（任意）</div>
+        <textarea id="memo_o" class="step-memo-textarea"
+          placeholder="期待効果に関して、迷っている点や次に確認したいことなどをメモしておけます。"
+          oninput="updateProgress()"></textarea>
+      </div>
     </div>
 
     <div class="step-nav">
@@ -466,85 +502,79 @@
         戻る
       </button>
       <button type="button" class="btn-preview" onclick="showPreview()">
-        👁 パズルを整理して確認する
+        内容をプレビュー・送信する
+        <svg viewBox="0 0 20 20" width="18" fill="currentColor"><path d="M7 4l6 6-6 6"/></svg>
       </button>
     </div>
-
     <div class="sub-action-row sub-action-row--step5">
       <button type="button" class="btn-clear-step" onclick="clearStep(4)">🗑️ 入力をクリア</button>
-      <button type="button" class="btn-secondary" onclick="resetForm()">🔄 最初からやり直す</button>
     </div>
   </section>
 
 </form>
 </main>
 
-<!-- ===== 終了画面 ===== -->
-<div class="end-screen" id="endScreen">
-  <div class="end-inner">
-    <div class="end-icon">🌿</div>
-    <h2 class="end-title">ヒアリング完了</h2>
-    <p class="end-body">
-      記録内容を保存・共有してください。<br>
-      <strong>「分析」から AI による詳細分析</strong>も行えます。
-    </p>
-    <button type="button" class="btn-restart" onclick="restartFromEnd()">
-      💡 新しいヒアリングを開始する
-    </button>
-  </div>
-</div>
-
-<!-- ===== プレビュー＆アクションモーダル ===== -->
+<!-- ===== プレビュー用モーダル ===== -->
 <div class="modal-overlay" id="previewModal">
   <div class="modal">
-    <h2>📋 ヒアリング内容の確認</h2>
-    <p style="font-size:0.85em;color:#666;margin-bottom:12px;">記録内容を確認し、アクションを選択してください。</p>
+    <h2>ヒアリング内容のプレビュー</h2>
+    <p style="font-size:0.82em;color:#555;margin-bottom:8px;">
+      内容を確認し、必要であれば修正してください。
+    </p>
     <pre id="previewText"></pre>
-    <div id="picoBox" style="margin-top:14px; padding:14px; background:#edf7f2; border-radius:8px;
-         font-size:0.83em; line-height:1.9; border-left:4px solid #4caf88; display:none;">
-      <strong>🔬 自動まとめ：アイデア実現のためのたたき台（PICO）</strong><br>
-      <span style="font-size:0.82em;color:#555;">※ 入力内容をもとに自動で整理しました。</span><br><br>
-      <span id="picoContent"></span>
+
+    <div id="picoBox" style="display:none;margin-top:16px;">
+      <h3 style="font-size:0.9em;color:#2e8b5f;margin-bottom:6px;">PICOの要約（参考）</h3>
+      <div id="picoContent" style="font-size:0.82em;color:#333;line-height:1.7;"></div>
     </div>
 
-    <div class="modal-action-grid">
-      <button class="btn-action btn-copy"    onclick="actionCopy()">📋 内容をコピー</button>
-      <button class="btn-action btn-save"    onclick="actionSaveToFolder()">💾 フォルダに保存</button>
-      <button class="btn-action btn-mail"    onclick="actionSendMail()">✉️ メールで送信</button>
-      <button class="btn-action btn-pdf"     onclick="actionSavePDF()">🖨️ PDFで保存</button>
-      <button class="btn-action btn-analyze" onclick="actionAnalyze()">🔬 分析</button>
-    </div>
-    <div class="modal-footer-row">
-      <button class="btn-back-active" onclick="closePreviewModal()">← 戻る</button>
-      <button class="btn-end-footer"  onclick="actionEnd()">🔚 終了</button>
+    <div class="modal-btn-row">
+      <button type="button" class="btn-mail" onclick="actionSendMail()">📧 メールで送る</button>
+      <button type="button" class="btn-mail" onclick="actionSaveToFolder()">💾 テキストとして保存</button>
+      <button type="button" class="btn-mail" onclick="actionSavePDF()">🖨️ PDF/印刷</button>
+      <button type="button" class="btn-mail" onclick="actionAnalyze()">📊 別ページで分析</button>
+      <button type="button" class="btn-close" onclick="closePreviewModal()">閉じる</button>
     </div>
   </div>
 </div>
 
-<!-- ===== メール送信先入力モーダル ===== -->
+<!-- ===== メール送信先選択モーダル ===== -->
 <div class="modal-overlay" id="mailModal">
-  <div class="modal modal--small">
-    <h2>✉️ メールで送信</h2>
-    <div class="mail-default-info" id="mailDefaultInfo">
-      <span class="mail-default-label">📬 送信先（固定）：</span>
-      <span class="mail-default-addr" id="mailDefaultDisplay"></span>
+  <div class="modal">
+    <h2>送信先メールアドレスの確認</h2>
+    <div class="mail-default-info">
+      <div class="mail-default-label">デフォルト送信先：</div>
+      <div class="mail-default-addr" id="mailDefaultDisplay"></div>
     </div>
-    <p style="font-size:0.85em;color:#666;margin:10px 0 6px;">追加の送信先があれば入力してください（任意）。</p>
-    <input type="email" id="mailTo" placeholder="例：recipient@hospital.jp"
-      style="width:100%;padding:10px;border:1px solid #ccc;border-radius:6px;font-size:1em;box-sizing:border-box;"
-      oninput="onMailToInput()">
-    <div id="mailToFb" style="font-size:0.82em;margin-top:4px;min-height:1.2em;"></div>
+    <p style="font-size:0.82em;color:#555;margin:10px 0 6px;">
+      必要に応じて、追加の送信先メールアドレスを入力してください（任意）。
+    </p>
+    <input type="email" id="mailTo" placeholder="追加の送信先メールアドレス（任意）" oninput="onMailToInput()">
+    <div id="mailToFb" style="font-size:0.8em;margin-top:4px;"></div>
 
-    <div class="modal-btn-row" style="margin-top:12px;">
-      <button class="btn-mail" onclick="doSendMail()">送信する</button>
-      <button class="btn-close" onclick="closeMailModal()">キャンセル</button>
+    <div class="modal-btn-row">
+      <button type="button" class="btn-mail" onclick="doSendMail()">📧 メールを作成する</button>
+      <button type="button" class="btn-close" onclick="closeMailModal()">閉じる</button>
     </div>
   </div>
 </div>
 
-<!-- 音声入力ステータス表示 -->
-<div id="voiceStatus" class="voice-status" style="display:none;">
-  <span class="voice-dot"></span> 音声認識中… タップで停止
+<!-- ===== 音声入力ステータス ===== -->
+<div id="voiceStatus">
+  <span>🎤 音声入力中… クリックで停止</span>
+</div>
+
+<!-- ===== 終了画面 ===== -->
+<div id="endScreen" class="end-screen">
+  <div class="end-inner">
+    <div class="end-icon">✅</div>
+    <div class="end-title">ヒアリングを終了しました</div>
+    <div class="end-body">
+      入力内容はクリアされました。<br>
+      再度ヒアリングを行う場合は、下のボタンからフォームを再開してください。
+    </div>
+    <button type="button" class="btn-restart" onclick="restartFromEnd()">フォームを再開する</button>
+  </div>
 </div>
 
 <script src="script.js"></script>
