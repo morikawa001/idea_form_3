@@ -1134,7 +1134,7 @@ textarea { resize: vertical; min-height: 90px; }
 }
 
 /* ============================================================
-   中央放射状メニュー
+   中央放射状メニュー（重なり解消＆ボタン拡大版）
 ============================================================ */
 
 .radial-menu-wrap {
@@ -1146,8 +1146,8 @@ textarea { resize: vertical; min-height: 90px; }
 
 .radial-menu {
   position: relative;
-  width: 260px;
-  height: 260px;
+  width: 320px;   /* 260 → 320 に拡大 */
+  height: 320px;  /* 260 → 320 に拡大 */
   margin: 0 auto;
   border-radius: 50%;
   background: radial-gradient(circle at 50% 50%, #ffffff 0, #f4faf7 45%, #e0f3eb 100%);
@@ -1160,8 +1160,8 @@ textarea { resize: vertical; min-height: 90px; }
   left: 50%;
   top: 50%;
   transform: translate(-50%,-50%);
-  width: 120px;
-  height: 120px;
+  width: 130px;      /* 少しだけ大きめ */
+  height: 130px;
   border-radius: 50%;
   border: 2px solid var(--green-mid);
   background: var(--green-pale);
@@ -1177,11 +1177,12 @@ textarea { resize: vertical; min-height: 90px; }
   transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
 }
 .radial-center-icon {
-  font-size: 1.7em;
+  font-size: 1.8em;
 }
 .radial-center-label {
-  font-size: 0.86em;
+  font-size: 0.90em;
   font-weight: 700;
+  white-space: nowrap;  /* 中央も改行させない */
 }
 .radial-center:hover {
   transform: translate(-50%,-52%);
@@ -1195,8 +1196,8 @@ textarea { resize: vertical; min-height: 90px; }
 /* 放射状ボタン */
 .radial-item {
   position: absolute;
-  width: 120px;
-  height: 52px;
+  width: 150px;    /* 120 → 150 に拡大 */
+  height: 60px;    /* 52 → 60 に拡大 */
   border-radius: 999px;
   border: 2px solid var(--green-border);
   background: #ffffff;
@@ -1204,16 +1205,17 @@ textarea { resize: vertical; min-height: 90px; }
   align-items: center;
   justify-content: center;
   gap: 6px;
-  padding: 8px 10px;
+  padding: 8px 12px;
   font-family: inherit;
-  font-size: 0.80em;
+  font-size: 0.82em;
   color: var(--text-sub);
   cursor: pointer;
   box-shadow: 0 2px 8px rgba(0,0,0,.08);
   transition: transform .18s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease;
+  white-space: nowrap;   /* 文字を途中で改行させない */
 }
 .radial-item .radial-emoji {
-  font-size: 1.2em;
+  font-size: 1.25em;
 }
 .radial-item .radial-label {
   display: inline-flex;
@@ -1221,28 +1223,28 @@ textarea { resize: vertical; min-height: 90px; }
   gap: 4px;
 }
 .radial-item .pico-tag {
-  font-size: 0.70em;
+  font-size: 0.72em;
 }
 
-/* 位置：上・右・下・左 */
+/* 位置：上・右・下・左（より外側へ配置） */
 .radial-item-top {
   left: 50%;
-  top: 10px;
+  top: 12px;                 /* 上端から少し余裕をもたせる */
   transform: translateX(-50%);
 }
 .radial-item-right {
   top: 50%;
-  right: 10px;
+  right: 12px;               /* 右端から少し余裕 */
   transform: translateY(-50%);
 }
 .radial-item-bottom {
   left: 50%;
-  bottom: 10px;
+  bottom: 12px;              /* 下端から少し余裕 */
   transform: translateX(-50%);
 }
 .radial-item-left {
   top: 50%;
-  left: 10px;
+  left: 12px;                /* 左端から少し余裕 */
   transform: translateY(-50%);
 }
 
@@ -1266,16 +1268,17 @@ textarea { resize: vertical; min-height: 90px; }
 /* 小さな画面で少し縮小 */
 @media (max-width: 480px) {
   .radial-menu {
-    width: 220px;
-    height: 220px;
+    width: 280px;   /* 320 より少し小さく */
+    height: 280px;
   }
   .radial-center {
-    width: 110px;
-    height: 110px;
+    width: 120px;
+    height: 120px;
   }
   .radial-item {
-    width: 110px;
-    font-size: 0.78em;
+    width: 140px;
+    height: 56px;
+    font-size: 0.80em;
   }
 }
 
