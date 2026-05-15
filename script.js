@@ -6,7 +6,7 @@
 const DEFAULT_MAIL_TO = 'ns.morizo@gmail.com';
 
 // ★ 追加：GAS の Web アプリ URL（APIキーは GAS 側で保持）
-const GAS_URL = 'ここにあなたのGASのURL';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbwFGWXonRPSDqhToxurlrxmvb0oMydOdM18_2Jy5aQWDXP60o6bKjkjYYfu741dgkqB/exec';
 
 let startTime = null;
 
