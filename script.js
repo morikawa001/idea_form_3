@@ -1,6 +1,5 @@
 // ============================================================
-// MIT ヒアリングフォーム v3.6 — script.js
-// q4「主にこまっているのは？」・q5「発生頻度」修正版
+// MIT ヒアリングフォーム v3.6 — script.js（レポート概要対応版）
 // ============================================================
 
 // デフォルト送信先
@@ -214,7 +213,7 @@ function showStep(step) {
   currentStep = step;
 }
 
-// 任意入力なので必須チェックはなし
+// 任意入力なので必須チェックは空
 const STEP_REQUIRED = [() => [], () => [], () => [], () => [], () => []];
 
 function goNext(step) {
@@ -234,7 +233,8 @@ function goPrev(step) {
 // ユーティリティ
 // ============================================================
 function getVal(id) {
-  return (document.getElementById(id) || { value: '' }).value.trim();
+  const el = document.getElementById(id);
+  return el ? el.value.trim() : '';
 }
 
 function getRadio(name) {
@@ -243,17 +243,21 @@ function getRadio(name) {
 }
 
 function getChecks(name) {
-  return [...document.querySelectorAll(`input[name="${name}"]:checked`)].map((e) => e.value);
+  return [...document.querySelectorAll(`input[name="${name}"]:checked`)].map(
+    (e) => e.value
+  );
 }
 
 function getQ3Value() {
   const v = getRadio('q3');
-  return v === 'その他' ? `その他（${getVal('q3-other-text')}）` : (v || '');
+  if (!v) return '';
+  return v === 'その他' ? `その他（${getVal('q3-other-text')}）` : v;
 }
 
 function getQ4Value() {
   const v = getRadio('q4');
-  return v === 'その他' ? `その他（${getVal('q4-other-text')}）` : (v || '');
+  if (!v) return '';
+  return v === 'その他' ? `その他（${getVal('q4-other-text')}）` : v;
 }
 
 function getQ6Values() {
@@ -279,7 +283,7 @@ function getIdeaTypes() {
 }
 
 // ============================================================
-// ステップ別進捗対象の定義
+// ステップ別進捗対象
 // ============================================================
 const STEP_ITEMS = {
   0: [
@@ -364,21 +368,8 @@ function updateProgress() {
 }
 
 // ============================================================
-// 入力イベント
+// 入力イベント（HTML 側から引数なしで呼ぶ）
 // ============================================================
-function showFieldFb(id, text, cls) {
-  const el = document.getElementById(`fb-${id}`);
-  if (!el) return;
-
-  el.textContent = text || '';
-  el.className = 'field-fb';
-
-  if (text) {
-    el.classList.add('show');
-    if (cls) el.classList.add(cls);
-  }
-}
-
 function onSelectChange() {
   updateProgress();
 }
@@ -496,7 +487,42 @@ function updateIdeaCharCount() {
 }
 
 // ============================================================
-// プレビュー用テキスト生成
+// レポート概要用テキスト
+// ============================================================
+function buildSummary() {
+  const q6v = getQ6Values();
+  const q9v = getQ9Values();
+  const q12v = getQ12Values();
+  const ideaTypes = getIdeaTypes();
+
+  return [
+    '【発案者情報】',
+    `所属部署：${getVal('q1') || '（未記入）'}`,
+    `氏名　　：${getVal('q2') || '（未記入）'}`,
+    `職種　　：${getQ3Value() || '（未選択）'}`,
+    '',
+    '【P：困りごと】',
+    `対象　　：${getQ4Value() || '（未選択）'}`,
+    `頻度　　：${getRadio('q5') || '（未選択）'}`,
+    `影響　　：${q6v.join(' / ') || '（未選択）'}`,
+    `場面　　：${getVal('q7') || '（未記入）'}`,
+    '',
+    '【C：今の対応】',
+    `対応内容：${getVal('q8') || '（未記入）'}`,
+    `問題点　：${q9v.length ? q9v.join(' / ') : '特になし'}`,
+    '',
+    '【I：アイデア】',
+    `内容　　：${getVal('q10') || '（未記入）'}`,
+    `アプローチ：${ideaTypes.length ? ideaTypes.join(' / ') : '（未選択）'}`,
+    '',
+    '【O：期待効果】',
+    `改善点　：${q12v.join(' / ') || '（未選択）'}`,
+    `インパクト：${getVal('q13') || '（未記入）'}`
+  ].join('\n');
+}
+
+// ============================================================
+// プレビュー用テキスト生成（全文）
 // ============================================================
 function buildText() {
   const q6v = getQ6Values();
@@ -559,6 +585,31 @@ function buildText() {
 }
 
 // ============================================================
+// レポートビュー表示/非表示
+// ============================================================
+function showReportView() {
+  const form = document.getElementById('ideaForm');
+  const report = document.getElementById('reportView');
+  const pre = document.getElementById('reportSummary');
+
+  if (form) form.style.display = 'none';
+  if (report) report.classList.add('active');
+  if (pre) pre.textContent = buildSummary();
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function hideReportView() {
+  const form = document.getElementById('ideaForm');
+  const report = document.getElementById('reportView');
+
+  if (report) report.classList.remove('active');
+  if (form) form.style.display = '';
+
+  showStep(currentStep);
+}
+
+// ============================================================
 // プレビュー・各種アクション
 // ============================================================
 function showPreview() {
@@ -591,6 +642,7 @@ function closeMailModal() {
 }
 
 function onMailToInput() {
+  // 将来的なバリデーション用に空関数で確保
 }
 
 function doSendMail() {
@@ -670,10 +722,12 @@ function clearStep(step) {
       break;
 
     case 3:
-      ['q10', 'q10_detail', 'q10_ref', 'q10_concern', 'memo_i'].forEach((id) => {
-        const el = document.getElementById(id);
-        if (el) el.value = '';
-      });
+      ['q10', 'q10_detail', 'q10_ref', 'q10_concern', 'memo_i'].forEach(
+        (id) => {
+          const el = document.getElementById(id);
+          if (el) el.value = '';
+        }
+      );
       document.querySelectorAll('input[name="q10_type"]').forEach((el) => {
         el.checked = false;
       });
@@ -694,13 +748,14 @@ function clearStep(step) {
       break;
   }
 
+  // 見た目の再同期
   syncCardRadio('q3');
   syncCardRadio('q4');
   syncFreqCards();
   syncCardCheck('q6');
   syncCardCheck('q9');
   syncCardCheck('q12');
-  highlightChecked('q10type');
+  highlightChecked('q10_type');
 
   updateProgress();
 }
@@ -718,6 +773,7 @@ function restartFromEnd() {
 // 初期化
 // ============================================================
 document.addEventListener('DOMContentLoaded', () => {
+  // ロードマップクリックでステップ移動
   document.querySelectorAll('.roadmap-step').forEach((stepEl) => {
     stepEl.style.cursor = 'pointer';
     stepEl.addEventListener('click', () => {
@@ -726,7 +782,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // 中央パネルメニューからも移動
   document.querySelectorAll('.panel-main, .panel-item').forEach((btn) => {
+    if (!btn.hasAttribute('data-step')) return;
     btn.addEventListener('click', () => {
       const step = parseInt(btn.getAttribute('data-step'), 10);
       if (!isNaN(step)) showStep(step);
@@ -734,13 +792,14 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // 初期状態同期
   syncCardRadio('q3');
   syncCardRadio('q4');
   syncFreqCards();
   syncCardCheck('q6');
   syncCardCheck('q9');
   syncCardCheck('q12');
-  highlightChecked('q10type');
+  highlightChecked('q10_type');
 
   updateProgress();
   showStep(0);
