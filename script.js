@@ -387,7 +387,7 @@ function buildText() {
 //  ロードマップ + 放射状メニュー クリックナビ
 // ============================================================
 document.addEventListener('DOMContentLoaded', () => {
-  // 上部ロードマップ
+  // 上部ロードマップ（そのまま）
   document.querySelectorAll('.roadmap-step').forEach(stepEl => {
     stepEl.style.cursor = 'pointer';
     stepEl.addEventListener('click', () => {
@@ -396,13 +396,11 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // 中央放射状メニュー
-  document.querySelectorAll('.radial-center, .radial-item').forEach(btn => {
+  // 中央パズルメニュー（基本情報＋周囲4ピース）
+  document.querySelectorAll('.puzzle-center, .puzzle-item').forEach(btn => {
     btn.addEventListener('click', () => {
       const step = parseInt(btn.getAttribute('data-step'), 10);
       if (!isNaN(step)) showStep(step);
-      // 最初のクリック時に、ロードマップ・プログレスバー・ガイドバーが
-      // 画面上部に来るように少しスクロール
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
   });
