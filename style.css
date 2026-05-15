@@ -957,121 +957,113 @@ textarea { resize: vertical; min-height: 90px; }
 }
 
 /* ============================================================
-   中央パズルメニュー（基本情報＋周囲の4ピース）
+   中央パネルメニュー（基本情報＋P/C/I/O）
 ============================================================ */
 
 .puzzle-menu-wrap {
   max-width: 680px;
   margin: 24px auto 12px;
   padding: 16px 16px 8px;
-  text-align: center;
 }
 
-.puzzle-menu {
-  position: relative;
-  width: 420px;
-  max-width: 100%;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(3, 90px);
-  gap: 8px;
-}
-
-/* 中央ピース：基本情報 */
-.puzzle-center {
-  grid-column: 2 / 3;
-  grid-row: 2 / 3;
+/* 上部：横長メインパネル（基本情報） */
+.panel-main {
+  width: 100%;
   border-radius: 16px;
   border: 2px solid var(--green-mid);
   background: var(--green-pale);
-  color: var(--green-dark);
   display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 4px;
-  font-family: inherit;
+  gap: 12px;
+  padding: 14px 16px;
   cursor: pointer;
-  box-shadow: 0 4px 10px rgba(46,139,95,.25);
+  box-shadow: 0 4px 12px rgba(46,139,95,.25);
   transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
 }
-.puzzle-center-emoji {
-  font-size: 1.8em;
+
+.panel-main-emoji {
+  font-size: 2.0em;
+  flex-shrink: 0;
 }
-.puzzle-center-label {
-  font-size: 0.92em;
+
+.panel-main-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.panel-main-title {
+  font-size: 0.98em;
   font-weight: 700;
-  white-space: nowrap;
+  color: var(--green-dark);
 }
-.puzzle-center:hover {
+
+.panel-main-sub {
+  font-size: 0.80em;
+  color: var(--text-sub);
+}
+
+.panel-main:hover {
   background: #e0f7ec;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(46,139,95,.35);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(46,139,95,.35);
 }
-.puzzle-center:active {
+.panel-main:active {
   transform: scale(.97);
 }
 
-/* 周囲のピース：P / C / I / O */
-.puzzle-item {
+/* 下段：P/C/I/O 2×2 グリッド */
+.panel-grid {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.panel-item {
   border-radius: 14px;
   border: 2px solid var(--green-border);
   background: #ffffff;
+  padding: 10px 10px;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  align-items: flex-start;
   gap: 4px;
-  font-family: inherit;
-  font-size: 0.80em;
-  color: var(--text-sub);
   cursor: pointer;
   box-shadow: 0 2px 6px rgba(0,0,0,.06);
   transition: transform .15s ease, box-shadow .15s ease, background .15s ease, border-color .15s ease;
-  white-space: nowrap;
 }
-.puzzle-emoji {
-  font-size: 1.4em;
+
+.panel-emoji {
+  font-size: 1.3em;
 }
-.puzzle-label {
+
+.panel-label {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-}
-.puzzle-label .pico-tag {
-  font-size: 0.72em;
-}
-
-/* 配置：上左右・下左右＋中央 */
-.puzzle-item-top-left {
-  grid-column: 1 / 2;
-  grid-row: 1 / 2;
-}
-.puzzle-item-top-right {
-  grid-column: 3 / 4;
-  grid-row: 1 / 2;
-}
-.puzzle-item-bottom-left {
-  grid-column: 1 / 2;
-  grid-row: 3 / 4;
-}
-.puzzle-item-bottom-right {
-  grid-column: 3 / 4;
-  grid-row: 3 / 4;
+  font-size: 0.86em;
+  color: var(--text-main);
+  font-weight: 600;
 }
 
-.puzzle-item:hover {
+.panel-desc {
+  font-size: 0.75em;
+  color: var(--text-muted);
+}
+
+.panel-item:hover {
   background: var(--green-pale);
   border-color: var(--green-mid);
   box-shadow: 0 4px 12px rgba(46,139,95,.18);
   transform: translateY(-1px);
 }
-.puzzle-item:active {
+.panel-item:active {
   transform: scale(.97);
 }
 
-/* メニュー下説明 */
+/* メニュー下説明テキスト */
 .puzzle-hint {
   margin-top: 14px;
   font-size: 0.80em;
@@ -1079,16 +1071,36 @@ textarea { resize: vertical; min-height: 90px; }
   line-height: 1.7;
 }
 
+/* スマホ向け微調整 */
 @media (max-width: 480px) {
-  .puzzle-menu {
-    grid-template-rows: repeat(3, 80px);
-    gap: 6px;
+  .puzzle-menu-wrap {
+    margin: 18px auto 6px;
+    padding: 12px 10px 6px;
   }
-  .puzzle-center {
+  .panel-main {
+    padding: 12px 12px;
     border-radius: 14px;
   }
-  .puzzle-item {
-    font-size: 0.78em;
+  .panel-main-emoji {
+    font-size: 1.6em;
+  }
+  .panel-main-title {
+    font-size: 0.92em;
+  }
+  .panel-main-sub {
+    font-size: 0.74em;
+  }
+  .panel-grid {
+    gap: 8px;
+  }
+  .panel-item {
+    padding: 9px 8px;
+  }
+  .panel-label {
+    font-size: 0.80em;
+  }
+  .panel-desc {
+    font-size: 0.72em;
   }
 }
 
