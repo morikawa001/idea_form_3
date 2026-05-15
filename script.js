@@ -1,5 +1,5 @@
 // ============================================================
-// MIT ヒアリングフォーム v3.6 — script.js（パネルメニュー対応＋メモ対応）
+// MIT ヒアリングフォーム v3.6 — script.js
 // ============================================================
 
 // デフォルト送信先
@@ -220,10 +220,45 @@ function getQ12Values(){ return getChecks('q12').map(v => v === 'その他' ? `�
 function getIdeaTypes(){ return getChecks('q10_type'); }
 
 // ============================================================
-// プログレスバー（その場メモは進捗に含めない）
+// ステップ別進捗対象の定義
+// ============================================================
+const STEP_ITEMS = {
+  0: [           // 基本情報
+    () => getVal('q1'),
+    () => getVal('q2'),
+    () => getVal('q2b'),
+    () => getQ3Value()
+  ],
+  1: [           // P
+    () => getQ4Value(),
+    () => getRadio('q5'),
+    () => (getQ6Values().length > 0 ? '1' : ''),
+    () => getVal('q7')
+  ],
+  2: [           // C
+    () => getVal('q8'),
+    () => (getQ9Values().length > 0 ? '1' : '')
+  ],
+  3: [           // I
+    () => getVal('q10'),
+    () => (getIdeaTypes().length > 0 ? '1' : ''),
+    () => getVal('q10_detail'),
+    () => getVal('q10_ref'),
+    () => getVal('q10_concern')
+  ],
+  4: [           // O
+    () => (getQ12Values().length > 0 ? '1' : ''),
+    () => getVal('q13')
+  ]
+};
+
+// ============================================================
+// プログレスバー（その場メモは進捗に含めない）＋ステップ別進捗
 // ============================================================
 function updateProgress() {
   if (!startTime) startTime = new Date();
+
+  // 全体用（従来ロジック）
   const items = [
     getVal('q1'), getVal('q2'), getVal('q2b'), getQ3Value(), getQ4Value(),
     getRadio('q5'), getChecks('q6').length > 0 ? '1' : '',
@@ -244,6 +279,18 @@ function updateProgress() {
   }
   if (pctEl) pctEl.textContent = `${pct}%`;
   if (fill)  fill.style.width  = `${pct}%`;
+
+  // ステップ別の進捗を計算してパネルに反映
+  for (let step = 0; step <= 4; step++) {
+    const defs = STEP_ITEMS[step];
+    if (!defs) continue;
+    const vals    = defs.map(fn => fn()).filter(v => v !== '');
+    const stepPct = Math.round(vals.length / defs.length * 100);
+    const panelEl = document.getElementById(`panelProgress${step}`);
+    if (panelEl) {
+      panelEl.textContent = `${stepPct}%`;
+    }
+  }
 }
 
 // ============================================================
@@ -265,11 +312,13 @@ function onTextInput(id)      { updateProgress(); }
 function onEmailInput(id)     { updateProgress(); }
 function onTextareaInput(id)  { updateProgress(); }
 function onIdeaInput()        { updateProgress(); updateIdeaCharCount(); }
+
+// ラジオ：同じ項目をもう一度クリックしたら解除する（q4, q5 用）
 function onRadioChange(id) {
   // q4, q5 だけ「再クリックで解除」を有効にする
   if (id === 'q4' || id === 'q5') {
-    const name = id; // name="q4" / "q5"
-    const clicked = getRadio(name); // 直近クリックで一旦選ばれた値
+    const name    = id;              // "q4" / "q5"
+    const clicked = getRadio(name);  // 直近クリックで一旦選ばれた値
     const final   = toggleRadioValue(name, clicked);
 
     // UI を選択状態に合わせて更新
@@ -287,7 +336,6 @@ function onRadioChange(id) {
   updateProgress();
   syncCardRadio(id);
 }
-function onCheckChange(id)    { updateProgress(); syncCardCheck(id); }
 
 // 同じラジオをもう一度クリックしたら解除するためのヘルパー
 function toggleRadioValue(groupName, clickedValue) {
@@ -302,6 +350,8 @@ function toggleRadioValue(groupName, clickedValue) {
   // 別の値をクリック → 通常通りこの値に更新
   return clickedValue;
 }
+
+function onCheckChange(id)    { updateProgress(); syncCardCheck(id); }
 
 function syncCardRadio(groupId) {
   const wrap = document.getElementById(groupId);
