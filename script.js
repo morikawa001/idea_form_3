@@ -1,5 +1,5 @@
 // ============================================================
-// MIT ヒアリングフォーム v3.6 — script.js（完全修正版）
+// MIT ヒアリングフォーム v3.6 — script.js（レポート概要対応版）
 // ============================================================
 
 // デフォルト送信先
@@ -487,7 +487,42 @@ function updateIdeaCharCount() {
 }
 
 // ============================================================
-// プレビュー用テキスト生成
+// レポート概要用テキスト
+// ============================================================
+function buildSummary() {
+  const q6v = getQ6Values();
+  const q9v = getQ9Values();
+  const q12v = getQ12Values();
+  const ideaTypes = getIdeaTypes();
+
+  return [
+    '【発案者情報】',
+    `所属部署：${getVal('q1') || '（未記入）'}`,
+    `氏名　　：${getVal('q2') || '（未記入）'}`,
+    `職種　　：${getQ3Value() || '（未選択）'}`,
+    '',
+    '【P：困りごと】',
+    `対象　　：${getQ4Value() || '（未選択）'}`,
+    `頻度　　：${getRadio('q5') || '（未選択）'}`,
+    `影響　　：${q6v.join(' / ') || '（未選択）'}`,
+    `場面　　：${getVal('q7') || '（未記入）'}`,
+    '',
+    '【C：今の対応】',
+    `対応内容：${getVal('q8') || '（未記入）'}`,
+    `問題点　：${q9v.length ? q9v.join(' / ') : '特になし'}`,
+    '',
+    '【I：アイデア】',
+    `内容　　：${getVal('q10') || '（未記入）'}`,
+    `アプローチ：${ideaTypes.length ? ideaTypes.join(' / ') : '（未選択）'}`,
+    '',
+    '【O：期待効果】',
+    `改善点　：${q12v.join(' / ') || '（未選択）'}`,
+    `インパクト：${getVal('q13') || '（未記入）'}`
+  ].join('\n');
+}
+
+// ============================================================
+// プレビュー用テキスト生成（全文）
 // ============================================================
 function buildText() {
   const q6v = getQ6Values();
@@ -550,6 +585,31 @@ function buildText() {
 }
 
 // ============================================================
+// レポートビュー表示/非表示
+// ============================================================
+function showReportView() {
+  const form = document.getElementById('ideaForm');
+  const report = document.getElementById('reportView');
+  const pre = document.getElementById('reportSummary');
+
+  if (form) form.style.display = 'none';
+  if (report) report.classList.add('active');
+  if (pre) pre.textContent = buildSummary();
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function hideReportView() {
+  const form = document.getElementById('ideaForm');
+  const report = document.getElementById('reportView');
+
+  if (report) report.classList.remove('active');
+  if (form) form.style.display = '';
+
+  showStep(currentStep);
+}
+
+// ============================================================
 // プレビュー・各種アクション
 // ============================================================
 function showPreview() {
@@ -582,7 +642,7 @@ function closeMailModal() {
 }
 
 function onMailToInput() {
-  // バリデーションを将来入れる場合用に空関数で確保
+  // 将来的なバリデーション用に空関数で確保
 }
 
 function doSendMail() {
@@ -724,6 +784,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // 中央パネルメニューからも移動
   document.querySelectorAll('.panel-main, .panel-item').forEach((btn) => {
+    if (!btn.hasAttribute('data-step')) return;
     btn.addEventListener('click', () => {
       const step = parseInt(btn.getAttribute('data-step'), 10);
       if (!isNaN(step)) showStep(step);
