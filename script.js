@@ -5,7 +5,7 @@
 // デフォルト送信先
 const DEFAULT_MAIL_TO = 'ns.morizo@gmail.com';
 
-// ★ GAS の Web アプリ URL（APIキーは GAS 側で保持）
+// ★ medical_device_idea と同じ GAS Web アプリ URL を入れる
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbwFGWXonRPSDqhToxurlrxmvb0oMydOdM18_2Jy5aQWDXP60o6bKjkjYYfu741dgkqB/exec';
 
 let startTime = null;
@@ -644,9 +644,7 @@ function closeMailModal() {
   if (mailModal) mailModal.classList.remove('active');
 }
 
-function onMailToInput() {
-  // 将来的なバリデーション用に空関数で確保
-}
+function onMailToInput() {}
 
 function doSendMail() {
   const extra = getVal('mailTo');
@@ -672,10 +670,10 @@ function actionAnalyze() {
 }
 
 // ============================================================
-// サマリー生成（GAS + 外部AI）
+// ★ サマリー生成（GAS + Gemini、app.jsと同じフォーマット）
 // ============================================================
 async function generateSummary() {
-  const baseText = buildSummary();
+  const baseText = buildSummary();  // レポート概要テキスト
 
   const summaryBtn = document.querySelector('.panel-item--summary');
   if (summaryBtn) {
@@ -685,31 +683,42 @@ async function generateSummary() {
   }
 
   try {
-    const res = await fetch(GAS_URL, {
+    const response = await fetch(GAS_URL, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ text: baseText })
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: baseText }] }],
+        generationConfig: {
+          temperature: 0.2,
+          topP: 0.85,
+          maxOutputTokens: 2048   // サマリーなので少し小さめ
+        }
+      })
     });
 
-    if (!res.ok) {
-      throw new Error('GAS 呼び出しに失敗しました');
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.error?.message || 'APIエラー: ' + response.status);
     }
 
-    const json = await res.json();
-    const summary = json.summary || 'サマリーを取得できませんでした。';
+    const data = await response.json();
+    const summaryText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!summaryText) {
+      throw new Error('レスポンスが空です。GASのdoPost内の処理を確認してください。');
+    }
 
+    // プレビュー画面でサマリー表示（picoBoxを利用）
     showPreview();
 
     const picoBox = document.getElementById('picoBox');
     const picoContent = document.getElementById('picoContent');
     if (picoBox && picoContent) {
       picoBox.style.display = 'block';
-      picoContent.textContent = summary;
+      picoContent.textContent = summaryText;
     } else {
-      alert('サマリー:\n\n' + summary);
+      alert('サマリー:\n\n' + summaryText);
     }
+
   } catch (e) {
     console.error(e);
     alert('サマリー生成中にエラーが発生しました：' + e.message);
