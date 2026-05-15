@@ -6,7 +6,7 @@
 const DEFAULT_MAIL_TO = 'ns.morizo@gmail.com';
 
 // ★ ここにあなたの GAS Web アプリ URL（/exec）を入れる
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbwFnGzrkXw2EEkfhnmYzZBSmIEhVsCr6oTQMGIqdaWKTfZWUDo1fClPMvqx_RHMukLoLA/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbwFGWXonRPSDqhToxurlrxmvb0oMydOdM18_2Jy5aQWDXP60o6bKjkjYYfu741dgkqB/exec';
 
 let startTime = null;
 
