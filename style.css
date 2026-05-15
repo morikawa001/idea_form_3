@@ -1166,3 +1166,73 @@ textarea { resize: vertical; min-height: 90px; }
     white-space: normal;
   }
 }
+
+/* ・・・既存のCSSはそのまま・・・ */
+
+/* ===== ステップごとの「その場メモ」ふせん ===== */
+.step-memo {
+  position: relative;
+  background: #fff9c4;
+  border-radius: 10px 10px 12px 10px;
+  padding: 8px 10px 10px;
+  box-shadow: 0 3px 6px rgba(0,0,0,.12);
+  border: 1px solid #f0e2a0;
+  margin-top: 6px;
+}
+
+.step-memo::before {
+  content: '';
+  position: absolute;
+  top: -7px;
+  left: 14px;
+  width: 40px;
+  height: 14px;
+  background: rgba(255,255,255,.6);
+  border-radius: 7px;
+  box-shadow: 0 2px 4px rgba(0,0,0,.15);
+}
+
+.step-memo-label {
+  font-size: 0.78em;
+  font-weight: 600;
+  color: #6d5e10;
+  margin-bottom: 4px;
+}
+
+.step-memo-textarea {
+  width: 100%;
+  border: none;
+  background: transparent;
+  resize: vertical;
+  min-height: 46px;
+  max-height: 120px;
+  font-family: inherit;
+  font-size: 0.85em;
+  line-height: 1.6;
+  color: var(--text-main);
+  padding: 2px 1px 0;
+}
+
+.step-memo-textarea:focus {
+  outline: none;
+}
+
+/* 音声入力ステータス */
+#voiceStatus {
+  position: fixed;
+  left: 50%;
+  bottom: 16px;
+  transform: translateX(-50%);
+  background: #333;
+  color: #fff;
+  font-size: 0.82em;
+  padding: 8px 14px;
+  border-radius: 20px;
+  box-shadow: 0 3px 8px rgba(0,0,0,.35);
+  cursor: pointer;
+  display: none;          /* ← これが重要 */
+  z-index: 2000;
+}
+#voiceStatus span {
+  white-space: nowrap;
+}
