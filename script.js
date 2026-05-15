@@ -5,7 +5,7 @@
 // デフォルト送信先
 const DEFAULT_MAIL_TO = 'ns.morizo@gmail.com';
 
-// ★ medical_device_idea と同じ GAS Web アプリ URL を入れる
+// ★ ここにあなたの GAS Web アプリ URL（/exec）を入れる
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbwFGWXonRPSDqhToxurlrxmvb0oMydOdM18_2Jy5aQWDXP60o6bKjkjYYfu741dgkqB/exec';
 
 let startTime = null;
@@ -373,26 +373,11 @@ function updateProgress() {
 // ============================================================
 // 入力イベント
 // ============================================================
-function onSelectChange() {
-  updateProgress();
-}
-
-function onTextInput() {
-  updateProgress();
-}
-
-function onEmailInput() {
-  updateProgress();
-}
-
-function onTextareaInput() {
-  updateProgress();
-}
-
-function onIdeaInput() {
-  updateProgress();
-  updateIdeaCharCount();
-}
+function onSelectChange() { updateProgress(); }
+function onTextInput() { updateProgress(); }
+function onEmailInput() { updateProgress(); }
+function onTextareaInput() { updateProgress(); }
+function onIdeaInput() { updateProgress(); updateIdeaCharCount(); }
 
 // ============================================================
 // ラジオ・チェックUI同期
@@ -407,7 +392,6 @@ function onRadioChange(groupName) {
   } else if (groupName === 'q5') {
     syncFreqCards();
   }
-
   updateProgress();
 }
 
@@ -484,9 +468,7 @@ function updateIdeaCharCount() {
   const ta = document.getElementById('q10');
   const cnt = document.getElementById('ideaCharCount');
   if (!ta || !cnt) return;
-
-  const len = ta.value.length;
-  cnt.textContent = `${len}文字`;
+  cnt.textContent = `${ta.value.length}文字`;
 }
 
 // ============================================================
@@ -670,7 +652,7 @@ function actionAnalyze() {
 }
 
 // ============================================================
-// ★ サマリー生成（GAS + Gemini、app.jsと同じフォーマット）
+// サマリー生成（GAS + summary type）
 // ============================================================
 async function generateSummary() {
   const baseText = buildSummary();  // レポート概要テキスト
@@ -683,31 +665,27 @@ async function generateSummary() {
   }
 
   try {
-    const response = await fetch(GAS_URL, {
+    const res = await fetch(GAS_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'text/plain' },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        contents: [{ parts: [{ text: baseText }] }],
-        generationConfig: {
-          temperature: 0.2,
-          topP: 0.85,
-          maxOutputTokens: 2048   // サマリーなので少し小さめ
-        }
+        type: 'summary',
+        text: baseText
       })
     });
 
-    if (!response.ok) {
-      const err = await response.json().catch(() => ({}));
-      throw new Error(err.error?.message || 'APIエラー: ' + response.status);
+    if (!res.ok) {
+      throw new Error('GAS 呼び出しに失敗しました（HTTP ' + res.status + '）');
     }
 
-    const data = await response.json();
-    const summaryText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (!summaryText) {
-      throw new Error('レスポンスが空です。GASのdoPost内の処理を確認してください。');
+    const json = await res.json().catch(() => null);
+    if (!json || !json.summary) {
+      throw new Error('サマリーが取得できませんでした。');
     }
 
-    // プレビュー画面でサマリー表示（picoBoxを利用）
+    const summaryText = json.summary;
+
+    // プレビュー画面に表示（picoBox利用）
     showPreview();
 
     const picoBox = document.getElementById('picoBox');
