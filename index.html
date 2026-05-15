@@ -28,39 +28,40 @@
   </div>
 </header>
 
-<!-- ===== 中央放射状メニュー ===== -->
-<div class="radial-menu-wrap">
-  <div class="radial-menu">
-    <!-- 中央：基本情報 -->
-    <button class="radial-center" data-step="0">
-      <div class="radial-center-icon">👤</div>
-      <div class="radial-center-label">基本情報</div>
+<!-- ===== 中央パズルメニュー ===== -->
+<div class="puzzle-menu-wrap">
+  <div class="puzzle-menu">
+    <!-- 上段：P / C -->
+    <button class="puzzle-item puzzle-item-top-left"  data-step="1">
+      <div class="puzzle-emoji">🔍</div>
+      <div class="puzzle-label"><span class="pico-tag">P</span> 困りごと</div>
     </button>
 
-    <!-- 放射状：P / C / I / O -->
-    <button class="radial-item radial-item-top" data-step="1">
-      <span class="radial-emoji">🔍</span>
-      <span class="radial-label"><span class="pico-tag">P</span> 困りごと</span>
+    <button class="puzzle-item puzzle-item-top-right" data-step="2">
+      <div class="puzzle-emoji">🔄</div>
+      <div class="puzzle-label"><span class="pico-tag">C</span> 今の対応</div>
     </button>
 
-    <button class="radial-item radial-item-right" data-step="2">
-      <span class="radial-emoji">🔄</span>
-      <span class="radial-label"><span class="pico-tag">C</span> 今の対応</span>
+    <!-- 中央：基本情報（少し大きめのピース） -->
+    <button class="puzzle-center" data-step="0">
+      <div class="puzzle-center-emoji">👤</div>
+      <div class="puzzle-center-label">基本情報</div>
     </button>
 
-    <button class="radial-item radial-item-bottom" data-step="3">
-      <span class="radial-emoji">💡</span>
-      <span class="radial-label"><span class="pico-tag">I</span> アイデア</span>
+    <!-- 下段：I / O -->
+    <button class="puzzle-item puzzle-item-bottom-left" data-step="3">
+      <div class="puzzle-emoji">💡</div>
+      <div class="puzzle-label"><span class="pico-tag">I</span> アイデア</div>
     </button>
 
-    <button class="radial-item radial-item-left" data-step="4">
-      <span class="radial-emoji">📊</span>
-      <span class="radial-label"><span class="pico-tag">O</span> 期待効果</span>
+    <button class="puzzle-item puzzle-item-bottom-right" data-step="4">
+      <div class="puzzle-emoji">📊</div>
+      <div class="puzzle-label"><span class="pico-tag">O</span> 期待効果</div>
     </button>
   </div>
-  <p class="radial-hint">
-    真ん中から順番にでも、気になるピースからでも選べます。<br>
-    いずれかのボタンを押すと入力フォームが開きます。
+  <p class="puzzle-hint">
+    真ん中の<strong>「基本情報」</strong>からでも、周りのピースからでも始められます。<br>
+    いずれかのパネルを押すと、その入力画面に移動します。
   </p>
 </div>
 
