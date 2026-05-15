@@ -173,7 +173,7 @@ const NAV_MESSAGES = [
 function showStep(step) {
   stopVoice();
   const sections = document.querySelectorAll('.step-section');
-  sections.forEach((s, i) => {
+  sections.forEach((s) => {
     if (s.id === 'memoSection') {
       if (step === 0) s.classList.add('active');
       else s.classList.remove('active');
@@ -265,7 +265,7 @@ function updateProgress() {
     getRadio('q5'), getChecks('q6').length > 0 ? '1' : '',
     getVal('q7'), getVal('q8'), getQ9Values().length > 0 ? '1' : '0',
     getVal('q10'), getChecks('q12').length > 0 ? '1' : '', getVal('q13'),
-    getVal('memo') // メモも1つのピースとしてカウント
+    getVal('memo')
   ];
   const filled = items.filter(v => v !== '').length;
   const pct    = Math.round(filled / items.length * 100);
@@ -417,7 +417,6 @@ function closePreviewModal() {
 
 // ============================================================
 //  アクション各種（コピー、保存、メール、PDF、分析）
-//  ※ 元のコードから変更なし
 // ============================================================
 function actionCopy() {
   const text = buildText();
