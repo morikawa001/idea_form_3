@@ -701,10 +701,153 @@ textarea { resize: vertical; min-height: 90px; }
 .sus-section-desc  { font-size: .82em; color: #666; margin-bottom: 16px; line-height: 1.7; }
 .sus-row label { padding: 7px 12px; font-size: .87em; }
 
-/* ============================================================
-   追加スタイル（パズル入力向けの軽い説明強化）
-============================================================ */
+/* ===== 感謝モーダル ===== */
+.thank-modal-overlay {
+  display: none; position: fixed;
+  inset: 0; background: rgba(0,0,0,.55);
+  z-index: 2000; align-items: center; justify-content: center;
+  padding: 16px;
+}
+.thank-modal-overlay.active { display: flex; }
+.thank-modal {
+  background: white; border-radius: 20px;
+  padding: 44px 32px; max-width: 440px; width: 100%;
+  text-align: center;
+  box-shadow: 0 12px 48px rgba(0,0,0,.2);
+  animation: thankPop .5s cubic-bezier(.175,.885,.32,1.275);
+}
+@keyframes thankPop {
+  0%   { opacity: 0; transform: scale(.7); }
+  80%  { transform: scale(1.04); }
+  100% { opacity: 1; transform: scale(1); }
+}
+.thank-icon  { font-size: 4em; margin-bottom: 16px; }
+.thank-title { font-size: 1.4em; font-weight: 700; color: var(--green-dark); margin-bottom: 12px; }
+.thank-body  { font-size: .92em; color: #555; line-height: 1.9; margin-bottom: 16px; }
+.thank-body strong { color: var(--green-mid); }
+.thank-reply-box {
+  background: var(--green-pale); border-left: 4px solid var(--green-mid);
+  border-radius: 8px; padding: 12px 16px;
+  margin: 0 0 22px; font-size: .88em; color: var(--green-dark);
+  text-align: left; line-height: 1.7;
+}
+.thank-reply-box .reply-email { font-weight: 700; word-break: break-all; color: var(--green-dark); }
+.thank-btn-row { display: flex; flex-direction: column; gap: 10px; }
+.btn-new-idea {
+  background: linear-gradient(135deg, var(--green-dark), var(--green-light));
+  color: white; padding: 13px 20px;
+  border: none; border-radius: 10px;
+  font-size: .95em; font-weight: 700;
+  cursor: pointer; font-family: inherit;
+  transition: opacity .2s;
+}
+.btn-new-idea:hover { opacity: .88; }
+.btn-just-close {
+  background: #ecf0f1; color: #777;
+  padding: 10px 20px;
+  border: none; border-radius: 10px;
+  font-size: .88em; cursor: pointer; font-family: inherit;
+}
+.btn-just-close:hover { opacity: .75; }
 
+/* ===== レスポンシブ ===== */
+
+/* ---- iPad / タブレット (601px〜1024px) ---- */
+@media (min-width: 601px) and (max-width: 1024px) {
+  .main-wrap { max-width: 720px; padding: 0 24px 60px; }
+  .card-radio-group { grid-template-columns: repeat(3, 1fr); }
+  .card-check-group { grid-template-columns: repeat(2, 1fr); }
+  .icon-check-group { grid-template-columns: repeat(4, 1fr); }
+  .freq-group { gap: 8px; }
+  .site-header { padding: 12px 20px 14px; }
+  .roadmap-inner { padding: 10px 16px; }
+}
+
+/* ---- スマートフォン (〜600px) ---- */
+@media (max-width: 600px) {
+  .site-header { padding: 10px 12px 12px; }
+  .header-brand { gap: 6px; }
+  .brand-logo { max-height: 48px; } /* SP向け上限小さめ */
+  .brand-title { font-size: 1.55em; }
+  .brand-sub   { font-size: 0.78em; }
+  .header-desc { font-size: 0.74em; padding: 7px 10px; }
+
+  .roadmap-inner { padding: 8px 6px; gap: 0; }
+  .rm-icon  { width: 28px; height: 28px; font-size: .85em; }
+  .rm-label { font-size: 0.50em; }
+  .roadmap-line { flex: 0 0 12px; }
+
+  .main-wrap { padding: 0 10px 60px; }
+  .step-header { padding: 20px 0 14px; }
+  .step-title  { font-size: 1.1em; }
+  .pico-label-large { font-size: 1.05em; }
+  .pico-tag-large { width: 26px; height: 26px; font-size: .9em; }
+
+  /* フィールド */
+  select, input[type="text"], input[type="email"], textarea {
+    font-size: 16px; /* iOS zoom防止 */
+    padding: 12px 14px;
+  }
+
+  /* カードUI */
+  .card-radio-group { grid-template-columns: 1fr 1fr; }
+  .card-radio { padding: 10px 12px; font-size: .88em; min-height: 46px; }
+  .card-check-group { grid-template-columns: 1fr; }
+  .card-check { padding: 11px 14px; }
+  .icon-check-group { grid-template-columns: repeat(3, 1fr); }
+  .icon-check-inner { padding: 10px 8px; }
+  .ic-emoji { font-size: 1.3em; }
+  .ic-text  { font-size: .72em; }
+
+  /* 頻度カード */
+  .freq-group { flex-wrap: wrap; gap: 7px; }
+  .freq-card  { min-width: 70px; padding: 10px 8px; font-size: .80em; }
+
+  /* ナビボタン */
+  .step-nav { flex-direction: column; gap: 10px; }
+  .btn-next, .btn-prev, .btn-preview {
+    width: 100%; justify-content: center;
+    padding: 14px 16px;
+  }
+  .sub-action-row { flex-direction: column; gap: 8px; }
+  .btn-secondary { width: 100%; text-align: center; }
+  .btn-clear-step { width: 100%; text-align: center; }
+  .sub-action-row--step5 { flex-direction: column; }
+
+  /* モーダル */
+  .modal, .survey-modal { padding: 18px 14px; border-radius: 12px; }
+  .modal pre { font-size: .74em; }
+  .thank-modal { padding: 28px 16px; border-radius: 16px; }
+  .thank-title { font-size: 1.2em; }
+  .thank-body  { font-size: .86em; }
+  .btn-mail, .btn-close { padding: 12px 16px; font-size: .88em; width: 100%; }
+  .modal-btn-row { flex-direction: column; gap: 8px; }
+  .mail-default-info { flex-direction: column; align-items: flex-start; gap: 2px; }
+  .end-inner { padding: 32px 18px; }
+}
+
+/* ---- 極小端末 (〜380px) ---- */
+@media (max-width: 380px) {
+  .icon-check-group { grid-template-columns: repeat(2, 1fr); }
+  .card-radio-group { grid-template-columns: 1fr; }
+  .freq-card { min-width: 60px; font-size: .75em; }
+}
+
+/* ---- 送信後の「入力内容を確認する」ボタン グレーアウト ---- */
+.btn-preview:disabled,
+.btn-preview.btn-grayed {
+  background: #9e9e9e !important;
+  cursor: not-allowed;
+  box-shadow: none;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* ============================================================
+   idea_form_3 追加スタイル
+   ============================================================ */
+
+/* ---- ステップ説明メモ ---- */
 .step-note {
   font-size: 0.83em;
   color: #777;
@@ -713,3 +856,427 @@ textarea { resize: vertical; min-height: 90px; }
   background: #f5f5f5;
   border-radius: 6px;
 }
+
+/* ---- 写真アップロードエリア ---- */
+.photo-upload-area {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.btn-camera,
+.btn-file-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 16px;
+  border-radius: 8px;
+  font-size: 0.88em;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1.5px solid #4caf88;
+  background: #fff;
+  color: #2e7d58;
+  transition: background 0.15s;
+}
+.btn-camera:hover,
+.btn-file-label:hover {
+  background: #edf7f2;
+}
+
+/* ---- カメラビューファインダー ---- */
+.camera-container {
+  margin-top: 10px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #000;
+  max-width: 480px;
+}
+.camera-container video {
+  width: 100%;
+  display: block;
+}
+.camera-controls {
+  display: flex;
+  gap: 10px;
+  padding: 10px;
+  background: rgba(0,0,0,0.6);
+  justify-content: center;
+}
+.btn-shutter {
+  padding: 10px 24px;
+  background: #e53935;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 1em;
+  font-weight: 700;
+  cursor: pointer;
+}
+.btn-camera-cancel {
+  padding: 10px 20px;
+  background: #fff;
+  color: #333;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 0.9em;
+  cursor: pointer;
+}
+
+/* ---- 写真サムネイルプレビュー ---- */
+.photo-preview-area {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 8px;
+}
+.photo-thumb {
+  position: relative;
+  width: 90px;
+  height: 90px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1.5px solid #ccc;
+  background: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.photo-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.photo-thumb-label {
+  font-size: 0.68em;
+  color: #555;
+  padding: 4px;
+  text-align: center;
+  word-break: break-all;
+}
+.photo-thumb-del {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 20px;
+  height: 20px;
+  background: rgba(0,0,0,0.55);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  font-size: 11px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+/* ---- アクションボタングリッド ---- */
+.modal-action-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 16px;
+}
+.btn-action {
+  padding: 12px 8px;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.84em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  line-height: 1.3;
+}
+.btn-action:active { transform: scale(0.96); }
+.btn-copy    { background: #e3f2fd; color: #1565c0; }
+.btn-save    { background: #e8f5e9; color: #2e7d32; }
+.btn-mail    { background: #fff3e0; color: #e65100; }
+.btn-pdf     { background: #fce4ec; color: #880e4f; }
+.btn-analyze { background: #f3e5f5; color: #6a1b9a; }
+
+/* ---- メール送信モーダル（小型） ---- */
+.modal--small {
+  max-width: 420px !important;
+}
+
+/* ---- モバイル対応 ---- */
+@media (max-width: 520px) {
+  .modal-action-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .photo-thumb { width: 72px; height: 72px; }
+}
+
+/* ---- 終了ボタン ---- */
+.btn-end { background: #eceff1; color: #455a64; }
+
+/* ============================================================
+   idea_form_3 v3.2 追加スタイル
+   ============================================================ */
+
+/* ---- テキストエリア＋マイクラッパー ---- */
+.textarea-mic-wrap {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.textarea-mic-wrap textarea {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ---- マイクボタン ---- */
+.btn-mic {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1.5px solid #4caf88;
+  background: #fff;
+  color: #2e7d58;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, box-shadow 0.15s;
+  margin-top: 4px;
+}
+.btn-mic:hover  { background: #edf7f2; }
+.btn-mic--active {
+  background: #e53935 !important;
+  border-color: #e53935 !important;
+  color: #fff !important;
+  animation: mic-pulse 1s ease-in-out infinite;
+}
+@keyframes mic-pulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(229,57,53,0.4); }
+  50%      { box-shadow: 0 0 0 8px rgba(229,57,53,0); }
+}
+
+/* ---- 音声入力ステータスバー ---- */
+.voice-status {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(30,30,30,0.88);
+  color: #fff;
+  padding: 10px 22px;
+  border-radius: 24px;
+  font-size: 0.88em;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 9999;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+}
+.voice-dot {
+  width: 10px;
+  height: 10px;
+  background: #e53935;
+  border-radius: 50%;
+  animation: mic-pulse 1s ease-in-out infinite;
+}
+
+/* ---- モーダル フッター行（戻る・終了） ---- */
+.modal-footer-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+  justify-content: space-between;
+}
+
+/* ---- 戻るボタン（アクティブ色） ---- */
+.btn-back-active {
+  flex: 1;
+  padding: 12px 18px;
+  background: #4caf88;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.92em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+}
+.btn-back-active:hover  { background: #3d9c76; }
+.btn-back-active:active { transform: scale(0.97); }
+
+/* ---- 終了ボタン（フッター用） ---- */
+.btn-end-footer {
+  flex: 1;
+  padding: 12px 18px;
+  background: #eceff1;
+  color: #455a64;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.92em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+}
+.btn-end-footer:hover  { background: #cfd8dc; }
+.btn-end-footer:active { transform: scale(0.97); }
+
+/* ---- モバイル対応 ---- */
+@media (max-width: 520px) {
+  .modal-footer-row { flex-direction: column; }
+  .btn-mic { width: 36px; height: 36px; font-size: 16px; }
+}
+
+/* ============================================================
+   中央放射状メニュー
+============================================================ */
+
+.radial-menu-wrap {
+  max-width: 680px;
+  margin: 24px auto 12px;
+  padding: 16px 16px 8px;
+  text-align: center;
+}
+
+.radial-menu {
+  position: relative;
+  width: 260px;
+  height: 260px;
+  margin: 0 auto;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 50%, #ffffff 0, #f4faf7 45%, #e0f3eb 100%);
+  box-shadow: 0 8px 24px rgba(0,0,0,.08);
+}
+
+/* 中央ボタン（基本情報） */
+.radial-center {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%,-50%);
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 2px solid var(--green-mid);
+  background: var(--green-pale);
+  color: var(--green-dark);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  font-family: inherit;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(46,139,95,.35);
+  transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+}
+.radial-center-icon {
+  font-size: 1.7em;
+}
+.radial-center-label {
+  font-size: 0.86em;
+  font-weight: 700;
+}
+.radial-center:hover {
+  transform: translate(-50%,-52%);
+  background: #e0f7ec;
+  box-shadow: 0 8px 20px rgba(46,139,95,.4);
+}
+.radial-center:active {
+  transform: translate(-50%,-48%) scale(.97);
+}
+
+/* 放射状ボタン */
+.radial-item {
+  position: absolute;
+  width: 120px;
+  height: 52px;
+  border-radius: 999px;
+  border: 2px solid var(--green-border);
+  background: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 10px;
+  font-family: inherit;
+  font-size: 0.80em;
+  color: var(--text-sub);
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,.08);
+  transition: transform .18s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease;
+}
+.radial-item .radial-emoji {
+  font-size: 1.2em;
+}
+.radial-item .radial-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.radial-item .pico-tag {
+  font-size: 0.70em;
+}
+
+/* 位置：上・右・下・左 */
+.radial-item-top {
+  left: 50%;
+  top: 10px;
+  transform: translateX(-50%);
+}
+.radial-item-right {
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+}
+.radial-item-bottom {
+  left: 50%;
+  bottom: 10px;
+  transform: translateX(-50%);
+}
+.radial-item-left {
+  top: 50%;
+  left: 10px;
+  transform: translateY(-50%);
+}
+
+.radial-item:hover {
+  background: var(--green-pale);
+  border-color: var(--green-mid);
+  box-shadow: 0 4px 12px rgba(46,139,95,.24);
+}
+.radial-item:active {
+  transform: scale(.97);
+}
+
+/* メニュー下説明 */
+.radial-hint {
+  margin-top: 14px;
+  font-size: 0.80em;
+  color: var(--text-muted);
+  line-height: 1.7;
+}
+
+/* 小さな画面で少し縮小 */
+@media (max-width: 480px) {
+  .radial-menu {
+    width: 220px;
+    height: 220px;
+  }
+  .radial-center {
+    width: 110px;
+    height: 110px;
+  }
+  .radial-item {
+    width: 110px;
+    font-size: 0.78em;
+  }
+}
+
+/* すでにある .step-note はそのまま利用 */
