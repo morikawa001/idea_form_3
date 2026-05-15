@@ -279,9 +279,15 @@
     <div class="field-block">
       <div class="step-memo">
         <div class="step-memo-label">このPのステップに関するメモ（任意）</div>
-        <textarea id="memo_p" class="step-memo-textarea"
-          placeholder="Pに関するラフなメモや、その場で出た補足を自由にメモしてください。"
-          oninput="updateProgress()"></textarea>
+        <div class="textarea-mic-wrap">
+          <textarea id="memo_p" class="step-memo-textarea"
+            placeholder="Pに関するラフなメモや、その場で出た補足を自由にメモしてください。"
+            oninput="updateProgress()"></textarea>
+          <button type="button" class="btn-mic"
+            data-mic-target="memo_p"
+            onclick="startVoice('memo_p')"
+            title="音声入力">🎤</button>
+        </div>
       </div>
     </div>
 
@@ -339,9 +345,15 @@
     <div class="field-block">
       <div class="step-memo">
         <div class="step-memo-label">このCのステップに関するメモ（任意）</div>
-        <textarea id="memo_c" class="step-memo-textarea"
-          placeholder="今の対応についての補足や、その場で出た気づきをメモしておけます。"
-          oninput="updateProgress()"></textarea>
+        <div class="textarea-mic-wrap">
+          <textarea id="memo_c" class="step-memo-textarea"
+            placeholder="今の対応についての補足や、その場で出た気づきをメモしておけます。"
+            oninput="updateProgress()"></textarea>
+          <button type="button" class="btn-mic"
+            data-mic-target="memo_c"
+            onclick="startVoice('memo_c')"
+            title="音声入力">🎤</button>
+        </div>
       </div>
     </div>
 
@@ -434,9 +446,15 @@
     <div class="field-block">
       <div class="step-memo">
         <div class="step-memo-label">このIのステップに関するメモ（任意）</div>
-        <textarea id="memo_i" class="step-memo-textarea"
-          placeholder="アイデアに関する懸念・別案・メモしておきたいことを書いておけます。"
-          oninput="updateProgress()"></textarea>
+        <div class="textarea-mic-wrap">
+          <textarea id="memo_i" class="step-memo-textarea"
+            placeholder="アイデアに関する懸念・別案・メモしておきたいことを書いておけます。"
+            oninput="updateProgress()"></textarea>
+          <button type="button" class="btn-mic"
+            data-mic-target="memo_i"
+            onclick="startVoice('memo_i')"
+            title="音声入力">🎤</button>
+        </div>
       </div>
     </div>
 
@@ -495,9 +513,15 @@
     <div class="field-block">
       <div class="step-memo">
         <div class="step-memo-label">このOのステップに関するメモ（任意）</div>
-        <textarea id="memo_o" class="step-memo-textarea"
-          placeholder="期待効果に関して、迷っている点や次に確認したいことなどをメモしておけます。"
-          oninput="updateProgress()"></textarea>
+        <div class="textarea-mic-wrap">
+          <textarea id="memo_o" class="step-memo-textarea"
+            placeholder="期待効果に関して、迷っている点や次に確認したいことなどをメモしておけます。"
+            oninput="updateProgress()"></textarea>
+          <button type="button" class="btn-mic"
+            data-mic-target="memo_o"
+            onclick="startVoice('memo_o')"
+            title="音声入力">🎤</button>
+        </div>
       </div>
     </div>
 
