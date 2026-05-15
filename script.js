@@ -1,5 +1,6 @@
 // ============================================================
-//  MIT ヒアリングフォーム v3.6 — script.js（パズル入力対応）
+//  MIT ヒアリングフォーム v3.5 — script.js
+//  音声入力を大幅改修
 // ============================================================
 
 // デフォルト送信先（お好みのアドレスに変更してください）
@@ -13,7 +14,7 @@ let startTime = null;
 let currentRecognition = null;
 let currentMicBtn      = null;
 let currentTargetId    = null;
-let interimSpan        = null;
+let interimSpan        = null;   // interim 表示用 span
 
 function startVoice(targetId) {
   const SpeechRecognition =
@@ -24,37 +25,44 @@ function startVoice(targetId) {
     return;
   }
 
+  // ── 認識中なら停止 ──
   if (currentRecognition) {
     stopVoice();
     return;
   }
 
   const ta  = document.getElementById(targetId);
+  // ボタンを data-target 属性でも onclick 属性でも探せるようにする
   const btn = document.querySelector(`[data-mic-target="${targetId}"]`) ||
               document.querySelector(`button[onclick*="startVoice('${targetId}')"]`) ||
               document.querySelector(`button[onclick*='startVoice("${targetId}")']`);
 
   const status = document.getElementById('voiceStatus');
 
+  // ── Recognition 初期化 ──
   const recognition            = new SpeechRecognition();
   recognition.lang             = 'ja-JP';
-  recognition.interimResults   = true;
-  recognition.continuous       = true;
+  recognition.interimResults   = true;   // リアルタイム表示
+  recognition.continuous       = true;   // 複数フレーズを連続認識
   recognition.maxAlternatives  = 1;
 
   currentRecognition = recognition;
   currentMicBtn      = btn;
   currentTargetId    = targetId;
 
+  // ── UI 更新 ──
   if (btn)    btn.classList.add('btn-mic--active');
   if (status) status.style.display = 'flex';
 
+  // interim 表示用 div を .textarea-mic-wrap の直後（外側）に挿入
   if (ta) {
     if (interimSpan) interimSpan.remove();
     interimSpan = document.createElement('div');
     interimSpan.id = 'voiceInterim';
     interimSpan.style.cssText =
       'font-size:0.8em;color:#888;min-height:1.2em;padding:2px 4px;margin-top:2px;';
+    // ta.parentNode = .textarea-mic-wrap (flex コンテナ)
+    // その親の nextSibling の前に挿入 = wrap の直後・field-fb の前
     const wrap = ta.parentNode;
     wrap.parentNode.insertBefore(interimSpan, wrap.nextSibling);
   }
@@ -62,6 +70,7 @@ function startVoice(targetId) {
   const baseText = ta ? ta.value : '';
   const startPos = ta ? ta.selectionStart ?? ta.value.length : 0;
 
+  // ── onresult ──
   recognition.onresult = (e) => {
     let interim = '';
     let finalText = '';
@@ -75,11 +84,16 @@ function startVoice(targetId) {
       }
     }
 
+    // interim をリアルタイム表示
     if (interimSpan) {
       interimSpan.textContent = interim ? `🎤 ${interim}` : '';
     }
 
+    // final テキストをテキストエリアに追記
     if (finalText && ta) {
+      const before = ta.value.slice(0, startPos);
+      const after  = ta.value.slice(startPos);
+      // 既に追記済みの final を考慮して末尾に追記する方式に変更
       ta.value = baseText + (ta.value.slice(baseText.length) || '') + finalText;
       if (interimSpan) interimSpan.textContent = '';
       updateProgress();
@@ -87,9 +101,11 @@ function startVoice(targetId) {
     }
   };
 
+  // ── onerror ──
   recognition.onerror = (e) => {
-    if (e.error === 'aborted') return;
+    if (e.error === 'aborted') return; // 手動停止は無視
     if (e.error === 'no-speech') {
+      // 無音タイムアウト → 自動再起動
       try { recognition.stop(); } catch (_) {}
       return;
     }
@@ -101,11 +117,14 @@ function startVoice(targetId) {
     if (currentRecognition === recognition) stopVoiceUI();
   };
 
+  // ── onend：continuous=true でも接続断等で終わる場合がある ──
   recognition.onend = () => {
-    if (currentRecognition !== recognition) return;
+    if (currentRecognition !== recognition) return; // 手動停止済みなら無視
+    // 自動再起動（認識継続）
     try { recognition.start(); } catch (_) { stopVoiceUI(); }
   };
 
+  // ── ステータスバーをタップして停止 ──
   if (status) {
     status.onclick = stopVoice;
   }
@@ -118,9 +137,10 @@ function startVoice(targetId) {
   }
 }
 
+// 認識を停止する（外部からも呼び出し可）
 function stopVoice() {
   const rec = currentRecognition;
-  stopVoiceUI();
+  stopVoiceUI(); // 先に UI リセット（onend で再起動しないよう currentRecognition を null に）
   if (rec) {
     try { rec.abort(); } catch (_) {}
   }
@@ -163,25 +183,17 @@ let currentStep = 0;
 const TOTAL_STEPS = 5;
 
 const NAV_MESSAGES = [
-  '発案者の情報は、あとから思い出したタイミングで追記・修正しても大丈夫です。',
-  '困りごとは、アイデアを聞きながら少しずつ書き足していってもOKです。',
-  '今の対応は、PやIの内容と行き来しながら、思いついた断片をメモしていってください。',
-  'アイデアはラフな言葉だけでも構いません。あとで何度も書き直せます。',
-  '期待される効果は、PとIを見比べながら「変わりそうなところ」を拾っていきましょう。'
+  'まず<strong>発案者の基本情報</strong>を確認・入力してください（すべて任意）。',
+  '<strong>誰が、どのような場面で困っているか</strong>を発案者から聞き取り、記録してください。',
+  '<strong>現在どのように対応しているか</strong>を発案者から聞き取り、記録してください。',
+  '<strong>発案者のアイデア</strong>を聞き取り、できるだけ原文に忠実に記録してください。',
+  'もう少しで完了です。<strong>このアイデアで何が変わりそうか</strong>を発案者とともに確認してください。'
 ];
 
 function showStep(step) {
+  // ステップ切替時は音声入力を停止
   stopVoice();
-  const sections = document.querySelectorAll('.step-section');
-  sections.forEach((s) => {
-    if (s.id === 'memoSection') {
-      if (step === 0) s.classList.add('active');
-      else s.classList.remove('active');
-    } else {
-      s.classList.toggle('active', s.id === `step${step}`);
-    }
-  });
-
+  document.querySelectorAll('.step-section').forEach((s, i) => s.classList.toggle('active', i === step));
   for (let i = 0; i < TOTAL_STEPS; i++) {
     const rm = document.getElementById(`rm${i}`);
     if (!rm) continue;
@@ -199,6 +211,9 @@ function showStep(step) {
   currentStep = step;
 }
 
+// ============================================================
+//  バリデーション（すべて任意）
+// ============================================================
 const STEP_REQUIRED = [ () => [], () => [], () => [], () => [], () => [] ];
 
 function goNext(step) {
@@ -222,9 +237,7 @@ function getQ9Values() { return getChecks('q9').map(v  => v === 'その他' ? `�
 function getQ12Values(){ return getChecks('q12').map(v => v === 'その他' ? `その他（${getVal('q12-other-text')}）` : v); }
 function getIdeaTypes(){ return getChecks('q10_type'); }
 
-// ============================================================
-//  フィードバック
-// ============================================================
+// ===== フィードバック =====
 function showFeedback(id, msg, type) {
   const el = document.getElementById(`fb-${id}`);
   if (!el) return;
@@ -264,18 +277,14 @@ function updateProgress() {
     getVal('q1'), getVal('q2'), getVal('q2b'), getQ3Value(), getQ4Value(),
     getRadio('q5'), getChecks('q6').length > 0 ? '1' : '',
     getVal('q7'), getVal('q8'), getQ9Values().length > 0 ? '1' : '0',
-    getVal('q10'), getChecks('q12').length > 0 ? '1' : '', getVal('q13'),
-    getVal('memo')
+    getVal('q10'), getChecks('q12').length > 0 ? '1' : '', getVal('q13')
   ];
   const filled = items.filter(v => v !== '').length;
   const pct    = Math.round(filled / items.length * 100);
   const label  = document.getElementById('progress-label');
   const pctEl  = document.getElementById('progress-pct');
   const fill   = document.getElementById('progressFill');
-  if (label) label.textContent =
-    filled === 0
-      ? '書きやすいところから少しずつ記録を始めてください'
-      : `フォーム全体の ${filled} / ${items.length} ピースが記録済みです`;
+  if (label) label.textContent = filled === 0 ? 'ヒアリングを開始してください' : `${filled} / ${items.length} 項目記録済み`;
   if (pctEl) pctEl.textContent = `${pct}%`;
   if (fill)  fill.style.width  = `${pct}%`;
 }
@@ -292,12 +301,8 @@ function onSelectChange(id) {
 function onTextInput(id) {
   const v = getVal(id);
   if (!v) { hideFeedback(id); return; }
-  if (id === 'q2') {
-    if (v.length < 2) { showFeedback(id, 'フルネームでご記入ください', 'warn'); return; }
-    showFeedback(id, `✅ ${v} さんの情報を記録します`, 'good');
-  } else {
-    showFeedback(id, `✅ 「${v}」を記録します`, 'good');
-  }
+  if (v.length < 2) { showFeedback(id, 'フルネームでご記入ください', 'warn'); return; }
+  showFeedback(id, `✅ ${v} さんの情報を記録します`, 'good');
 }
 function onEmailInput(id) {
   const v  = getVal(id);
@@ -334,14 +339,13 @@ function onIdeaInput() {
 }
 
 // ============================================================
-//  テキスト生成（P / C / I / O + メモ）
+//  テキスト生成
 // ============================================================
 function buildText() {
   const q6v       = getQ6Values();
   const q9v       = getQ9Values();
   const q12v      = getQ12Values();
   const ideaTypes = getIdeaTypes();
-  const memoText  = getVal('memo');
   const endTime   = new Date();
   const diffMs    = startTime ? endTime - startTime : 0;
   const elapsed   = startTime
@@ -379,9 +383,6 @@ function buildText() {
     `期待される改善：${q12v.join(' / ') || '（未選択）'}`,
     `改善の規模感　：${getVal('q13') || '（未記入）'}`,
     '',
-    '【メモ・備考・未整理の情報】',
-    memoText || '（特になし）',
-    '',
     '━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
     `記録日時　　　　　：${endTime.toLocaleString('ja-JP')}`,
     `ヒアリング所要時間：${elapsed}`,
@@ -400,7 +401,7 @@ function showPreview() {
   const outcomes = getQ12Values();
   if (idea && who && outcomes.length > 0) {
     document.getElementById('picoContent').innerHTML = [
-      `<b>P</b>（対象・背景）：${who}が${freq || '（頻度未記入）'}`,
+      `<b>P</b>（対象・背景）：${who}が${freq}`,
       `<b>I</b>（介入・アイデア）：${idea.slice(0,120)}${idea.length>120?'…':''}`,
       `<b>C</b>（比較・現状）：${getVal('q8') || '現在の対応'}`,
       `<b>O</b>（期待する成果）：${outcomes.join('、')}`
@@ -411,12 +412,13 @@ function showPreview() {
   }
   document.getElementById('previewModal').classList.add('active');
 }
+
 function closePreviewModal() {
   document.getElementById('previewModal').classList.remove('active');
 }
 
 // ============================================================
-//  アクション各種（コピー、保存、メール、PDF、分析）
+//  アクション：内容をコピー
 // ============================================================
 function actionCopy() {
   const text = buildText();
@@ -437,6 +439,9 @@ function fallbackCopy(text) {
   document.body.removeChild(ta);
 }
 
+// ============================================================
+//  アクション：フォルダに保存
+// ============================================================
 function actionSaveToFolder() {
   const text     = buildText();
   const blob     = new Blob([text], { type: 'text/plain;charset=utf-8' });
@@ -448,9 +453,14 @@ function actionSaveToFolder() {
   URL.revokeObjectURL(url);
 }
 
+// ============================================================
+//  アクション：メールで送信
+// ============================================================
 function actionSendMail() {
+  // デフォルト送信先を画面に表示
   const dispEl = document.getElementById('mailDefaultDisplay');
   if (dispEl) dispEl.textContent = DEFAULT_MAIL_TO;
+  // 入力欄とフィードバックをリセット
   const input = document.getElementById('mailTo');
   if (input) input.value = '';
   const fb = document.getElementById('mailToFb');
@@ -471,10 +481,12 @@ function onMailToInput() {
 }
 function doSendMail() {
   const extra = document.getElementById('mailTo').value.trim();
+  // 追加送信先が入力されている場合は形式チェック
   if (extra && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(extra)) {
     alert('追加送信先のメールアドレスの形式を確認してください。');
     return;
   }
+  // 送信先を組み立てる：デフォルト + 追加
   const toList = [DEFAULT_MAIL_TO];
   if (extra) toList.push(extra);
   const toStr  = toList.join(',');
@@ -490,6 +502,9 @@ function doSendMail() {
   closeMailModal();
 }
 
+// ============================================================
+//  アクション：PDFで保存
+// ============================================================
 function actionSavePDF() {
   const text     = buildText();
   const printWin = window.open('', '_blank');
@@ -512,6 +527,9 @@ function actionSavePDF() {
   setTimeout(() => { printWin.print(); }, 400);
 }
 
+// ============================================================
+//  アクション：分析
+// ============================================================
 function actionAnalyze() {
   const text      = buildText();
   const targetUrl = 'https://morikawa001.github.io/medical_device_idea_2/';
@@ -530,7 +548,7 @@ function actionAnalyze() {
 }
 
 // ============================================================
-//  終了・リセット
+//  アクション：終了
 // ============================================================
 function actionEnd() {
   if (confirm('ヒアリングを終了しますか？\n入力内容は消去されます。')) {
@@ -540,6 +558,9 @@ function actionEnd() {
   }
 }
 
+// ============================================================
+//  リセット
+// ============================================================
 function resetForm() {
   stopVoice();
   document.getElementById('ideaForm').reset();
@@ -572,10 +593,13 @@ function restartFromEnd() {
 // ============================================================
 //  ステップ単位の入力クリア
 // ============================================================
+
+// 共通ヘルパー：ラジオグループをリセット
 function clearRadioGroup(name) {
   document.querySelectorAll(`input[name="${name}"]`).forEach(r => r.checked = false);
   document.querySelectorAll(`#${name} label`).forEach(l => l.classList.remove('selected'));
 }
+// 共通ヘルパー：チェックボックスグループをリセット
 function clearCheckGroup(name, otherCheckId, otherWrapId) {
   document.querySelectorAll(`input[name="${name}"]`).forEach(c => c.checked = false);
   document.querySelectorAll(`#${name} label, [id^="${name}"] label`).forEach(l => l.classList.remove('selected'));
@@ -584,10 +608,12 @@ function clearCheckGroup(name, otherCheckId, otherWrapId) {
     if (wrap) { wrap.classList.remove('show'); const ta = wrap.querySelector('textarea'); if (ta) ta.value = ''; }
   }
 }
+// 共通ヘルパー：ラジオのother-wrapをリセット
 function clearRadioOtherWrap(wrapId) {
   const wrap = document.getElementById(wrapId);
   if (wrap) { wrap.classList.remove('show'); const ta = wrap.querySelector('textarea'); if (ta) ta.value = ''; }
 }
+// 共通ヘルパー：フィードバック一括非表示
 function clearFeedbacks(...ids) {
   ids.forEach(id => hideFeedback(id));
 }
@@ -595,7 +621,7 @@ function clearFeedbacks(...ids) {
 function clearStep(step) {
   if (!confirm('このステップの入力内容をクリアしますか？')) return;
   switch (step) {
-    case 0:
+    case 0: // 基本情報
       document.getElementById('q1').value = '';
       document.getElementById('q2').value = '';
       document.getElementById('q2b').value = '';
@@ -603,7 +629,7 @@ function clearStep(step) {
       clearRadioOtherWrap('q3-other-wrap');
       clearFeedbacks('q1', 'q2', 'q2b', 'q3');
       break;
-    case 1:
+    case 1: // 困りごと
       clearRadioGroup('q4');
       clearRadioOtherWrap('q4-other-wrap');
       clearRadioGroup('q5');
@@ -611,12 +637,12 @@ function clearStep(step) {
       document.getElementById('q7').value = '';
       clearFeedbacks('q4', 'q5', 'q6', 'q7');
       break;
-    case 2:
+    case 2: // 今の対応
       document.getElementById('q8').value = '';
       clearCheckGroup('q9', 'q9-other-check', 'q9-other-wrap');
       clearFeedbacks('q8', 'q9');
       break;
-    case 3:
+    case 3: // アイデア
       document.getElementById('q10').value = '';
       const charCount = document.getElementById('ideaCharCount');
       if (charCount) charCount.textContent = '0文字';
@@ -627,7 +653,7 @@ function clearStep(step) {
       document.getElementById('q10_concern').value = '';
       clearFeedbacks('q10');
       break;
-    case 4:
+    case 4: // 期待効果
       clearCheckGroup('q12', 'q12-other-check', 'q12-other-wrap');
       document.getElementById('q13').value = '';
       clearFeedbacks('q12', 'q13');
@@ -640,17 +666,11 @@ function clearStep(step) {
 //  ロードマップ クリックナビゲーション
 // ============================================================
 document.addEventListener('DOMContentLoaded', () => {
-  let roadmapHintShown = false;
   document.querySelectorAll('.roadmap-step').forEach(step => {
     step.style.cursor = 'pointer';
     step.addEventListener('click', () => {
       const target = parseInt(step.getAttribute('data-step'), 10);
       if (!isNaN(target)) showStep(target);
-      if (!roadmapHintShown) {
-        roadmapHintShown = true;
-        alert('上部のPICOロードマップから、いつでも好きなステップに移動できます。\n' +
-              '書きやすいところからピースを埋めていき、あとで行き来しながら整理してください。');
-      }
     });
   });
 });
@@ -659,4 +679,3 @@ document.addEventListener('DOMContentLoaded', () => {
 //  初期化
 // ============================================================
 updateProgress();
-showStep(0);
