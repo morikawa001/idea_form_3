@@ -1134,20 +1134,20 @@ textarea { resize: vertical; min-height: 90px; }
 }
 
 /* ============================================================
-   中央放射状メニュー（重なり解消＆ボタン拡大版）
+   中央放射状メニュー（さらに余裕をもたせた版）
 ============================================================ */
 
 .radial-menu-wrap {
   max-width: 680px;
-  margin: 24px auto 12px;
+  margin: 28px auto 12px;
   padding: 16px 16px 8px;
   text-align: center;
 }
 
 .radial-menu {
   position: relative;
-  width: 340px;   /* 大きめの円にする */
-  height: 340px;
+  width: 380px;   /* 340 → 380 に拡大 */
+  height: 380px;
   margin: 0 auto;
   border-radius: 50%;
   background: radial-gradient(circle at 50% 50%, #ffffff 0, #f4faf7 45%, #e0f3eb 100%);
@@ -1160,8 +1160,8 @@ textarea { resize: vertical; min-height: 90px; }
   left: 50%;
   top: 50%;
   transform: translate(-50%,-50%);
-  width: 130px;
-  height: 130px;
+  width: 120px;   /* 130 → 120 に少しだけ縮小 */
+  height: 120px;
   border-radius: 50%;
   border: 2px solid var(--green-mid);
   background: var(--green-pale);
@@ -1196,7 +1196,7 @@ textarea { resize: vertical; min-height: 90px; }
 /* 放射状ボタン（P / C / I / O） */
 .radial-item {
   position: absolute;
-  width: 160px;    /* かなり広めにとる */
+  width: 170px;   /* 160 → 170 に拡大 */
   height: 64px;
   border-radius: 999px;
   border: 2px solid var(--green-border);
@@ -1205,9 +1205,9 @@ textarea { resize: vertical; min-height: 90px; }
   align-items: center;
   justify-content: center;
   gap: 6px;
-  padding: 8px 14px;
+  padding: 8px 16px;
   font-family: inherit;
-  font-size: 0.84em;
+  font-size: 0.86em;
   color: var(--text-sub);
   cursor: pointer;
   box-shadow: 0 2px 8px rgba(0,0,0,.08);
@@ -1226,25 +1226,25 @@ textarea { resize: vertical; min-height: 90px; }
   font-size: 0.72em;
 }
 
-/* 位置：中心から十分離す */
+/* 位置：円のかなり外側に寄せる */
 .radial-item-top {
   left: 50%;
-  top: 8px;                   /* 上の外周ギリギリ */
+  top: 16px;                   /* 上端から少し離す */
   transform: translateX(-50%);
 }
 .radial-item-right {
   top: 50%;
-  right: 8px;                 /* 右の外周ギリギリ */
+  right: 16px;                 /* 右端から少し離す */
   transform: translateY(-50%);
 }
 .radial-item-bottom {
   left: 50%;
-  bottom: 8px;                /* 下の外周ギリギリ */
+  bottom: 16px;                /* 下端から少し離す */
   transform: translateX(-50%);
 }
 .radial-item-left {
   top: 50%;
-  left: 8px;                  /* 左の外周ギリギリ */
+  left: 16px;                  /* 左端から少し離す */
   transform: translateY(-50%);
 }
 
@@ -1259,7 +1259,7 @@ textarea { resize: vertical; min-height: 90px; }
 
 /* メニュー下説明 */
 .radial-hint {
-  margin-top: 14px;
+  margin-top: 16px;
   font-size: 0.80em;
   color: var(--text-muted);
   line-height: 1.7;
@@ -1272,8 +1272,8 @@ textarea { resize: vertical; min-height: 90px; }
     height: 300px;
   }
   .radial-center {
-    width: 120px;
-    height: 120px;
+    width: 110px;
+    height: 110px;
   }
   .radial-item {
     width: 150px;
