@@ -1216,3 +1216,23 @@ textarea { resize: vertical; min-height: 90px; }
 .step-memo-textarea:focus {
   outline: none;
 }
+
+/* 音声入力ステータス */
+#voiceStatus {
+  position: fixed;
+  left: 50%;
+  bottom: 16px;
+  transform: translateX(-50%);
+  background: #333;
+  color: #fff;
+  font-size: 0.82em;
+  padding: 8px 14px;
+  border-radius: 20px;
+  box-shadow: 0 3px 8px rgba(0,0,0,.35);
+  cursor: pointer;
+  display: none;          /* ← これが重要 */
+  z-index: 2000;
+}
+#voiceStatus span {
+  white-space: nowrap;
+}
