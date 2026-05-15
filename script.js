@@ -1,5 +1,6 @@
 // ============================================================
 // MIT ヒアリングフォーム v3.6 — script.js
+// q4「主にこまっているのは？」・q5「発生頻度」修正版
 // ============================================================
 
 // デフォルト送信先
@@ -11,9 +12,9 @@ let startTime = null;
 // 音声入力（Web Speech API）
 // ============================================================
 let currentRecognition = null;
-let currentMicBtn      = null;
-let currentTargetId    = null;
-let interimSpan        = null;
+let currentMicBtn = null;
+let currentTargetId = null;
+let interimSpan = null;
 
 function startVoice(targetId) {
   const SpeechRecognition =
@@ -29,24 +30,25 @@ function startVoice(targetId) {
     return;
   }
 
-  const ta  = document.getElementById(targetId);
-  const btn = document.querySelector(`[data-mic-target="${targetId}"]`) ||
-              document.querySelector(`button[onclick*="startVoice('${targetId}')"]`) ||
-              document.querySelector(`button[onclick*='startVoice("${targetId}")']`);
+  const ta = document.getElementById(targetId);
+  const btn =
+    document.querySelector(`[data-mic-target="${targetId}"]`) ||
+    document.querySelector(`button[onclick*="startVoice('${targetId}')"]`) ||
+    document.querySelector(`button[onclick*='startVoice("${targetId}")']`);
 
   const status = document.getElementById('voiceStatus');
 
-  const recognition            = new SpeechRecognition();
-  recognition.lang             = 'ja-JP';
-  recognition.interimResults   = true;
-  recognition.continuous       = true;
-  recognition.maxAlternatives  = 1;
+  const recognition = new SpeechRecognition();
+  recognition.lang = 'ja-JP';
+  recognition.interimResults = true;
+  recognition.continuous = true;
+  recognition.maxAlternatives = 1;
 
   currentRecognition = recognition;
-  currentMicBtn      = btn;
-  currentTargetId    = targetId;
+  currentMicBtn = btn;
+  currentTargetId = targetId;
 
-  if (btn)    btn.classList.add('btn-mic--active');
+  if (btn) btn.classList.add('btn-mic--active');
   if (status) status.style.display = 'flex';
 
   if (ta) {
@@ -62,13 +64,16 @@ function startVoice(targetId) {
   const baseText = ta ? ta.value : '';
 
   recognition.onresult = (e) => {
-    let interim   = '';
+    let interim = '';
     let finalText = '';
 
     for (let i = e.resultIndex; i < e.results.length; i++) {
       const transcript = e.results[i][0].transcript;
-      if (e.results[i].isFinal) finalText += transcript;
-      else                      interim   += transcript;
+      if (e.results[i].isFinal) {
+        finalText += transcript;
+      } else {
+        interim += transcript;
+      }
     }
 
     if (interimSpan) {
@@ -85,21 +90,28 @@ function startVoice(targetId) {
 
   recognition.onerror = (e) => {
     if (e.error === 'aborted') return;
+
     if (e.error === 'no-speech') {
       try { recognition.stop(); } catch (_) {}
       return;
     }
+
     if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
       alert('マイクへのアクセスが拒否されています。\nブラウザのアドレスバー左のマイクアイコンから許可してください。');
     } else {
       alert('音声認識エラー：' + e.error);
     }
+
     if (currentRecognition === recognition) stopVoiceUI();
   };
 
   recognition.onend = () => {
     if (currentRecognition !== recognition) return;
-    try { recognition.start(); } catch (_) { stopVoiceUI(); }
+    try {
+      recognition.start();
+    } catch (_) {
+      stopVoiceUI();
+    }
   };
 
   if (status) status.onclick = stopVoice;
@@ -122,15 +134,18 @@ function stopVoice() {
 
 function stopVoiceUI() {
   currentRecognition = null;
-  currentTargetId    = null;
+  currentTargetId = null;
+
   if (currentMicBtn) {
     currentMicBtn.classList.remove('btn-mic--active');
     currentMicBtn = null;
   }
+
   if (interimSpan) {
     interimSpan.remove();
     interimSpan = null;
   }
+
   const status = document.getElementById('voiceStatus');
   if (status) {
     status.style.display = 'none';
@@ -144,10 +159,17 @@ function stopVoiceUI() {
 const FORM_UI_IDS = ['picoRoadmap', 'progressWrap', 'navigator', 'ideaForm'];
 
 function hideFormUI() {
-  FORM_UI_IDS.forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
+  FORM_UI_IDS.forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
 }
+
 function showFormUI() {
-  FORM_UI_IDS.forEach(id => { const el = document.getElementById(id); if (el) el.style.display = ''; });
+  FORM_UI_IDS.forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = '';
+  });
 }
 
 // ============================================================
@@ -167,16 +189,18 @@ const NAV_MESSAGES = [
 function showStep(step) {
   stopVoice();
 
-  document.querySelectorAll('.step-section').forEach((s, i) =>
-    s.classList.toggle('active', i === step)
-  );
+  document.querySelectorAll('.step-section').forEach((section, i) => {
+    section.classList.toggle('active', i === step);
+  });
 
   for (let i = 0; i < TOTAL_STEPS; i++) {
     const rm = document.getElementById(`rm${i}`);
     if (!rm) continue;
+
     rm.className = 'roadmap-step';
-    if (i < step)   rm.classList.add('done');
+    if (i < step) rm.classList.add('done');
     if (i === step) rm.classList.add('active');
+
     if (i < TOTAL_STEPS - 1) {
       const line = document.getElementById(`rml${i}`);
       if (line) line.className = 'roadmap-line' + (i < step ? ' done' : '');
@@ -191,7 +215,7 @@ function showStep(step) {
 }
 
 // 任意入力なので必須チェックはなし
-const STEP_REQUIRED = [ () => [], () => [], () => [], () => [], () => [] ];
+const STEP_REQUIRED = [() => [], () => [], () => [], () => [], () => []];
 
 function goNext(step) {
   const errs = STEP_REQUIRED[step]();
@@ -201,6 +225,7 @@ function goNext(step) {
   }
   if (step < TOTAL_STEPS - 1) showStep(step + 1);
 }
+
 function goPrev(step) {
   if (step > 0) showStep(step - 1);
 }
@@ -208,68 +233,112 @@ function goPrev(step) {
 // ============================================================
 // ユーティリティ
 // ============================================================
-function getVal(id)    { return (document.getElementById(id) || { value: '' }).value.trim(); }
-function getRadio(nm)  { const el = document.querySelector(`input[name="${nm}"]:checked`); return el ? el.value : ''; }
-function getChecks(nm) { return [...document.querySelectorAll(`input[name="${nm}"]:checked`)].map(e => e.value); }
+function getVal(id) {
+  return (document.getElementById(id) || { value: '' }).value.trim();
+}
 
-function getQ3Value()  { const v = getRadio('q3');  return v === 'その他' ? `その他（${getVal('q3-other-text')}）`  : (v || ''); }
-function getQ4Value()  { const v = getRadio('q4');  return v === 'その他' ? `その他（${getVal('q4-other-text')}）`  : (v || ''); }
-function getQ6Values() { return getChecks('q6').map(v  => v === 'その他' ? `その他（${getVal('q6-other-text')}）`  : v); }
-function getQ9Values() { return getChecks('q9').map(v  => v === 'その他' ? `その他（${getVal('q9-other-text')}）`  : v); }
-function getQ12Values(){ return getChecks('q12').map(v => v === 'その他' ? `その他（${getVal('q12-other-text')}）` : v); }
-function getIdeaTypes(){ return getChecks('q10_type'); }
+function getRadio(name) {
+  const el = document.querySelector(`input[name="${name}"]:checked`);
+  return el ? el.value : '';
+}
+
+function getChecks(name) {
+  return [...document.querySelectorAll(`input[name="${name}"]:checked`)].map((e) => e.value);
+}
+
+function getQ3Value() {
+  const v = getRadio('q3');
+  return v === 'その他' ? `その他（${getVal('q3-other-text')}）` : (v || '');
+}
+
+function getQ4Value() {
+  const v = getRadio('q4');
+  return v === 'その他' ? `その他（${getVal('q4-other-text')}）` : (v || '');
+}
+
+function getQ6Values() {
+  return getChecks('q6').map((v) =>
+    v === 'その他' ? `その他（${getVal('q6-other-text')}）` : v
+  );
+}
+
+function getQ9Values() {
+  return getChecks('q9').map((v) =>
+    v === 'その他' ? `その他（${getVal('q9-other-text')}）` : v
+  );
+}
+
+function getQ12Values() {
+  return getChecks('q12').map((v) =>
+    v === 'その他' ? `その他（${getVal('q12-other-text')}）` : v
+  );
+}
+
+function getIdeaTypes() {
+  return getChecks('q10_type');
+}
 
 // ============================================================
 // ステップ別進捗対象の定義
 // ============================================================
 const STEP_ITEMS = {
-  0: [           // 基本情報
+  0: [
     () => getVal('q1'),
     () => getVal('q2'),
     () => getVal('q2b'),
     () => getQ3Value()
   ],
-  1: [           // P
+  1: [
     () => getQ4Value(),
     () => getRadio('q5'),
     () => (getQ6Values().length > 0 ? '1' : ''),
     () => getVal('q7')
   ],
-  2: [           // C
+  2: [
     () => getVal('q8'),
     () => (getQ9Values().length > 0 ? '1' : '')
   ],
-  3: [           // I
+  3: [
     () => getVal('q10'),
     () => (getIdeaTypes().length > 0 ? '1' : ''),
     () => getVal('q10_detail'),
     () => getVal('q10_ref'),
     () => getVal('q10_concern')
   ],
-  4: [           // O
+  4: [
     () => (getQ12Values().length > 0 ? '1' : ''),
     () => getVal('q13')
   ]
 };
 
 // ============================================================
-// プログレスバー（その場メモは進捗に含めない）＋ステップ別進捗
+// プログレスバー
 // ============================================================
 function updateProgress() {
   if (!startTime) startTime = new Date();
 
-  // 全体用（従来ロジック）
   const items = [
-    getVal('q1'), getVal('q2'), getVal('q2b'), getQ3Value(), getQ4Value(),
-    getRadio('q5'), getChecks('q6').length > 0 ? '1' : '',
-    getVal('q7'), getVal('q8'), getQ9Values().length > 0 ? '1' : '',
-    getVal('q10'), getChecks('q12').length > 0 ? '1' : '', getVal('q13')
+    getVal('q1'),
+    getVal('q2'),
+    getVal('q2b'),
+    getQ3Value(),
+    getQ4Value(),
+    getRadio('q5'),
+    getChecks('q6').length > 0 ? '1' : '',
+    getVal('q7'),
+    getVal('q8'),
+    getQ9Values().length > 0 ? '1' : '',
+    getVal('q10'),
+    getChecks('q12').length > 0 ? '1' : '',
+    getVal('q13')
   ];
-  const filled = items.filter(v => v !== '').length;
-  const pct    = Math.round(filled / items.length * 100);
-  const label  = document.getElementById('progress-label');
-  const pctEl  = document.getElementById('progress-pct');
-  const fill   = document.getElementById('progressFill');
+
+  const filled = items.filter((v) => v !== '').length;
+  const pct = Math.round((filled / items.length) * 100);
+
+  const label = document.getElementById('progress-label');
+  const pctEl = document.getElementById('progress-pct');
+  const fill = document.getElementById('progressFill');
 
   if (label) {
     label.textContent =
@@ -278,15 +347,16 @@ function updateProgress() {
         : `フォーム全体の ${filled} / ${items.length} ピースが記録済みです`;
   }
   if (pctEl) pctEl.textContent = `${pct}%`;
-  if (fill)  fill.style.width  = `${pct}%`;
+  if (fill) fill.style.width = `${pct}%`;
 
-  // ステップ別の進捗を計算してパネルに反映
   for (let step = 0; step <= 4; step++) {
     const defs = STEP_ITEMS[step];
     if (!defs) continue;
-    const vals    = defs.map(fn => fn()).filter(v => v !== '');
-    const stepPct = Math.round(vals.length / defs.length * 100);
+
+    const vals = defs.map((fn) => fn()).filter((v) => v !== '');
+    const stepPct = Math.round((vals.length / defs.length) * 100);
     const panelEl = document.getElementById(`panelProgress${step}`);
+
     if (panelEl) {
       panelEl.textContent = `${stepPct}%`;
     }
@@ -294,132 +364,133 @@ function updateProgress() {
 }
 
 // ============================================================
-// 入力フィードバック用（簡略版）
+// 入力イベント
 // ============================================================
 function showFieldFb(id, text, cls) {
   const el = document.getElementById(`fb-${id}`);
   if (!el) return;
+
   el.textContent = text || '';
   el.className = 'field-fb';
+
   if (text) {
     el.classList.add('show');
     if (cls) el.classList.add(cls);
   }
 }
 
-function onSelectChange(id)   { updateProgress(); }
-function onTextInput(id)      { updateProgress(); }
-function onEmailInput(id)     { updateProgress(); }
-function onTextareaInput(id)  { updateProgress(); }
-function onIdeaInput()        { updateProgress(); updateIdeaCharCount(); }
-
-// ラジオ：同じ項目をもう一度クリックしたら解除する（q4, q5 用）
-function onRadioChange(id) {
-  // q4, q5 だけ「再クリックで解除」を有効にする
-  if (id === 'q4' || id === 'q5') {
-    const name    = id;              // "q4" / "q5"
-    const clicked = getRadio(name);  // 直近クリックで一旦選ばれた値
-    const final   = toggleRadioValue(name, clicked);
-
-    // UI を選択状態に合わせて更新
-    if (id === 'q5') {
-      syncFreqCards();          // .freq-card の selected を付け外し
-    } else {
-      syncCardRadio(id);        // q4 の .card-radio.selected を更新
-    }
-
-    updateProgress();
-    return;
-  }
-
-  // それ以外は従来通り
+function onSelectChange() {
   updateProgress();
-  syncCardRadio(id);
 }
 
-// 同じラジオをもう一度クリックしたら解除するためのヘルパー
-function toggleRadioValue(groupName, clickedValue) {
-  const current = getRadio(groupName);
-  if (current === clickedValue) {
-    // すでに選ばれている値を再クリック → 全部クリア
-    document.querySelectorAll(`input[name="${groupName}"]`).forEach(el => {
-      el.checked = false;
-    });
-    return ''; // 空値を返す
+function onTextInput() {
+  updateProgress();
+}
+
+function onEmailInput() {
+  updateProgress();
+}
+
+function onTextareaInput() {
+  updateProgress();
+}
+
+function onIdeaInput() {
+  updateProgress();
+  updateIdeaCharCount();
+}
+
+// ============================================================
+// ラジオ・チェックUI同期
+// ============================================================
+function onRadioChange(groupName) {
+  if (groupName === 'q3') {
+    syncCardRadio('q3');
+    toggleOtherInputRadio('q3-other-check', 'q3-other-wrap');
+  } else if (groupName === 'q4') {
+    syncCardRadio('q4');
+    toggleOtherInputRadio('q4-other-check', 'q4-other-wrap');
+  } else if (groupName === 'q5') {
+    syncFreqCards();
   }
-  // 別の値をクリック → 通常通りこの値に更新
-  return clickedValue;
+
+  updateProgress();
 }
 
-function onCheckChange(id)    { updateProgress(); syncCardCheck(id); }
+function onCheckChange(groupId) {
+  updateProgress();
+  syncCardCheck(groupId);
+
+  if (groupId === 'q6') {
+    toggleOtherInput('q6-other-check', 'q6-other-wrap');
+  } else if (groupId === 'q9') {
+    toggleOtherInput('q9-other-check', 'q9-other-wrap');
+  } else if (groupId === 'q12') {
+    toggleOtherInput('q12-other-check', 'q12-other-wrap');
+  }
+}
 
 function syncCardRadio(groupId) {
   const wrap = document.getElementById(groupId);
   if (!wrap) return;
-  const selectedVal = getRadio(groupId);
-  wrap.querySelectorAll('.card-radio').forEach(lbl => {
-    const input = lbl.querySelector('input[type="radio"]');
-    lbl.classList.toggle('selected', input && input.value === selectedVal);
+
+  wrap.querySelectorAll('.card-radio').forEach((label) => {
+    const input = label.querySelector('input[type="radio"]');
+    label.classList.toggle('selected', !!input && input.checked);
   });
 }
 
 function syncCardCheck(groupId) {
   const wrap = document.getElementById(groupId);
   if (!wrap) return;
-  wrap.querySelectorAll('.card-check').forEach(lbl => {
-    const input = lbl.querySelector('input[type="checkbox"]');
-    lbl.classList.toggle('selected', input && input.checked);
+
+  wrap.querySelectorAll('.card-check').forEach((label) => {
+    const input = label.querySelector('input[type="checkbox"]');
+    label.classList.toggle('selected', !!input && input.checked);
   });
 }
 
-// 発生頻度カード専用のハイライト
 function syncFreqCards() {
   const group = document.getElementById('q5');
   if (!group) return;
-  const val = getRadio('q5');
 
-  // いったん全ての selected を外す
-  group.querySelectorAll('.freq-card').forEach(lbl => {
-    lbl.classList.remove('selected');
-  });
-
-  // 選択されている value と一致するカードだけ selected を付ける
-  group.querySelectorAll('.freq-card').forEach(lbl => {
-    const input = lbl.querySelector('input[type="radio"]');
-    if (input && input.value === val) {
-      lbl.classList.add('selected');
-    }
+  group.querySelectorAll('.freq-card').forEach((label) => {
+    const input = label.querySelector('input[type="radio"]');
+    label.classList.toggle('selected', !!input && input.checked);
   });
 }
 
 function toggleOtherInput(checkId, wrapId) {
-  const chk  = document.getElementById(checkId);
+  const chk = document.getElementById(checkId);
   const wrap = document.getElementById(wrapId);
   if (!chk || !wrap) return;
   wrap.classList.toggle('show', chk.checked);
 }
 
 function toggleOtherInputRadio(checkId, wrapId) {
-  const chk  = document.getElementById(checkId);
+  const chk = document.getElementById(checkId);
   const wrap = document.getElementById(wrapId);
   if (!chk || !wrap) return;
-  const checked = chk.checked;
-  wrap.classList.toggle('show', checked);
+  wrap.classList.toggle('show', chk.checked);
 }
 
 function highlightChecked(groupName) {
   const wrap = document.getElementById(groupName);
   if (!wrap) return;
-  wrap.querySelectorAll('.icon-check').forEach(lbl => {
-    const input = lbl.querySelector('input[type="checkbox"]');
-    lbl.classList.toggle('selected', input && input.checked);
+
+  wrap.querySelectorAll('.icon-check').forEach((label) => {
+    const input = label.querySelector('input[type="checkbox"]');
+    label.classList.toggle('selected', !!input && input.checked);
   });
+
+  updateProgress();
 }
 
 function updateIdeaCharCount() {
-  const ta   = document.getElementById('q10');
-  const cnt  = document.getElementById('ideaCharCount');
+  const ta = document.getElementById('q10');
+  const cnt = document.getElementById('ideaCharCount');
   if (!ta || !cnt) return;
+
   const len = ta.value.length;
   cnt.textContent = `${len}文字`;
 }
@@ -428,18 +499,21 @@ function updateIdeaCharCount() {
 // プレビュー用テキスト生成
 // ============================================================
 function buildText() {
-  const q6v       = getQ6Values();
-  const q9v       = getQ9Values();
-  const q12v      = getQ12Values();
+  const q6v = getQ6Values();
+  const q9v = getQ9Values();
+  const q12v = getQ12Values();
   const ideaTypes = getIdeaTypes();
-  const memoP     = getVal('memo_p');
-  const memoC     = getVal('memo_c');
-  const memoI     = getVal('memo_i');
-  const memoO     = getVal('memo_o');
-  const endTime   = new Date();
-  const diffMs    = startTime ? endTime - startTime : 0;
-  const elapsed   = startTime
-    ? `${Math.floor(diffMs/60000)}分${Math.floor((diffMs%60000)/1000)}秒` : '不明';
+
+  const memoP = getVal('memo_p');
+  const memoC = getVal('memo_c');
+  const memoI = getVal('memo_i');
+  const memoO = getVal('memo_o');
+
+  const endTime = new Date();
+  const diffMs = startTime ? endTime - startTime : 0;
+  const elapsed = startTime
+    ? `${Math.floor(diffMs / 60000)}分${Math.floor((diffMs % 60000) / 1000)}秒`
+    : '不明';
 
   return [
     '━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
@@ -480,7 +554,7 @@ function buildText() {
     '━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
     `記録日時　　　　　：${endTime.toLocaleString('ja-JP')}`,
     `ヒアリング所要時間：${elapsed}`,
-    '━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
+    '━━━━━━━━━━━━━━━━━━━━━━━━━━━━'
   ].join('\n');
 }
 
@@ -489,7 +563,7 @@ function buildText() {
 // ============================================================
 function showPreview() {
   const previewModal = document.getElementById('previewModal');
-  const previewText  = document.getElementById('previewText');
+  const previewText = document.getElementById('previewText');
   if (!previewModal || !previewText) return;
 
   previewText.textContent = buildText();
@@ -501,10 +575,10 @@ function closePreviewModal() {
   if (previewModal) previewModal.classList.remove('active');
 }
 
-// メール送信用モーダル
 function actionSendMail() {
   const mailModal = document.getElementById('mailModal');
-  const defDisp   = document.getElementById('mailDefaultDisplay');
+  const defDisp = document.getElementById('mailDefaultDisplay');
+
   if (mailModal && defDisp) {
     defDisp.textContent = DEFAULT_MAIL_TO;
     mailModal.classList.add('active');
@@ -517,27 +591,27 @@ function closeMailModal() {
 }
 
 function onMailToInput() {
-  // 簡易バリデーションが必要ならここに追加
 }
 
 function doSendMail() {
   const extra = getVal('mailTo');
-  const to    = extra || DEFAULT_MAIL_TO;
-  const body  = encodeURIComponent(buildText());
-  const subj  = encodeURIComponent('MIT ヒアリング記録');
-  const addr  = encodeURIComponent(to);
+  const to = extra || DEFAULT_MAIL_TO;
+  const body = encodeURIComponent(buildText());
+  const subj = encodeURIComponent('MIT ヒアリング記録');
+  const addr = encodeURIComponent(to);
 
   const url = `mailto:${addr}?subject=${subj}&body=${body}`;
   window.location.href = url;
 }
 
-// ダミー実装（必要に応じて後で具体化）
 function actionSaveToFolder() {
   alert('テキスト保存機能は、現状ブラウザ上ではクリップボードコピー等で代替してください。');
 }
+
 function actionSavePDF() {
   window.print();
 }
+
 function actionAnalyze() {
   alert('分析ページ連携は未実装です。');
 }
@@ -550,50 +624,101 @@ function clearStep(step) {
 
   switch (step) {
     case 0:
-      ['q1','q2','q2b'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
-      document.querySelectorAll('input[name="q3"]').forEach(el => { el.checked = false; });
-      document.getElementById('q3-other-text').value = '';
-      document.getElementById('q3-other-wrap').classList.remove('show');
-      break;
-    case 1:
-      ['q4-other-text','q6-other-text','q7','memo_p'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
-      ['q4','q5','q6'].forEach(name => {
-        document.querySelectorAll(`input[name="${name}"]`).forEach(el => { el.checked = false; });
+      ['q1', 'q2', 'q2b'].forEach((id) => {
+        const el = document.getElementById(id);
+        if (el) el.value = '';
       });
-      ['q4-other-wrap','q6-other-wrap'].forEach(id => { const el = document.getElementById(id); if (el) el.classList.remove('show'); });
+      document.querySelectorAll('input[name="q3"]').forEach((el) => {
+        el.checked = false;
+      });
+      {
+        const otherText = document.getElementById('q3-other-text');
+        const otherWrap = document.getElementById('q3-other-wrap');
+        if (otherText) otherText.value = '';
+        if (otherWrap) otherWrap.classList.remove('show');
+      }
       break;
+
+    case 1:
+      ['q4-other-text', 'q6-other-text', 'q7', 'memo_p'].forEach((id) => {
+        const el = document.getElementById(id);
+        if (el) el.value = '';
+      });
+      ['q4', 'q5', 'q6'].forEach((name) => {
+        document.querySelectorAll(`input[name="${name}"]`).forEach((el) => {
+          el.checked = false;
+        });
+      });
+      ['q4-other-wrap', 'q6-other-wrap'].forEach((id) => {
+        const el = document.getElementById(id);
+        if (el) el.classList.remove('show');
+      });
+      break;
+
     case 2:
-      ['q8','q9-other-text','memo_c'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
-      document.querySelectorAll('input[name="q9"]').forEach(el => { el.checked = false; });
-      const w9 = document.getElementById('q9-other-wrap'); if (w9) w9.classList.remove('show');
+      ['q8', 'q9-other-text', 'memo_c'].forEach((id) => {
+        const el = document.getElementById(id);
+        if (el) el.value = '';
+      });
+      document.querySelectorAll('input[name="q9"]').forEach((el) => {
+        el.checked = false;
+      });
+      {
+        const w9 = document.getElementById('q9-other-wrap');
+        if (w9) w9.classList.remove('show');
+      }
       break;
+
     case 3:
-      ['q10','q10_detail','q10_ref','q10_concern','memo_i'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
-      document.querySelectorAll('input[name="q10_type"]').forEach(el => { el.checked = false; });
+      ['q10', 'q10_detail', 'q10_ref', 'q10_concern', 'memo_i'].forEach((id) => {
+        const el = document.getElementById(id);
+        if (el) el.value = '';
+      });
+      document.querySelectorAll('input[name="q10_type"]').forEach((el) => {
+        el.checked = false;
+      });
       break;
+
     case 4:
-      ['q12-other-text','q13','memo_o'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
-      document.querySelectorAll('input[name="q12"]').forEach(el => { el.checked = false; });
-      const w12 = document.getElementById('q12-other-wrap'); if (w12) w12.classList.remove('show');
+      ['q12-other-text', 'q13', 'memo_o'].forEach((id) => {
+        const el = document.getElementById(id);
+        if (el) el.value = '';
+      });
+      document.querySelectorAll('input[name="q12"]').forEach((el) => {
+        el.checked = false;
+      });
+      {
+        const w12 = document.getElementById('q12-other-wrap');
+        if (w12) w12.classList.remove('show');
+      }
       break;
   }
+
+  syncCardRadio('q3');
+  syncCardRadio('q4');
+  syncFreqCards();
+  syncCardCheck('q6');
+  syncCardCheck('q9');
+  syncCardCheck('q12');
+  highlightChecked('q10type');
+
   updateProgress();
 }
 
 function restartFromEnd() {
   const end = document.getElementById('endScreen');
   if (end) end.classList.remove('active');
+
   showFormUI();
   showStep(0);
   updateProgress();
 }
 
 // ============================================================
-// ロードマップ + パネルメニュー クリックナビ
+// 初期化
 // ============================================================
 document.addEventListener('DOMContentLoaded', () => {
-  // ロードマップクリック
-  document.querySelectorAll('.roadmap-step').forEach(stepEl => {
+  document.querySelectorAll('.roadmap-step').forEach((stepEl) => {
     stepEl.style.cursor = 'pointer';
     stepEl.addEventListener('click', () => {
       const target = parseInt(stepEl.getAttribute('data-step'), 10);
@@ -601,14 +726,21 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // 上部パネルメニュークリック（基本情報 + P/C/I/O）
-  document.querySelectorAll('.panel-main, .panel-item').forEach(btn => {
+  document.querySelectorAll('.panel-main, .panel-item').forEach((btn) => {
     btn.addEventListener('click', () => {
       const step = parseInt(btn.getAttribute('data-step'), 10);
       if (!isNaN(step)) showStep(step);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
   });
+
+  syncCardRadio('q3');
+  syncCardRadio('q4');
+  syncFreqCards();
+  syncCardCheck('q6');
+  syncCardCheck('q9');
+  syncCardCheck('q12');
+  highlightChecked('q10type');
 
   updateProgress();
   showStep(0);
