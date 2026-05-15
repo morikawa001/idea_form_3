@@ -28,40 +28,55 @@
   </div>
 </header>
 
-<!-- ===== 中央パズルメニュー ===== -->
+<!-- ===== 中央パネルメニュー ===== -->
 <div class="puzzle-menu-wrap">
-  <div class="puzzle-menu">
-    <!-- 上段：P / C -->
-    <button class="puzzle-item puzzle-item-top-left" data-step="1">
-      <div class="puzzle-emoji">🔍</div>
-      <div class="puzzle-label"><span class="pico-tag">P</span> 困りごと</div>
+  <!-- 上：横長の基本情報パネル -->
+  <button class="panel-main" data-step="0">
+    <div class="panel-main-emoji">👤</div>
+    <div class="panel-main-text">
+      <div class="panel-main-title">基本情報から聞く</div>
+      <div class="panel-main-sub">発案者・所属などの背景を軽く確認します</div>
+    </div>
+  </button>
+
+  <!-- 下：P / C / I / O を 2×2 で配置 -->
+  <div class="panel-grid">
+    <button class="panel-item" data-step="1">
+      <div class="panel-emoji">🔍</div>
+      <div class="panel-label">
+        <span class="pico-tag">P</span> 困りごと
+      </div>
+      <div class="panel-desc">誰が・どんな場面で困っているか</div>
     </button>
 
-    <button class="puzzle-item puzzle-item-top-right" data-step="2">
-      <div class="puzzle-emoji">🔄</div>
-      <div class="puzzle-label"><span class="pico-tag">C</span> 今の対応</div>
+    <button class="panel-item" data-step="2">
+      <div class="panel-emoji">🔄</div>
+      <div class="panel-label">
+        <span class="pico-tag">C</span> 今の対応
+      </div>
+      <div class="panel-desc">今どうやってしのいでいるか</div>
     </button>
 
-    <!-- 中央：基本情報 -->
-    <button class="puzzle-center" data-step="0">
-      <div class="puzzle-center-emoji">👤</div>
-      <div class="puzzle-center-label">基本情報</div>
+    <button class="panel-item" data-step="3">
+      <div class="panel-emoji">💡</div>
+      <div class="panel-label">
+        <span class="pico-tag">I</span> アイデア
+      </div>
+      <div class="panel-desc">発案者のひらめき・工夫</div>
     </button>
 
-    <!-- 下段：I / O -->
-    <button class="puzzle-item puzzle-item-bottom-left" data-step="3">
-      <div class="puzzle-emoji">💡</div>
-      <div class="puzzle-label"><span class="pico-tag">I</span> アイデア</div>
-    </button>
-
-    <button class="puzzle-item puzzle-item-bottom-right" data-step="4">
-      <div class="puzzle-emoji">📊</div>
-      <div class="puzzle-label"><span class="pico-tag">O</span> 期待効果</div>
+    <button class="panel-item" data-step="4">
+      <div class="panel-emoji">📊</div>
+      <div class="panel-label">
+        <span class="pico-tag">O</span> 期待効果
+      </div>
+      <div class="panel-desc">このアイデアで何が変わりそうか</div>
     </button>
   </div>
+
   <p class="puzzle-hint">
-    真ん中の<strong>「基本情報」</strong>からでも、周りのピースからでも始められます。<br>
-    いずれかのパネルを押すと、その入力画面に移動します。
+    まずは上の<strong>「基本情報から聞く」</strong>がおすすめです。<br>
+    困りごとから整理したい場合は、下の P / C / I / O から始めても構いません。
   </p>
 </div>
 
