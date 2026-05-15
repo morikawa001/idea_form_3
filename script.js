@@ -2,7 +2,9 @@
 // MIT ヒアリングフォーム v3.6 — script.js（パズルメニュー対応）
 // ============================================================
 
+// デフォルト送信先
 const DEFAULT_MAIL_TO = 'ns.morizo@gmail.com';
+
 let startTime = null;
 
 // ============================================================
@@ -60,16 +62,13 @@ function startVoice(targetId) {
   const baseText = ta ? ta.value : '';
 
   recognition.onresult = (e) => {
-    let interim = '';
+    let interim   = '';
     let finalText = '';
 
     for (let i = e.resultIndex; i < e.results.length; i++) {
       const transcript = e.results[i][0].transcript;
-      if (e.results[i].isFinal) {
-        finalText += transcript;
-      } else {
-        interim += transcript;
-      }
+      if (e.results[i].isFinal) finalText += transcript;
+      else                      interim   += transcript;
     }
 
     if (interimSpan) {
@@ -103,9 +102,7 @@ function startVoice(targetId) {
     try { recognition.start(); } catch (_) { stopVoiceUI(); }
   };
 
-  if (status) {
-    status.onclick = stopVoice;
-  }
+  if (status) status.onclick = stopVoice;
 
   try {
     recognition.start();
@@ -170,7 +167,9 @@ const NAV_MESSAGES = [
 function showStep(step) {
   stopVoice();
 
-  document.querySelectorAll('.step-section').forEach((s, i) => s.classList.toggle('active', i === step));
+  document.querySelectorAll('.step-section').forEach((s, i) =>
+    s.classList.toggle('active', i === step)
+  );
 
   for (let i = 0; i < TOTAL_STEPS; i++) {
     const rm = document.getElementById(`rm${i}`);
@@ -191,11 +190,15 @@ function showStep(step) {
   currentStep = step;
 }
 
+// 任意入力なので必須チェックはなし
 const STEP_REQUIRED = [ () => [], () => [], () => [], () => [], () => [] ];
 
 function goNext(step) {
   const errs = STEP_REQUIRED[step]();
-  if (errs.length > 0) { alert('入力内容を確認してください：\n\n' + errs.join('\n')); return; }
+  if (errs.length > 0) {
+    alert('入力内容を確認してください：\n\n' + errs.join('\n'));
+    return;
+  }
   showStep(step + 1);
 }
 function goPrev(step) { showStep(step - 1); }
@@ -218,7 +221,8 @@ function getIdeaTypes(){ return getChecks('q10_type'); }
 function showFeedback(id, msg, type) {
   const el = document.getElementById(`fb-${id}`);
   if (!el) return;
-  el.textContent = msg; el.className = `field-fb fb-${type} show`;
+  el.textContent = msg;
+  el.className = `field-fb fb-${type} show`;
 }
 function hideFeedback(id) {
   const el = document.getElementById(`fb-${id}`);
@@ -236,13 +240,19 @@ function toggleOtherInput(checkId, wrapId) {
   const checked = document.getElementById(checkId).checked;
   const wrap    = document.getElementById(wrapId);
   wrap.classList.toggle('show', checked);
-  if (!checked) { const ta = wrap.querySelector('textarea'); if (ta) ta.value = ''; }
+  if (!checked) {
+    const ta = wrap.querySelector('textarea');
+    if (ta) ta.value = '';
+  }
 }
 function toggleOtherInputRadio(radioId, wrapId) {
   const sel  = document.getElementById(radioId).checked;
   const wrap = document.getElementById(wrapId);
   wrap.classList.toggle('show', sel);
-  if (!sel) { const ta = wrap.querySelector('textarea'); if (ta) ta.value = ''; }
+  if (!sel) {
+    const ta = wrap.querySelector('textarea');
+    if (ta) ta.value = '';
+  }
 }
 
 // ============================================================
@@ -253,7 +263,7 @@ function updateProgress() {
   const items = [
     getVal('q1'), getVal('q2'), getVal('q2b'), getQ3Value(), getQ4Value(),
     getRadio('q5'), getChecks('q6').length > 0 ? '1' : '',
-    getVal('q7'), getVal('q8'), getQ9Values().length > 0 ? '1' : '0',
+    getVal('q7'), getVal('q8'), getQ9Values().length > 0 ? '1' : '',
     getVal('q10'), getChecks('q12').length > 0 ? '1' : '', getVal('q13')
   ];
   const filled = items.filter(v => v !== '').length;
@@ -261,10 +271,13 @@ function updateProgress() {
   const label  = document.getElementById('progress-label');
   const pctEl  = document.getElementById('progress-pct');
   const fill   = document.getElementById('progressFill');
-  if (label) label.textContent =
-    filled === 0
-      ? '書きやすいところから少しずつ記録を始めてください'
-      : `フォーム全体の ${filled} / ${items.length} ピースが記録済みです`;
+
+  if (label) {
+    label.textContent =
+      filled === 0
+        ? '書きやすいところから少しずつ記録を始めてください'
+        : `フォーム全体の ${filled} / ${items.length} ピースが記録済みです`;
+  }
   if (pctEl) pctEl.textContent = `${pct}%`;
   if (fill)  fill.style.width  = `${pct}%`;
 }
@@ -276,7 +289,8 @@ document.addEventListener('input',  updateProgress);
 // ============================================================
 function onSelectChange(id) {
   const v = getVal(id);
-  if (v) showFeedback(id, `✅ 「${v}」で記録します`, 'good'); else hideFeedback(id);
+  if (v) showFeedback(id, `✅ 「${v}」で記録します`, 'good');
+  else  hideFeedback(id);
 }
 function onTextInput(id) {
   const v = getVal(id);
@@ -295,12 +309,14 @@ function onEmailInput(id) {
   else    showFeedback(id, '⚠️ メールアドレスの形式を確認してください', 'warn');
 }
 function onRadioChange(groupId) {
-  highlightSelected(groupId); updateProgress();
+  highlightSelected(groupId);
+  updateProgress();
   const v = getRadio(groupId);
   if (v) showFeedback(groupId, `✅ 「${v}」を選択しました`, 'good');
 }
 function onCheckChange(groupId) {
-  highlightChecked(groupId); updateProgress();
+  highlightChecked(groupId);
+  updateProgress();
   const vals = getChecks(groupId);
   if (vals.length > 0) showFeedback(groupId, `✅ ${vals.length}項目選択中`, 'good');
   else hideFeedback(groupId);
@@ -374,33 +390,47 @@ function buildText() {
 }
 
 // ============================================================
-// プレビュー
+// プレビュー（ここが今回のポイント）
 // ============================================================
 function showPreview() {
-  document.getElementById('previewText').textContent = buildText();
+  const textEl = document.getElementById('previewText');
+  if (!textEl) {
+    alert('プレビュー用要素（#previewText）が見つかりません。index.html の該当部分をご確認ください。');
+    return;
+  }
+  textEl.textContent = buildText();
+
   const idea     = getVal('q10');
   const who      = getQ4Value();
   const freq     = getRadio('q5');
   const outcomes = getQ12Values();
-  if (idea && who && outcomes.length > 0) {
-    document.getElementById('picoContent').innerHTML = [
+
+  const picoBox = document.getElementById('picoBox');
+  const picoEl  = document.getElementById('picoContent');
+
+  if (idea && who && outcomes.length > 0 && picoBox && picoEl) {
+    picoEl.innerHTML = [
       `<b>P</b>（対象・背景）：${who}が${freq || '（頻度未記入）'}`,
       `<b>I</b>（介入・アイデア）：${idea.slice(0,120)}${idea.length>120?'…':''}`,
       `<b>C</b>（比較・現状）：${getVal('q8') || '現在の対応'}`,
       `<b>O</b>（期待する成果）：${outcomes.join('、')}`
     ].join('<br><br>');
-    document.getElementById('picoBox').style.display = 'block';
-  } else {
-    document.getElementById('picoBox').style.display = 'none';
+    picoBox.style.display = 'block';
+  } else if (picoBox) {
+    picoBox.style.display = 'none';
   }
-  document.getElementById('previewModal').classList.add('active');
+
+  const modal = document.getElementById('previewModal');
+  if (modal) modal.classList.add('active');
 }
+
 function closePreviewModal() {
-  document.getElementById('previewModal').classList.remove('active');
+  const modal = document.getElementById('previewModal');
+  if (modal) modal.classList.remove('active');
 }
 
 // ============================================================
-// アクション各種
+// アクション各種（コピー・保存・メール・PDF・分析）
 // ============================================================
 function actionCopy() {
   const text = buildText();
@@ -439,10 +469,12 @@ function actionSendMail() {
   if (input) input.value = '';
   const fb = document.getElementById('mailToFb');
   if (fb) { fb.textContent = ''; fb.style.color = ''; }
-  document.getElementById('mailModal').classList.add('active');
+  const modal = document.getElementById('mailModal');
+  if (modal) modal.classList.add('active');
 }
 function closeMailModal() {
-  document.getElementById('mailModal').classList.remove('active');
+  const modal = document.getElementById('mailModal');
+  if (modal) modal.classList.remove('active');
 }
 function onMailToInput() {
   const v  = document.getElementById('mailTo').value.trim();
@@ -450,8 +482,8 @@ function onMailToInput() {
   if (!fb) return;
   if (!v) { fb.textContent = ''; return; }
   const ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
-  fb.style.color = ok ? '#2e8b5f' : '#c0392b';
-  fb.textContent = ok ? `✅ 追加送信先：${v}` : '⚠️ メールアドレスの形式を確認してください';
+  fb.style.color   = ok ? '#2e8b5f' : '#c0392b';
+  fb.textContent   = ok ? `✅ 追加送信先：${v}` : '⚠️ メールアドレスの形式を確認してください';
 }
 function doSendMail() {
   const extra = document.getElementById('mailTo').value.trim();
@@ -462,15 +494,18 @@ function doSendMail() {
   const toList = [DEFAULT_MAIL_TO];
   if (extra) toList.push(extra);
   const toStr  = toList.join(',');
+
   const text    = buildText();
   const name    = getVal('q2') || '（未記入）';
   const dept    = getVal('q1') || '';
   const subject = `ヒアリング記録：${name}${dept ? '【' + dept + '】' : ''}のアイデア提案`;
   const note    = '\n\n※ 写真・資料がある場合はメーラーから添付してください。';
+
   window.location.href =
     'mailto:' + encodeURIComponent(toStr) +
     '?subject=' + encodeURIComponent(subject) +
     '&body='    + encodeURIComponent(text + note);
+
   closeMailModal();
 }
 
@@ -521,9 +556,13 @@ function actionEnd() {
   }
 }
 
+// ============================================================
+// フォームリセット・終了画面
+// ============================================================
 function resetForm() {
   stopVoice();
-  document.getElementById('ideaForm').reset();
+  const form = document.getElementById('ideaForm');
+  if (form) form.reset();
   document.querySelectorAll('.field-fb').forEach(el => { el.className = 'field-fb'; el.textContent = ''; });
   document.querySelectorAll('.card-radio, .card-check, .freq-card, .icon-check').forEach(lbl => lbl.classList.remove('selected'));
   document.querySelectorAll('.other-input-wrap').forEach(w => {
@@ -535,23 +574,26 @@ function resetForm() {
   if (charCount) charCount.textContent = '0文字';
   startTime = null;
   showFormUI();
-  document.getElementById('endScreen').classList.remove('active');
+  const end = document.getElementById('endScreen');
+  if (end) end.classList.remove('active');
   showStep(0);
   updateProgress();
 }
 
 function showEndScreen() {
   hideFormUI();
-  document.getElementById('endScreen').classList.add('active');
+  const end = document.getElementById('endScreen');
+  if (end) end.classList.add('active');
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 function restartFromEnd() {
-  document.getElementById('endScreen').classList.remove('active');
+  const end = document.getElementById('endScreen');
+  if (end) end.classList.remove('active');
   resetForm();
 }
 
 // ============================================================
-// ステップ単位の入力クリア
+// ステップ単位クリア
 // ============================================================
 function clearRadioGroup(name) {
   document.querySelectorAll(`input[name="${name}"]`).forEach(r => r.checked = false);
@@ -562,12 +604,18 @@ function clearCheckGroup(name, otherCheckId, otherWrapId) {
   document.querySelectorAll(`#${name} label, [id^="${name}"] label`).forEach(l => l.classList.remove('selected'));
   if (otherWrapId) {
     const wrap = document.getElementById(otherWrapId);
-    if (wrap) { wrap.classList.remove('show'); const ta = wrap.querySelector('textarea'); if (ta) ta.value = ''; }
+    if (wrap) {
+      wrap.classList.remove('show');
+      const ta = wrap.querySelector('textarea'); if (ta) ta.value = '';
+    }
   }
 }
 function clearRadioOtherWrap(wrapId) {
   const wrap = document.getElementById(wrapId);
-  if (wrap) { wrap.classList.remove('show'); const ta = wrap.querySelector('textarea'); if (ta) ta.value = ''; }
+  if (wrap) {
+    wrap.classList.remove('show');
+    const ta = wrap.querySelector('textarea'); if (ta) ta.value = '';
+  }
 }
 function clearFeedbacks(...ids) {
   ids.forEach(id => hideFeedback(id));
@@ -599,12 +647,14 @@ function clearStep(step) {
       break;
     case 3:
       document.getElementById('q10').value = '';
-      const charCount = document.getElementById('ideaCharCount');
-      if (charCount) charCount.textContent = '0文字';
+      {
+        const cc = document.getElementById('ideaCharCount');
+        if (cc) cc.textContent = '0文字';
+      }
       document.querySelectorAll('input[name="q10_type"]').forEach(c => c.checked = false);
       document.querySelectorAll('#q10_type label').forEach(l => l.classList.remove('selected'));
       document.getElementById('q10_detail').value = '';
-      document.getElementById('q10_ref').value = '';
+      document.getElementById('q10_ref').value   = '';
       document.getElementById('q10_concern').value = '';
       clearFeedbacks('q10');
       break;
