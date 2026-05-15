@@ -266,14 +266,42 @@ function onEmailInput(id)     { updateProgress(); }
 function onTextareaInput(id)  { updateProgress(); }
 function onIdeaInput()        { updateProgress(); updateIdeaCharCount(); }
 function onRadioChange(id) {
-  updateProgress();
-  if (id === 'q5') {
-    syncFreqCards();
-  } else {
-    syncCardRadio(id);
+  // q4, q5 だけ「再クリックで解除」を有効にする
+  if (id === 'q4' || id === 'q5') {
+    const name = id; // name="q4" / "q5"
+    const clicked = getRadio(name); // 直近クリックで一旦選ばれた値
+    const final   = toggleRadioValue(name, clicked);
+
+    // UI を選択状態に合わせて更新
+    if (id === 'q5') {
+      syncFreqCards();          // .freq-card の selected を付け外し
+    } else {
+      syncCardRadio(id);        // q4 の .card-radio.selected を更新
+    }
+
+    updateProgress();
+    return;
   }
+
+  // それ以外は従来通り
+  updateProgress();
+  syncCardRadio(id);
 }
 function onCheckChange(id)    { updateProgress(); syncCardCheck(id); }
+
+// 同じラジオをもう一度クリックしたら解除するためのヘルパー
+function toggleRadioValue(groupName, clickedValue) {
+  const current = getRadio(groupName);
+  if (current === clickedValue) {
+    // すでに選ばれている値を再クリック → 全部クリア
+    document.querySelectorAll(`input[name="${groupName}"]`).forEach(el => {
+      el.checked = false;
+    });
+    return ''; // 空値を返す
+  }
+  // 別の値をクリック → 通常通りこの値に更新
+  return clickedValue;
+}
 
 function syncCardRadio(groupId) {
   const wrap = document.getElementById(groupId);
