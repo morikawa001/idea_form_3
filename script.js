@@ -496,14 +496,14 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // パズルメニュークリック
-  document.querySelectorAll('.puzzle-center, .puzzle-item').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const step = parseInt(btn.getAttribute('data-step'), 10);
-      if (!isNaN(step)) showStep(step);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
+ // パネルメニュークリック
+document.querySelectorAll('.panel-main, .panel-item').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const step = parseInt(btn.getAttribute('data-step'), 10);
+    if (!isNaN(step)) showStep(step);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   });
+});
 
   updateProgress();
   showStep(0);
