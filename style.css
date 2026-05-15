@@ -1091,3 +1091,78 @@ textarea { resize: vertical; min-height: 90px; }
     font-size: 0.78em;
   }
 }
+
+/* ============================================================
+   ヒアリング内容確認モーダル：アクションボタンレイアウト
+============================================================ */
+
+.modal-action-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 16px;
+}
+
+/* 共通ボタンスタイル */
+.btn-action {
+  padding: 12px 10px;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.84em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s, box-shadow 0.15s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  line-height: 1.3;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  white-space: nowrap;
+}
+.btn-action:active {
+  transform: scale(0.96);
+}
+
+/* 個別カラー */
+.btn-copy {
+  background: #e3f2fd;
+  color: #1565c0;
+}
+.btn-save {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+.btn-mail {
+  background: #fff3e0;
+  color: #e65100;
+}
+.btn-pdf {
+  background: #fce4ec;
+  color: #880e4f;
+}
+.btn-analyze {
+  background: #f3e5f5;
+  color: #6a1b9a;
+}
+
+/* ホバー時の軽い強調 */
+.btn-action:hover {
+  opacity: 0.92;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+}
+
+/* モバイル時：2列にして詰まりすぎを防ぐ */
+@media (max-width: 520px) {
+  .modal-action-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+  .btn-action {
+    font-size: 0.80em;
+    padding: 10px 8px;
+    white-space: normal; /* スマホでは2行になってもOK */
+  }
+}
