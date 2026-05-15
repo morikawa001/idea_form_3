@@ -1625,3 +1625,55 @@ textarea { resize: vertical; min-height: 90px; }
     margin-top: 10px;
   }
 }
+
+/* トップのAIサマリパネル（強調） */
+.panel-item.panel-item--summary {
+  border-style: dashed;
+  border-color: #d6c7f3;
+  background: #f8f5ff;
+}
+
+.panel-item.panel-item--summary .panel-emoji {
+  font-size: 1.6em;
+}
+
+.panel-item.panel-item--summary:hover {
+  background: #f2ecff;
+  border-color: #b39ddb;
+}
+
+/* 期待効果の下のサマリ結果カード */
+.summary-inline-card {
+  background: #f8f5ff;
+  border-radius: var(--radius-md);
+  border: 1.5px solid #d6c7f3;
+  padding: 14px 14px 12px;
+}
+
+.summary-inline-header {
+  margin-bottom: 6px;
+}
+
+.summary-inline-title {
+  font-size: 0.96em;
+  font-weight: 700;
+  color: #5b3f9a;
+  margin-bottom: 2px;
+}
+
+.summary-inline-sub {
+  font-size: 0.78em;
+  color: #6b6284;
+  line-height: 1.6;
+}
+
+.summary-inline-body {
+  margin-top: 6px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: #ffffff;
+  font-size: 0.82em;
+  color: #4a3b7c;
+  line-height: 1.6;
+  min-height: 44px;
+}
