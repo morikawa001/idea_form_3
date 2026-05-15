@@ -1146,8 +1146,8 @@ textarea { resize: vertical; min-height: 90px; }
 
 .radial-menu {
   position: relative;
-  width: 320px;   /* 260 → 320 に拡大 */
-  height: 320px;  /* 260 → 320 に拡大 */
+  width: 340px;   /* 大きめの円にする */
+  height: 340px;
   margin: 0 auto;
   border-radius: 50%;
   background: radial-gradient(circle at 50% 50%, #ffffff 0, #f4faf7 45%, #e0f3eb 100%);
@@ -1160,7 +1160,7 @@ textarea { resize: vertical; min-height: 90px; }
   left: 50%;
   top: 50%;
   transform: translate(-50%,-50%);
-  width: 130px;      /* 少しだけ大きめ */
+  width: 130px;
   height: 130px;
   border-radius: 50%;
   border: 2px solid var(--green-mid);
@@ -1182,7 +1182,7 @@ textarea { resize: vertical; min-height: 90px; }
 .radial-center-label {
   font-size: 0.90em;
   font-weight: 700;
-  white-space: nowrap;  /* 中央も改行させない */
+  white-space: nowrap;
 }
 .radial-center:hover {
   transform: translate(-50%,-52%);
@@ -1193,11 +1193,11 @@ textarea { resize: vertical; min-height: 90px; }
   transform: translate(-50%,-48%) scale(.97);
 }
 
-/* 放射状ボタン */
+/* 放射状ボタン（P / C / I / O） */
 .radial-item {
   position: absolute;
-  width: 150px;    /* 120 → 150 に拡大 */
-  height: 60px;    /* 52 → 60 に拡大 */
+  width: 160px;    /* かなり広めにとる */
+  height: 64px;
   border-radius: 999px;
   border: 2px solid var(--green-border);
   background: #ffffff;
@@ -1205,17 +1205,17 @@ textarea { resize: vertical; min-height: 90px; }
   align-items: center;
   justify-content: center;
   gap: 6px;
-  padding: 8px 12px;
+  padding: 8px 14px;
   font-family: inherit;
-  font-size: 0.82em;
+  font-size: 0.84em;
   color: var(--text-sub);
   cursor: pointer;
   box-shadow: 0 2px 8px rgba(0,0,0,.08);
   transition: transform .18s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease;
-  white-space: nowrap;   /* 文字を途中で改行させない */
+  white-space: nowrap;   /* 途中で改行させない */
 }
 .radial-item .radial-emoji {
-  font-size: 1.25em;
+  font-size: 1.3em;
 }
 .radial-item .radial-label {
   display: inline-flex;
@@ -1226,25 +1226,25 @@ textarea { resize: vertical; min-height: 90px; }
   font-size: 0.72em;
 }
 
-/* 位置：上・右・下・左（より外側へ配置） */
+/* 位置：中心から十分離す */
 .radial-item-top {
   left: 50%;
-  top: 12px;                 /* 上端から少し余裕をもたせる */
+  top: 8px;                   /* 上の外周ギリギリ */
   transform: translateX(-50%);
 }
 .radial-item-right {
   top: 50%;
-  right: 12px;               /* 右端から少し余裕 */
+  right: 8px;                 /* 右の外周ギリギリ */
   transform: translateY(-50%);
 }
 .radial-item-bottom {
   left: 50%;
-  bottom: 12px;              /* 下端から少し余裕 */
+  bottom: 8px;                /* 下の外周ギリギリ */
   transform: translateX(-50%);
 }
 .radial-item-left {
   top: 50%;
-  left: 12px;                /* 左端から少し余裕 */
+  left: 8px;                  /* 左の外周ギリギリ */
   transform: translateY(-50%);
 }
 
@@ -1265,19 +1265,19 @@ textarea { resize: vertical; min-height: 90px; }
   line-height: 1.7;
 }
 
-/* 小さな画面で少し縮小 */
+/* スマホ向け（幅が狭い場合） */
 @media (max-width: 480px) {
   .radial-menu {
-    width: 280px;   /* 320 より少し小さく */
-    height: 280px;
+    width: 300px;
+    height: 300px;
   }
   .radial-center {
     width: 120px;
     height: 120px;
   }
   .radial-item {
-    width: 140px;
-    height: 56px;
+    width: 150px;
+    height: 60px;
     font-size: 0.80em;
   }
 }
