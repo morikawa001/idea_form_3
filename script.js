@@ -508,7 +508,3 @@ document.addEventListener('DOMContentLoaded', () => {
   updateProgress();
   showStep(0);
 });
-
-  updateProgress();
-  showStep(0);
-});
