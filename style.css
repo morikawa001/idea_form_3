@@ -1134,35 +1134,32 @@ textarea { resize: vertical; min-height: 90px; }
 }
 
 /* ============================================================
-   中央放射状メニュー（ボタンが絶対に重ならない配置）
+   中央パズルメニュー（基本情報＋周囲の4ピース）
 ============================================================ */
 
-.radial-menu-wrap {
+.puzzle-menu-wrap {
   max-width: 680px;
-  margin: 28px auto 12px;
+  margin: 24px auto 12px;
   padding: 16px 16px 8px;
   text-align: center;
 }
 
-.radial-menu {
+.puzzle-menu {
   position: relative;
-  width: 420px;   /* 十分広いキャンバス */
-  height: 260px;
+  width: 420px;
+  max-width: 100%;
   margin: 0 auto;
-  border-radius: 24px;
-  background: radial-gradient(circle at 50% 50%, #ffffff 0, #f4faf7 45%, #e0f3eb 100%);
-  box-shadow: 0 8px 24px rgba(0,0,0,.08);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 90px);
+  gap: 8px;
 }
 
-/* 中央ボタン（基本情報） */
-.radial-center {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%,-50%);
-  width: 140px;
-  height: 140px;
-  border-radius: 50%;
+/* 基本情報（中央ピース） */
+.puzzle-center {
+  grid-column: 2 / 3;
+  grid-row: 2 / 3;
+  border-radius: 16px;
   border: 2px solid var(--green-mid);
   background: var(--green-pale);
   color: var(--green-dark);
@@ -1173,90 +1170,87 @@ textarea { resize: vertical; min-height: 90px; }
   gap: 4px;
   font-family: inherit;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(46,139,95,.35);
-  transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+  box-shadow: 0 4px 10px rgba(46,139,95,.25);
+  transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
 }
-.radial-center-icon {
-  font-size: 1.9em;
+.puzzle-center-emoji {
+  font-size: 1.8em;
 }
-.radial-center-label {
+.puzzle-center-label {
   font-size: 0.92em;
   font-weight: 700;
   white-space: nowrap;
 }
-.radial-center:hover {
-  transform: translate(-50%,-52%);
+.puzzle-center:hover {
   background: #e0f7ec;
-  box-shadow: 0 8px 20px rgba(46,139,95,.4);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(46,139,95,.35);
 }
-.radial-center:active {
-  transform: translate(-50%,-48%) scale(.97);
+.puzzle-center:active {
+  transform: scale(.97);
 }
 
-/* 放射状ボタン（P / C / I / O） */
-/* 4 つを上下 2 行 × 左右 2 列に配置して、絶対に重ならないようにする */
-.radial-item {
-  position: absolute;
-  width: 160px;
-  height: 64px;
-  border-radius: 999px;
+/* 周囲のピース（P / C / I / O） */
+.puzzle-item {
+  border-radius: 14px;
   border: 2px solid var(--green-border);
   background: #ffffff;
-  display: inline-flex;
+  display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  padding: 8px 14px;
+  gap: 4px;
   font-family: inherit;
-  font-size: 0.84em;
+  font-size: 0.80em;
   color: var(--text-sub);
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0,0,0,.08);
-  transition: transform .18s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease;
+  box-shadow: 0 2px 6px rgba(0,0,0,.06);
+  transition: transform .15s ease, box-shadow .15s ease, background .15s ease, border-color .15s ease;
   white-space: nowrap;
 }
-.radial-item .radial-emoji {
-  font-size: 1.3em;
+.puzzle-emoji {
+  font-size: 1.4em;
 }
-.radial-item .radial-label {
+.puzzle-label {
   display: inline-flex;
   align-items: center;
   gap: 4px;
 }
-.radial-item .pico-tag {
+.puzzle-label .pico-tag {
   font-size: 0.72em;
 }
 
-/* 位置指定：上段左右 / 下段左右（中央の円の対角線の外側に置く） */
-.radial-item-top {      /* P 困りごと（左上） */
-  left: 12%;
-  top: 16px;
+/* 位置指定：十字ではなく、周囲四隅＋中央でパズルっぽく */
+.puzzle-item-top-left {
+  grid-column: 1 / 2;
+  grid-row: 1 / 2;
 }
-.radial-item-right {    /* C 今の対応（右上） */
-  right: 12%;
-  top: 16px;
+.puzzle-item-top-right {
+  grid-column: 3 / 4;
+  grid-row: 1 / 2;
 }
-.radial-item-bottom {   /* I アイデア（右下） */
-  right: 12%;
-  bottom: 16px;
+.puzzle-item-bottom-left {
+  grid-column: 1 / 2;
+  grid-row: 3 / 4;
 }
-.radial-item-left {     /* O 期待効果（左下） */
-  left: 12%;
-  bottom: 16px;
+.puzzle-item-bottom-right {
+  grid-column: 3 / 4;
+  grid-row: 3 / 4;
 }
 
-.radial-item:hover {
+.puzzle-item:hover {
   background: var(--green-pale);
   border-color: var(--green-mid);
-  box-shadow: 0 4px 12px rgba(46,139,95,.24);
+  box-shadow: 0 4px 12px rgba(46,139,95,.18);
+  transform: translateY(-1px);
 }
-.radial-item:active {
+.puzzle-item:active {
   transform: scale(.97);
 }
 
 /* メニュー下説明 */
-.radial-hint {
-  margin-top: 16px;
+.puzzle-hint {
+  margin-top: 14px;
   font-size: 0.80em;
   color: var(--text-muted);
   line-height: 1.7;
@@ -1264,27 +1258,15 @@ textarea { resize: vertical; min-height: 90px; }
 
 /* スマホ向け（幅が狭い場合） */
 @media (max-width: 480px) {
-  .radial-menu {
-    width: 100%;
-    max-width: 340px;
-    height: 260px;
+  .puzzle-menu {
+    grid-template-rows: repeat(3, 80px);
+    gap: 6px;
   }
-  .radial-center {
-    width: 120px;
-    height: 120px;
+  .puzzle-center {
+    border-radius: 14px;
   }
-  .radial-item {
-    width: 140px;
-    height: 60px;
-    font-size: 0.80em;
-  }
-  .radial-item-top,
-  .radial-item-right {
-    top: 12px;
-  }
-  .radial-item-bottom,
-  .radial-item-left {
-    bottom: 12px;
+  .puzzle-item {
+    font-size: 0.78em;
   }
 }
 
