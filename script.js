@@ -782,6 +782,18 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  function onClickSummaryCard() {
+  const box = document.getElementById('summaryResult');
+  if (!box) return;
+
+  // いまはダミーの例文。ここを将来、AIの返答に置き換える想定
+  box.innerText =
+    '（サマリ案の例）\n' +
+    'GICUでの◯◯に関する業務負担と患者さんの安全性低下の課題に対し、\n' +
+    '新しいデバイスと運用ルールの見直しによって、\n' +
+    '転記作業の削減とインシデントリスクの低減を目指すアイデアが提案されている。';
+}
+  
   // 中央パネルメニューからも移動
   document.querySelectorAll('.panel-main, .panel-item').forEach((btn) => {
     if (!btn.hasAttribute('data-step')) return;
