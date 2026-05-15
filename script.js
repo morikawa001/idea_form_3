@@ -5,7 +5,7 @@
 // デフォルト送信先
 const DEFAULT_MAIL_TO = 'ns.morizo@gmail.com';
 
-// ★ 追加：GAS の Web アプリ URL（APIキーは GAS 側で保持）
+// ★ GAS の Web アプリ URL（APIキーは GAS 側で保持）
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbwFGWXonRPSDqhToxurlrxmvb0oMydOdM18_2Jy5aQWDXP60o6bKjkjYYfu741dgkqB/exec';
 
 let startTime = null;
@@ -371,7 +371,7 @@ function updateProgress() {
 }
 
 // ============================================================
-// 入力イベント（HTML 側から引数なしで呼ぶ）
+// 入力イベント
 // ============================================================
 function onSelectChange() {
   updateProgress();
@@ -672,13 +672,11 @@ function actionAnalyze() {
 }
 
 // ============================================================
-// ★ サマリー生成（GAS + 外部AI）
+// サマリー生成（GAS + 外部AI）
 // ============================================================
 async function generateSummary() {
-  // 1) レポート概要テキストを取得
   const baseText = buildSummary();
 
-  // 2) ローディング表示
   const summaryBtn = document.querySelector('.panel-item--summary');
   if (summaryBtn) {
     summaryBtn.disabled = true;
@@ -687,7 +685,6 @@ async function generateSummary() {
   }
 
   try {
-    // 3) GAS に送信
     const res = await fetch(GAS_URL, {
       method: 'POST',
       headers: {
@@ -703,7 +700,6 @@ async function generateSummary() {
     const json = await res.json();
     const summary = json.summary || 'サマリーを取得できませんでした。';
 
-    // 4) プレビュー画面で表示（picoBox を利用）
     showPreview();
 
     const picoBox = document.getElementById('picoBox');
@@ -718,7 +714,6 @@ async function generateSummary() {
     console.error(e);
     alert('サマリー生成中にエラーが発生しました：' + e.message);
   } finally {
-    // 5) ボタンを元に戻す
     if (summaryBtn) {
       summaryBtn.disabled = false;
       summaryBtn.innerHTML = summaryBtn.dataset.originalLabel || 'サマリー生成';
@@ -822,7 +817,6 @@ function restartFromEnd() {
 // 初期化
 // ============================================================
 document.addEventListener('DOMContentLoaded', () => {
-  // ロードマップクリックでステップ移動
   document.querySelectorAll('.roadmap-step').forEach((stepEl) => {
     stepEl.style.cursor = 'pointer';
     stepEl.addEventListener('click', () => {
@@ -831,7 +825,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // 中央パネルメニューからも移動
   document.querySelectorAll('.panel-main, .panel-item').forEach((btn) => {
     if (!btn.hasAttribute('data-step')) return;
     btn.addEventListener('click', () => {
@@ -841,7 +834,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // 初期状態同期
   syncCardRadio('q3');
   syncCardRadio('q4');
   syncFreqCards();
