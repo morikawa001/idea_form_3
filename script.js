@@ -870,15 +870,19 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // 中央パネルメニューからも移動
-  document.querySelectorAll('.panel-main, .panel-item').forEach((btn) => {
-    if (!btn.hasAttribute('data-step')) return;
-    btn.addEventListener('click', () => {
-      const step = parseInt(btn.getAttribute('data-step'), 10);
-      if (!isNaN(step)) showStep(step);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+  // 中央パネルメニューからも移動（data-step のあるボタンだけ）
+  document
+    .querySelectorAll('.panel-main, .panel-item')
+    .forEach((btn) => {
+      const stepAttr = btn.getAttribute('data-step');
+      if (stepAttr === null || stepAttr === '') return;
+
+      btn.addEventListener('click', () => {
+        const step = parseInt(stepAttr, 10);
+        if (!isNaN(step)) showStep(step);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
     });
-  });
 
   // 初期状態同期
   syncCardRadio('q3');
