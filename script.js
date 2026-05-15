@@ -1,6 +1,5 @@
 // ============================================================
-// MIT ヒアリングフォーム v3.6 — script.js
-// q4「主にこまっているのは？」・q5「発生頻度」修正版
+// MIT ヒアリングフォーム v3.6 — script.js（完全修正版）
 // ============================================================
 
 // デフォルト送信先
@@ -214,7 +213,7 @@ function showStep(step) {
   currentStep = step;
 }
 
-// 任意入力なので必須チェックはなし
+// 任意入力なので必須チェックは空
 const STEP_REQUIRED = [() => [], () => [], () => [], () => [], () => []];
 
 function goNext(step) {
@@ -234,7 +233,8 @@ function goPrev(step) {
 // ユーティリティ
 // ============================================================
 function getVal(id) {
-  return (document.getElementById(id) || { value: '' }).value.trim();
+  const el = document.getElementById(id);
+  return el ? el.value.trim() : '';
 }
 
 function getRadio(name) {
@@ -243,17 +243,21 @@ function getRadio(name) {
 }
 
 function getChecks(name) {
-  return [...document.querySelectorAll(`input[name="${name}"]:checked`)].map((e) => e.value);
+  return [...document.querySelectorAll(`input[name="${name}"]:checked`)].map(
+    (e) => e.value
+  );
 }
 
 function getQ3Value() {
   const v = getRadio('q3');
-  return v === 'その他' ? `その他（${getVal('q3-other-text')}）` : (v || '');
+  if (!v) return '';
+  return v === 'その他' ? `その他（${getVal('q3-other-text')}）` : v;
 }
 
 function getQ4Value() {
   const v = getRadio('q4');
-  return v === 'その他' ? `その他（${getVal('q4-other-text')}）` : (v || '');
+  if (!v) return '';
+  return v === 'その他' ? `その他（${getVal('q4-other-text')}）` : v;
 }
 
 function getQ6Values() {
@@ -279,7 +283,7 @@ function getIdeaTypes() {
 }
 
 // ============================================================
-// ステップ別進捗対象の定義
+// ステップ別進捗対象
 // ============================================================
 const STEP_ITEMS = {
   0: [
@@ -364,21 +368,8 @@ function updateProgress() {
 }
 
 // ============================================================
-// 入力イベント
+// 入力イベント（HTML 側から引数なしで呼ぶ）
 // ============================================================
-function showFieldFb(id, text, cls) {
-  const el = document.getElementById(`fb-${id}`);
-  if (!el) return;
-
-  el.textContent = text || '';
-  el.className = 'field-fb';
-
-  if (text) {
-    el.classList.add('show');
-    if (cls) el.classList.add(cls);
-  }
-}
-
 function onSelectChange() {
   updateProgress();
 }
@@ -591,6 +582,7 @@ function closeMailModal() {
 }
 
 function onMailToInput() {
+  // バリデーションを将来入れる場合用に空関数で確保
 }
 
 function doSendMail() {
@@ -670,10 +662,12 @@ function clearStep(step) {
       break;
 
     case 3:
-      ['q10', 'q10_detail', 'q10_ref', 'q10_concern', 'memo_i'].forEach((id) => {
-        const el = document.getElementById(id);
-        if (el) el.value = '';
-      });
+      ['q10', 'q10_detail', 'q10_ref', 'q10_concern', 'memo_i'].forEach(
+        (id) => {
+          const el = document.getElementById(id);
+          if (el) el.value = '';
+        }
+      );
       document.querySelectorAll('input[name="q10_type"]').forEach((el) => {
         el.checked = false;
       });
@@ -694,13 +688,14 @@ function clearStep(step) {
       break;
   }
 
+  // 見た目の再同期
   syncCardRadio('q3');
   syncCardRadio('q4');
   syncFreqCards();
   syncCardCheck('q6');
   syncCardCheck('q9');
   syncCardCheck('q12');
-  highlightChecked('q10type');
+  highlightChecked('q10_type');
 
   updateProgress();
 }
@@ -718,6 +713,7 @@ function restartFromEnd() {
 // 初期化
 // ============================================================
 document.addEventListener('DOMContentLoaded', () => {
+  // ロードマップクリックでステップ移動
   document.querySelectorAll('.roadmap-step').forEach((stepEl) => {
     stepEl.style.cursor = 'pointer';
     stepEl.addEventListener('click', () => {
@@ -726,6 +722,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // 中央パネルメニューからも移動
   document.querySelectorAll('.panel-main, .panel-item').forEach((btn) => {
     btn.addEventListener('click', () => {
       const step = parseInt(btn.getAttribute('data-step'), 10);
@@ -734,13 +731,14 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // 初期状態同期
   syncCardRadio('q3');
   syncCardRadio('q4');
   syncFreqCards();
   syncCardCheck('q6');
   syncCardCheck('q9');
   syncCardCheck('q12');
-  highlightChecked('q10type');
+  highlightChecked('q10_type');
 
   updateProgress();
   showStep(0);
