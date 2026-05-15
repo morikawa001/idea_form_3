@@ -90,14 +90,14 @@
       <div class="panel-item-progress" id="panelProgress4">0%</div>
     </button>
 
-    <!-- 追加：レポート概要カード -->
+    <!-- レポート概要カード -->
     <button class="panel-item panel-item--report" type="button" onclick="showReportView()">
       <div class="panel-emoji">📄</div>
       <div class="panel-label">レポート概要</div>
       <div class="panel-desc">これまでの入力内容を一目で確認できます</div>
     </button>
 
-    <!-- 追加：サマリー生成カード -->
+    <!-- サマリー生成カード -->
     <button class="panel-item panel-item--summary" type="button" onclick="generateSummary()">
       <div class="panel-emoji">🧾</div>
       <div class="panel-label">サマリー生成</div>
@@ -166,12 +166,10 @@
 <main class="main-wrap">
   <form id="ideaForm" novalidate>
 
-    <!-- STEP 0: 基本情報 -->
-    <!-- （ここから下は元のフォーム定義をそのまま） -->
-    <!-- ・・・中略：P / C / I / O の各セクション・・・ -->
+    <!-- STEP 0〜4: ここは元ファイルのフォーム定義をそのまま貼り付けてください -->
+    <!-- 所属部署(q1), 氏名(q2), メール(q2b), 職種(q3), P/C/I/O 各種設問... -->
 
-    <!-- 既存コードそのまま（STEP0〜4） -->
-    <!-- ※元ファイルの内容をそのまま残してください -->
+    <!-- 省略：元ファイルの内容をそのままにする -->
 
   </form>
 
@@ -187,7 +185,7 @@
     <div class="report-body">
       <pre id="reportSummary"></pre>
 
-      <!-- 追加：AI サマリー表示ブロック -->
+      <!-- AI サマリー表示ブロック -->
       <div class="ai-summary-block">
         <h3 class="ai-summary-title">AI サマリー</h3>
         <p class="ai-summary-note">
@@ -208,8 +206,6 @@
 </main>
 
 <!-- ===== プレビュー用モーダル ===== -->
-<!-- （元の previewModal, mailModal, voiceStatus, endScreen などはそのまま） -->
-
 <div class="modal-overlay" id="previewModal">
   <div class="modal">
     <h2>ヒアリング内容のプレビュー</h2>
