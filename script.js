@@ -1,5 +1,5 @@
 // ============================================================
-// MIT ヒアリングフォーム v3.6 — script.js（レポート概要対応版）
+// MIT ヒアリングフォーム v3.6 — script.js（AIサマリ対応）
 // ============================================================
 
 // デフォルト送信先
@@ -368,7 +368,7 @@ function updateProgress() {
 }
 
 // ============================================================
-// 入力イベント（HTML 側から引数なしで呼ぶ）
+// 入力イベント
 // ============================================================
 function onSelectChange() {
   updateProgress();
@@ -585,42 +585,23 @@ function buildText() {
 }
 
 // ============================================================
-// レポートビュー表示/非表示
-// ============================================================
-function showReportView() {
-  const form = document.getElementById('ideaForm');
-  const report = document.getElementById('reportView');
-  const pre = document.getElementById('reportSummary');
-
-  if (form) form.style.display = 'none';
-  if (report) report.classList.add('active');
-  if (pre) pre.textContent = buildSummary();
-
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-function hideReportView() {
-  const form = document.getElementById('ideaForm');
-  const report = document.getElementById('reportView');
-
-  if (report) report.classList.remove('active');
-  if (form) form.style.display = '';
-
-  showStep(currentStep);
-}
-
-// ============================================================
 // AIサマリカード（ダミー版）
 // ============================================================
 function onClickSummaryCard() {
   const box = document.getElementById('summaryResult');
   if (!box) return;
 
-  box.innerText =
-    '（サマリ案の例）\n' +
-    'GICUでの◯◯に関する業務負担と患者さんの安全性低下の課題に対し、\n' +
-    '新しいデバイスと運用ルールの見直しによって、\n' +
-    '転記作業の削減とインシデントリスクの低減を目指すアイデアが提案されている。';
+  const idea = getVal('q10');
+  const target = getQ4Value();
+  const effects = getQ12Values();
+  const effectStr = effects.join(' / ');
+
+  const line =
+    (idea ? `「${idea}」` : 'このアイデア') +
+    (target ? `（主な対象：${target}）` : '') +
+    (effectStr ? ` により、${effectStr} を目指す提案です。` : ' に関する提案です。');
+
+  box.textContent = line;
 }
 
 // ============================================================
@@ -762,7 +743,6 @@ function clearStep(step) {
       break;
   }
 
-  // 見た目の再同期
   syncCardRadio('q3');
   syncCardRadio('q4');
   syncFreqCards();
@@ -795,8 +775,8 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!isNaN(target)) showStep(target);
     });
   });
-  
-  // 中央パネルメニューからも移動
+
+  // 中央パネルメニューからステップ移動（AIサマリカードは data-step 無し）
   document.querySelectorAll('.panel-main, .panel-item').forEach((btn) => {
     if (!btn.hasAttribute('data-step')) return;
     btn.addEventListener('click', () => {
