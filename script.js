@@ -1,5 +1,5 @@
 // ============================================================
-// MIT ヒアリングフォーム v3.6 — script.js（パズルメニュー対応）
+// MIT ヒアリングフォーム v3.6 — script.js（パズルメニュー対応＋メモ対応）
 // ============================================================
 
 // デフォルト送信先
@@ -7,8 +7,207 @@ const DEFAULT_MAIL_TO = 'ns.morizo@gmail.com';
 
 let startTime = null;
 
-// ・・・（音声入力など、既存コードはそのまま）・・・
+// ============================================================
+// 音声入力（Web Speech API）
+// ============================================================
+let currentRecognition = null;
+let currentMicBtn      = null;
+let currentTargetId    = null;
+let interimSpan        = null;
 
+function startVoice(targetId) {
+  const SpeechRecognition =
+    window.SpeechRecognition || window.webkitSpeechRecognition;
+
+  if (!SpeechRecognition) {
+    alert('このブラウザは音声入力に対応していません。\nChrome または Edge をお使いください。');
+    return;
+  }
+
+  if (currentRecognition) {
+    stopVoice();
+    return;
+  }
+
+  const ta  = document.getElementById(targetId);
+  const btn = document.querySelector(`[data-mic-target="${targetId}"]`) ||
+              document.querySelector(`button[onclick*="startVoice('${targetId}')"]`) ||
+              document.querySelector(`button[onclick*='startVoice("${targetId}")']`);
+
+  const status = document.getElementById('voiceStatus');
+
+  const recognition            = new SpeechRecognition();
+  recognition.lang             = 'ja-JP';
+  recognition.interimResults   = true;
+  recognition.continuous       = true;
+  recognition.maxAlternatives  = 1;
+
+  currentRecognition = recognition;
+  currentMicBtn      = btn;
+  currentTargetId    = targetId;
+
+  if (btn)    btn.classList.add('btn-mic--active');
+  if (status) status.style.display = 'flex';
+
+  if (ta) {
+    if (interimSpan) interimSpan.remove();
+    interimSpan = document.createElement('div');
+    interimSpan.id = 'voiceInterim';
+    interimSpan.style.cssText =
+      'font-size:0.8em;color:#888;min-height:1.2em;padding:2px 4px;margin-top:2px;';
+    const wrap = ta.parentNode;
+    wrap.parentNode.insertBefore(interimSpan, wrap.nextSibling);
+  }
+
+  const baseText = ta ? ta.value : '';
+
+  recognition.onresult = (e) => {
+    let interim   = '';
+    let finalText = '';
+
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      const transcript = e.results[i][0].transcript;
+      if (e.results[i].isFinal) finalText += transcript;
+      else                      interim   += transcript;
+    }
+
+    if (interimSpan) {
+      interimSpan.textContent = interim ? `🎤 ${interim}` : '';
+    }
+
+    if (finalText && ta) {
+      ta.value = baseText + (ta.value.slice(baseText.length) || '') + finalText;
+      if (interimSpan) interimSpan.textContent = '';
+      updateProgress();
+      ta.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+  };
+
+  recognition.onerror = (e) => {
+    if (e.error === 'aborted') return;
+    if (e.error === 'no-speech') {
+      try { recognition.stop(); } catch (_) {}
+      return;
+    }
+    if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
+      alert('マイクへのアクセスが拒否されています。\nブラウザのアドレスバー左のマイクアイコンから許可してください。');
+    } else {
+      alert('音声認識エラー：' + e.error);
+    }
+    if (currentRecognition === recognition) stopVoiceUI();
+  };
+
+  recognition.onend = () => {
+    if (currentRecognition !== recognition) return;
+    try { recognition.start(); } catch (_) { stopVoiceUI(); }
+  };
+
+  if (status) status.onclick = stopVoice;
+
+  try {
+    recognition.start();
+  } catch (e) {
+    alert('音声認識を開始できませんでした：' + e.message);
+    stopVoiceUI();
+  }
+}
+
+function stopVoice() {
+  const rec = currentRecognition;
+  stopVoiceUI();
+  if (rec) {
+    try { rec.abort(); } catch (_) {}
+  }
+}
+
+function stopVoiceUI() {
+  currentRecognition = null;
+  currentTargetId    = null;
+  if (currentMicBtn) {
+    currentMicBtn.classList.remove('btn-mic--active');
+    currentMicBtn = null;
+  }
+  if (interimSpan) {
+    interimSpan.remove();
+    interimSpan = null;
+  }
+  const status = document.getElementById('voiceStatus');
+  if (status) {
+    status.style.display = 'none';
+    status.onclick = null;
+  }
+}
+
+// ============================================================
+// UI ヘルパー
+// ============================================================
+const FORM_UI_IDS = ['picoRoadmap', 'progressWrap', 'navigator', 'ideaForm'];
+
+function hideFormUI() {
+  FORM_UI_IDS.forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
+}
+function showFormUI() {
+  FORM_UI_IDS.forEach(id => { const el = document.getElementById(id); if (el) el.style.display = ''; });
+}
+
+// ============================================================
+// ステップ管理
+// ============================================================
+let currentStep = 0;
+const TOTAL_STEPS = 5;
+
+const NAV_MESSAGES = [
+  '発案者の基本情報を確認・入力してください（すべて任意）。',
+  '誰が・どのような場面で困っているかを発案者から聞き取り、記録してください。',
+  '現在どのように対応しているかを発案者から聞き取り、記録してください。',
+  '発案者のアイデアを聞き取り、できるだけ原文に忠実に記録してください。',
+  'このアイデアで何が変わりそうかを発案者と一緒に確認してください。'
+];
+
+function showStep(step) {
+  stopVoice();
+
+  document.querySelectorAll('.step-section').forEach((s, i) =>
+    s.classList.toggle('active', i === step)
+  );
+
+  for (let i = 0; i < TOTAL_STEPS; i++) {
+    const rm = document.getElementById(`rm${i}`);
+    if (!rm) continue;
+    rm.className = 'roadmap-step';
+    if (i < step)   rm.classList.add('done');
+    if (i === step) rm.classList.add('active');
+    if (i < TOTAL_STEPS - 1) {
+      const line = document.getElementById(`rml${i}`);
+      if (line) line.className = 'roadmap-line' + (i < step ? ' done' : '');
+    }
+  }
+
+  const bubble = document.getElementById('navBubble');
+  if (bubble) bubble.innerHTML = NAV_MESSAGES[step];
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  currentStep = step;
+}
+
+// 任意入力なので必須チェックはなし
+const STEP_REQUIRED = [ () => [], () => [], () => [], () => [], () => [] ];
+
+function goNext(step) {
+  const errs = STEP_REQUIRED[step]();
+  if (errs.length > 0) {
+    alert('入力内容を確認してください：\n\n' + errs.join('\n'));
+    return;
+  }
+  if (step < TOTAL_STEPS - 1) showStep(step + 1);
+}
+function goPrev(step) {
+  if (step > 0) showStep(step - 1);
+}
+
+// ============================================================
+// ユーティリティ
+// ============================================================
 function getVal(id)    { return (document.getElementById(id) || { value: '' }).value.trim(); }
 function getRadio(nm)  { const el = document.querySelector(`input[name="${nm}"]:checked`); return el ? el.value : ''; }
 function getChecks(nm) { return [...document.querySelectorAll(`input[name="${nm}"]:checked`)].map(e => e.value); }
@@ -21,7 +220,7 @@ function getQ12Values(){ return getChecks('q12').map(v => v === 'その他' ? `�
 function getIdeaTypes(){ return getChecks('q10_type'); }
 
 // ============================================================
-// プログレスバー（その場メモは「おまけ扱い」でカウントに含めない）
+// プログレスバー（その場メモは進捗に含めない）
 // ============================================================
 function updateProgress() {
   if (!startTime) startTime = new Date();
@@ -30,7 +229,6 @@ function updateProgress() {
     getRadio('q5'), getChecks('q6').length > 0 ? '1' : '',
     getVal('q7'), getVal('q8'), getQ9Values().length > 0 ? '1' : '',
     getVal('q10'), getChecks('q12').length > 0 ? '1' : '', getVal('q13')
-    // memo_p / memo_c / memo_i / memo_o は進捗には含めない
   ];
   const filled = items.filter(v => v !== '').length;
   const pct    = Math.round(filled / items.length * 100);
@@ -48,8 +246,82 @@ function updateProgress() {
   if (fill)  fill.style.width  = `${pct}%`;
 }
 
-// ・・・（フィードバック関数などは既存のまま）・・・
+// ============================================================
+// 入力フィードバック用（簡略版）
+// ============================================================
+function showFieldFb(id, text, cls) {
+  const el = document.getElementById(`fb-${id}`);
+  if (!el) return;
+  el.textContent = text || '';
+  el.className = 'field-fb';
+  if (text) {
+    el.classList.add('show');
+    if (cls) el.classList.add(cls);
+  }
+}
 
+function onSelectChange(id)   { updateProgress(); }
+function onTextInput(id)      { updateProgress(); }
+function onEmailInput(id)     { updateProgress(); }
+function onTextareaInput(id)  { updateProgress(); }
+function onIdeaInput()        { updateProgress(); updateIdeaCharCount(); }
+function onRadioChange(id)    { updateProgress(); syncCardRadio(id); }
+function onCheckChange(id)    { updateProgress(); syncCardCheck(id); }
+
+function syncCardRadio(groupId) {
+  const wrap = document.getElementById(groupId);
+  if (!wrap) return;
+  const selectedVal = getRadio(groupId);
+  wrap.querySelectorAll('.card-radio').forEach(lbl => {
+    const input = lbl.querySelector('input[type="radio"]');
+    lbl.classList.toggle('selected', input && input.value === selectedVal);
+  });
+}
+
+function syncCardCheck(groupId) {
+  const wrap = document.getElementById(groupId);
+  if (!wrap) return;
+  wrap.querySelectorAll('.card-check').forEach(lbl => {
+    const input = lbl.querySelector('input[type="checkbox"]');
+    lbl.classList.toggle('selected', input && input.checked);
+  });
+}
+
+function toggleOtherInput(checkId, wrapId) {
+  const chk  = document.getElementById(checkId);
+  const wrap = document.getElementById(wrapId);
+  if (!chk || !wrap) return;
+  wrap.classList.toggle('show', chk.checked);
+}
+
+function toggleOtherInputRadio(checkId, wrapId) {
+  const chk  = document.getElementById(checkId);
+  const wrap = document.getElementById(wrapId);
+  if (!chk || !wrap) return;
+  const checked = chk.checked;
+  wrap.classList.toggle('show', checked);
+}
+
+function highlightChecked(groupName) {
+  const wrap = document.getElementById(groupName);
+  if (!wrap) return;
+  wrap.querySelectorAll('.icon-check').forEach(lbl => {
+    const input = lbl.querySelector('input[type="checkbox"]');
+    lbl.classList.toggle('selected', input && input.checked);
+  });
+}
+
+function updateIdeaCharCount() {
+  const ta   = document.getElementById('q10');
+  const cnt  = document.getElementById('ideaCharCount');
+  if (!ta || !cnt) return;
+  const len = ta.value.length;
+  cnt.textContent = `${len}文字`;
+}
+
+// ============================================================
+// プレビュー用テキスト生成
+// ============================================================
 function buildText() {
   const q6v       = getQ6Values();
   const q9v       = getQ9Values();
@@ -107,31 +379,132 @@ function buildText() {
   ].join('\n');
 }
 
-// showPreview / actionCopy / actionSaveToFolder / メール送信などは
-// 元のコードからそのまま（変更なし）で使えます。
+// ============================================================
+// プレビュー・各種アクション
+// ============================================================
+function showPreview() {
+  const previewModal = document.getElementById('previewModal');
+  const previewText  = document.getElementById('previewText');
+  if (!previewModal || !previewText) return;
 
-// clearStep のときにメモも消したい場合は、各 case に追記：
+  previewText.textContent = buildText();
+  previewModal.classList.add('active');
+}
+
+function closePreviewModal() {
+  const previewModal = document.getElementById('previewModal');
+  if (previewModal) previewModal.classList.remove('active');
+}
+
+// メール送信用モーダル
+function actionSendMail() {
+  const mailModal = document.getElementById('mailModal');
+  const defDisp   = document.getElementById('mailDefaultDisplay');
+  if (mailModal && defDisp) {
+    defDisp.textContent = DEFAULT_MAIL_TO;
+    mailModal.classList.add('active');
+  }
+}
+
+function closeMailModal() {
+  const mailModal = document.getElementById('mailModal');
+  if (mailModal) mailModal.classList.remove('active');
+}
+
+function onMailToInput() {
+  // 簡易バリデーションが必要ならここに追加
+}
+
+function doSendMail() {
+  const extra = getVal('mailTo');
+  const to    = extra || DEFAULT_MAIL_TO;
+  const body  = encodeURIComponent(buildText());
+  const subj  = encodeURIComponent('MIT ヒアリング記録');
+  const addr  = encodeURIComponent(to);
+
+  const url = `mailto:${addr}?subject=${subj}&body=${body}`;
+  window.location.href = url;
+}
+
+// ダミー実装（必要に応じて後で具体化）
+function actionSaveToFolder() {
+  alert('テキスト保存機能は、現状ブラウザ上ではクリップボードコピー等で代替してください。');
+}
+function actionSavePDF() {
+  window.print();
+}
+function actionAnalyze() {
+  alert('分析ページ連携は未実装です。');
+}
+
+// ============================================================
+// ステップクリア・再スタート
+// ============================================================
 function clearStep(step) {
   if (!confirm('このステップの入力内容をクリアしますか？')) return;
+
   switch (step) {
+    case 0:
+      ['q1','q2','q2b'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+      document.querySelectorAll('input[name="q3"]').forEach(el => { el.checked = false; });
+      document.getElementById('q3-other-text').value = '';
+      document.getElementById('q3-other-wrap').classList.remove('show');
+      break;
     case 1:
-      // ...既存のクリア処理...
-      document.getElementById('memo_p').value = '';
+      ['q4-other-text','q6-other-text','q7','memo_p'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+      ['q4','q5','q6'].forEach(name => {
+        document.querySelectorAll(`input[name="${name}"]`).forEach(el => { el.checked = false; });
+      });
+      ['q4-other-wrap','q6-other-wrap'].forEach(id => { const el = document.getElementById(id); if (el) el.classList.remove('show'); });
       break;
     case 2:
-      // ...既存のクリア処理...
-      document.getElementById('memo_c').value = '';
+      ['q8','q9-other-text','memo_c'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+      document.querySelectorAll('input[name="q9"]').forEach(el => { el.checked = false; });
+      const w9 = document.getElementById('q9-other-wrap'); if (w9) w9.classList.remove('show');
       break;
     case 3:
-      // ...既存のクリア処理...
-      document.getElementById('memo_i').value = '';
+      ['q10','q10_detail','q10_ref','q10_concern','memo_i'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+      document.querySelectorAll('input[name="q10_type"]').forEach(el => { el.checked = false; });
       break;
     case 4:
-      // ...既存のクリア処理...
-      document.getElementById('memo_o').value = '';
+      ['q12-other-text','q13','memo_o'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+      document.querySelectorAll('input[name="q12"]').forEach(el => { el.checked = false; });
+      const w12 = document.getElementById('q12-other-wrap'); if (w12) w12.classList.remove('show');
       break;
   }
   updateProgress();
 }
 
-// DOMContentLoaded 〜 も既存のまま（ロードマップ／パズルナビ）でOK
+function restartFromEnd() {
+  const end = document.getElementById('endScreen');
+  if (end) end.classList.remove('active');
+  showFormUI();
+  showStep(0);
+  updateProgress();
+}
+
+// ============================================================
+// ロードマップ + パズルメニュー クリックナビ
+// ============================================================
+document.addEventListener('DOMContentLoaded', () => {
+  // ロードマップクリック
+  document.querySelectorAll('.roadmap-step').forEach(stepEl => {
+    stepEl.style.cursor = 'pointer';
+    stepEl.addEventListener('click', () => {
+      const target = parseInt(stepEl.getAttribute('data-step'), 10);
+      if (!isNaN(target)) showStep(target);
+    });
+  });
+
+  // パズルメニュークリック
+  document.querySelectorAll('.puzzle-center, .puzzle-item').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const step = parseInt(btn.getAttribute('data-step'), 10);
+      if (!isNaN(step)) showStep(step);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  });
+
+  updateProgress();
+  showStep(0);
+});
