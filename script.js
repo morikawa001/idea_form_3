@@ -265,7 +265,14 @@ function onTextInput(id)      { updateProgress(); }
 function onEmailInput(id)     { updateProgress(); }
 function onTextareaInput(id)  { updateProgress(); }
 function onIdeaInput()        { updateProgress(); updateIdeaCharCount(); }
-function onRadioChange(id)    { updateProgress(); syncCardRadio(id); }
+function onRadioChange(id) {
+  updateProgress();
+  if (id === 'q5') {
+    syncFreqCards();
+  } else {
+    syncCardRadio(id);
+  }
+}
 function onCheckChange(id)    { updateProgress(); syncCardCheck(id); }
 
 function syncCardRadio(groupId) {
@@ -284,6 +291,17 @@ function syncCardCheck(groupId) {
   wrap.querySelectorAll('.card-check').forEach(lbl => {
     const input = lbl.querySelector('input[type="checkbox"]');
     lbl.classList.toggle('selected', input && input.checked);
+  });
+}
+
+// 発生頻度カード専用のハイライト
+function syncFreqCards() {
+  const group = document.getElementById('q5');
+  if (!group) return;
+  const val = getRadio('q5');
+  group.querySelectorAll('.freq-card').forEach(lbl => {
+    const input = lbl.querySelector('input[type="radio"]');
+    lbl.classList.toggle('selected', input && input.value === val);
   });
 }
 
