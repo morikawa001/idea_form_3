@@ -484,7 +484,7 @@ function restartFromEnd() {
 }
 
 // ============================================================
-// ロードマップ + パズルメニュー クリックナビ
+// ロードマップ + パネルメニュー クリックナビ
 // ============================================================
 document.addEventListener('DOMContentLoaded', () => {
   // ロードマップクリック
@@ -496,13 +496,17 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
- // パネルメニュークリック
-document.querySelectorAll('.panel-main, .panel-item').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const step = parseInt(btn.getAttribute('data-step'), 10);
-    if (!isNaN(step)) showStep(step);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+  // 上部パネルメニュークリック（基本情報 + P/C/I/O）
+  document.querySelectorAll('.panel-main, .panel-item').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const step = parseInt(btn.getAttribute('data-step'), 10);
+      if (!isNaN(step)) showStep(step);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
   });
+
+  updateProgress();
+  showStep(0);
 });
 
   updateProgress();
