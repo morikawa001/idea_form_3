@@ -299,9 +299,18 @@ function syncFreqCards() {
   const group = document.getElementById('q5');
   if (!group) return;
   const val = getRadio('q5');
+
+  // いったん全ての selected を外す
+  group.querySelectorAll('.freq-card').forEach(lbl => {
+    lbl.classList.remove('selected');
+  });
+
+  // 選択されている value と一致するカードだけ selected を付ける
   group.querySelectorAll('.freq-card').forEach(lbl => {
     const input = lbl.querySelector('input[type="radio"]');
-    lbl.classList.toggle('selected', input && input.value === val);
+    if (input && input.value === val) {
+      lbl.classList.add('selected');
+    }
   });
 }
 
