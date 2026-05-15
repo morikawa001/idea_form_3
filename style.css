@@ -60,12 +60,13 @@ body {
   display: flex; align-items: center; gap: 10px;
   margin-bottom: 8px;
 }
+/* ロゴ: タイトル+サブタイトルの高さに自動追従 */
 .brand-logo {
   flex-shrink: 0;
   width: auto;
   height: auto;
   align-self: stretch;
-  max-height: 72px;
+  max-height: 72px; /* 上限設定 */
 }
 .brand-title {
   font-size: 2.4em; font-weight: 700;
@@ -202,11 +203,6 @@ body {
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* メモセクション少し余白調整 */
-#memoSection {
-  margin-top: 18px;
-}
-
 /* ステップヘッダー */
 .step-header {
   padding: 28px 0 20px;
@@ -240,7 +236,7 @@ body {
 }
 .step-desc { font-size: 0.88em; color: var(--text-sub); }
 
-/* フィールドブロック */
+/* ===== フィールドブロック ===== */
 .field-block {
   margin-bottom: 28px;
 }
@@ -303,363 +299,412 @@ select:focus, input:focus, textarea:focus {
 }
 textarea { resize: vertical; min-height: 90px; }
 
-/* カードUI */
-  .card-radio-group { grid-template-columns: 1fr 1fr; }
-  .card-radio { padding: 10px 12px; font-size: .88em; min-height: 46px; }
-  .card-check-group { grid-template-columns: 1fr; }
-  .card-check { padding: 11px 14px; }
-  .icon-check-group { grid-template-columns: repeat(3, 1fr); }
-  .icon-check-inner { padding: 10px 8px; }
-  .ic-emoji { font-size: 1.3em; }
-  .ic-text  { font-size: .72em; }
-
-  /* 頻度カード */
-  .freq-group { flex-wrap: wrap; gap: 7px; }
-  .freq-card  { min-width: 70px; padding: 10px 8px; font-size: .80em; }
-
-  /* ナビボタン */
-  .step-nav { flex-direction: column; gap: 10px; }
-  .btn-next, .btn-prev, .btn-preview {
-    width: 100%; justify-content: center;
-    padding: 14px 16px;
-  }
-  .sub-action-row { flex-direction: column; gap: 8px; }
-  .btn-secondary { width: 100%; text-align: center; }
-  .btn-clear-step { width: 100%; text-align: center; }
-  .sub-action-row--step5 { flex-direction: column; }
-
-  /* モーダル */
-  .modal, .survey-modal { padding: 18px 14px; border-radius: 12px; }
-  .modal pre { font-size: .74em; }
-  .thank-modal { padding: 28px 16px; border-radius: 16px; }
-  .thank-title { font-size: 1.2em; }
-  .thank-body  { font-size: .86em; }
-  .btn-mail, .btn-close { padding: 12px 16px; font-size: .88em; width: 100%; }
-  .modal-btn-row { flex-direction: column; gap: 8px; }
-  .mail-default-info { flex-direction: column; align-items: flex-start; gap: 2px; }
-  .end-inner { padding: 32px 18px; }
-}
-
-/* ---- 極小端末 (〜380px) ---- */
-@media (max-width: 380px) {
-  .icon-check-group { grid-template-columns: repeat(2, 1fr); }
-  .card-radio-group { grid-template-columns: 1fr; }
-  .freq-card { min-width: 60px; font-size: .75em; }
-}
-
-/* ---- 送信後の「入力内容を確認する」ボタン グレーアウト ---- */
-.btn-preview:disabled,
-.btn-preview.btn-grayed {
-  background: #9e9e9e !important;
-  cursor: not-allowed;
-  box-shadow: none;
-  opacity: 0.6;
-  pointer-events: none;
-}
-
-/* ============================================================
-   idea_form_3 追加スタイル
-   ============================================================ */
-
-/* ---- ステップ説明メモ ---- */
-.step-note {
-  font-size: 0.83em;
-  color: #777;
-  margin: -6px 0 14px;
-  padding: 6px 10px;
-  background: #f5f5f5;
-  border-radius: 6px;
-}
-
-/* ---- 写真アップロードエリア ---- */
-.photo-upload-area {
-  display: flex;
+/* ===== カード式ラジオボタン ===== */
+.card-radio-group {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
   gap: 10px;
-  flex-wrap: wrap;
-  margin-bottom: 12px;
 }
-.btn-camera,
-.btn-file-label {
+.card-radio-group--vertical {
+  grid-template-columns: 1fr;
+}
+.card-radio {
+  display: flex; align-items: center;
+  background: var(--bg-card);
+  border: 2px solid var(--green-border);
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+  cursor: pointer;
+  font-size: 0.92em; font-weight: 500;
+  transition: all var(--transition);
+  min-height: 52px;
+  gap: 10px;
+}
+.card-radio input[type="radio"] { display: none; }
+.card-radio span { color: var(--text-main); line-height: 1.4; }
+.card-radio:hover {
+  background: var(--green-pale);
+  border-color: var(--green-light);
+}
+.card-radio.selected {
+  background: var(--green-pale);
+  border-color: var(--green-mid);
+  box-shadow: 0 0 0 3px rgba(46,139,95,.15);
+}
+.card-radio.selected::before {
+  content: '✓';
   display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 9px 16px;
-  border-radius: 8px;
+  width: 22px; height: 22px;
+  background: var(--green-mid);
+  color: white; font-size: .85em;
+  border-radius: 50%;
+  align-items: center; justify-content: center;
+  flex-shrink: 0;
+  animation: checkPop .25s cubic-bezier(.175,.885,.32,1.275);
+}
+@keyframes checkPop {
+  0%   { transform: scale(0); }
+  80%  { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+.card-radio--wide { min-width: 100%; }
+
+/* ===== 頻度カード ===== */
+.freq-group {
+  display: flex; flex-wrap: wrap; gap: 10px;
+}
+.freq-card {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  background: var(--bg-card);
+  border: 2px solid var(--green-border);
+  border-radius: var(--radius-sm);
+  padding: 14px 12px;
+  cursor: pointer; text-align: center;
+  flex: 1; min-width: 90px;
+  font-size: 0.84em; font-weight: 500;
+  color: var(--text-sub);
+  transition: all var(--transition);
+}
+.freq-card input { display: none; }
+.freq-dot {
+  width: 14px; height: 14px; border-radius: 50%;
+  border: 2px solid #ccc;
+}
+.freq-dot--5   { background: #e53935; border-color: #e53935; }
+.freq-dot--4   { background: #fb8c00; border-color: #fb8c00; }
+.freq-dot--3   { background: #fdd835; border-color: #fdd835; }
+.freq-dot--2   { background: #43a047; border-color: #43a047; }
+.freq-dot--alert { background: #7b1fa2; border-color: #7b1fa2; }
+.freq-card:hover  { background: var(--green-pale); border-color: var(--green-light); }
+.freq-card.selected {
+  background: var(--green-pale);
+  border-color: var(--green-mid);
+  color: var(--green-dark); font-weight: 700;
+  box-shadow: 0 0 0 3px rgba(46,139,95,.12);
+}
+
+/* ===== カード式チェックボックス ===== */
+.card-check-group {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
+}
+.card-check {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--bg-card);
+  border: 2px solid var(--green-border);
+  border-radius: var(--radius-sm);
+  padding: 13px 16px;
+  cursor: pointer;
+  font-size: 0.92em; font-weight: 500;
+  transition: all var(--transition);
+  min-height: 52px;
+}
+.card-check input[type="checkbox"] { display: none; }
+.card-check span { color: var(--text-main); line-height: 1.4; }
+.card-check:hover {
+  background: var(--green-pale);
+  border-color: var(--green-light);
+}
+.card-check.selected {
+  background: var(--green-pale);
+  border-color: var(--green-mid);
+  box-shadow: 0 0 0 3px rgba(46,139,95,.12);
+}
+.card-check.selected::before {
+  content: '✓';
+  display: inline-flex;
+  width: 22px; height: 22px;
+  background: var(--green-mid);
+  color: white; font-size: .85em;
+  border-radius: 50%;
+  align-items: center; justify-content: center;
+  flex-shrink: 0;
+  animation: checkPop .25s cubic-bezier(.175,.885,.32,1.275);
+}
+
+/* ===== その他入力欄 ===== */
+.other-input-wrap {
+  display: none;
+  margin-top: 12px;
+  animation: stepIn .25s ease;
+}
+.other-input-wrap.show { display: block; }
+.other-input-wrap textarea { min-height: 70px; }
+
+/* ===== アイデア入力（メイン）===== */
+.idea-main-block {
+  background: var(--green-pale);
+  border: 2px solid var(--green-border);
+  border-radius: var(--radius-md);
+  padding: 20px;
+}
+.idea-textarea {
+  border-color: var(--green-border) !important;
+  background: white !important;
+  font-size: 1.02em;
+  min-height: 120px;
+}
+.idea-char-count {
+  font-size: 0.75em; color: var(--text-muted);
+  text-align: right; margin-top: 5px;
+}
+
+/* ===== アイコン付きチェック（Q10_type）===== */
+.icon-check-group {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 10px;
+}
+.icon-check {
+  border: 2px solid var(--green-border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-card);
+  cursor: pointer;
+  transition: all var(--transition);
+  overflow: hidden;
+}
+.icon-check input { display: none; }
+.icon-check-inner {
+  padding: 14px 12px;
+  display: flex; flex-direction: column; align-items: center;
+  gap: 6px; text-align: center;
+}
+.ic-emoji { font-size: 1.6em; }
+.ic-text {
+  font-size: 0.80em; font-weight: 500;
+  color: var(--text-sub); line-height: 1.3;
+}
+.icon-check:hover {
+  background: var(--green-pale);
+  border-color: var(--green-light);
+}
+.icon-check.selected {
+  background: var(--green-pale);
+  border-color: var(--green-mid);
+  box-shadow: 0 0 0 3px rgba(46,139,95,.12);
+}
+.icon-check.selected .ic-text { color: var(--green-dark); font-weight: 700; }
+
+/* ===== 添付資料案内 ===== */
+.attach-note-block {
+  display: flex; align-items: flex-start; gap: 14px;
+  background: #f8f5ff;
+  border: 2px dashed #c5b8e8;
+  border-radius: var(--radius-sm);
+  padding: 16px 18px;
+}
+.attach-note-icon { font-size: 1.8em; flex-shrink: 0; }
+
+/* ===== フィードバック ===== */
+.field-fb {
+  margin-top: 8px;
+  font-size: 0.82em; border-radius: 6px;
+  padding: 0; height: 0; overflow: hidden;
+  transition: all .3s;
+}
+.field-fb.show {
+  padding: 8px 12px;
+  height: auto;
+}
+.field-fb.fb-good    { background: #e8f7f0; color: var(--green-dark); border-left: 3px solid var(--green-light); }
+.field-fb.fb-warn    { background: #fff8e1; color: #7c5700; border-left: 3px solid #ffc107; }
+.field-fb.fb-tip     { background: var(--green-pale); color: var(--green-dark); border-left: 3px solid var(--green-mid); }
+
+/* ===== ナビゲーションボタン ===== */
+.step-nav {
+  display: flex; gap: 12px;
+  margin-top: 36px; flex-wrap: wrap;
+}
+.btn-next, .btn-prev, .btn-preview {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 14px 24px;
+  border: none; border-radius: var(--radius-sm);
+  font-family: inherit; font-size: 0.97em; font-weight: 700;
+  cursor: pointer; transition: all var(--transition);
+  line-height: 1;
+}
+.btn-next {
+  background: var(--green-mid); color: white;
+  flex: 1;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(46,139,95,.3);
+}
+.btn-next:hover   { background: var(--green-dark); box-shadow: 0 6px 18px rgba(46,139,95,.35); }
+.btn-next:active  { transform: scale(.97); }
+.btn-prev {
+  background: #e8f0eb; color: var(--text-sub);
+  min-width: 100px;
+}
+.btn-prev:hover  { background: var(--green-border); }
+.btn-preview {
+  background: var(--green-dark); color: white;
+  flex: 1; justify-content: center;
+  box-shadow: 0 4px 12px rgba(27,107,74,.3);
+}
+.btn-preview:hover  { opacity: .88; }
+.btn-preview:active { transform: scale(.97); }
+
+.sub-action-row {
+  display: flex; gap: 12px;
+  justify-content: center; flex-wrap: wrap;
+  margin-top: 16px;
+}
+.btn-secondary {
+  background: #ecf3ef; color: var(--text-sub);
+  border: 1.5px solid var(--green-border);
+  padding: 10px 20px; border-radius: var(--radius-sm);
+  font-family: inherit; font-size: 0.88em; font-weight: 600;
+  cursor: pointer; transition: all var(--transition);
+}
+.btn-secondary:hover { background: var(--green-pale); border-color: var(--green-mid); }
+
+/* 入力クリアボタン */
+.btn-clear-step {
+  background: var(--bg-card);
+  color: #7a5c52;
+  border: 1.5px solid #ddc9c4;
+  border-radius: var(--radius-sm);
+  padding: 10px 18px;
+  font-family: inherit;
   font-size: 0.88em;
   font-weight: 500;
   cursor: pointer;
-  border: 1.5px solid #4caf88;
-  background: #fff;
-  color: #2e7d58;
-  transition: background 0.15s;
+  transition: background var(--transition), border-color var(--transition), color var(--transition);
 }
-.btn-camera:hover,
-.btn-file-label:hover {
-  background: #edf7f2;
-}
+.btn-clear-step:hover  { background: #fdf0ed; border-color: #c0897a; color: #5a3a2e; }
+.btn-clear-step:active { transform: scale(.97); }
 
-/* ---- カメラビューファインダー ---- */
-.camera-container {
-  margin-top: 10px;
-  border-radius: 10px;
-  overflow: hidden;
-  background: #000;
-  max-width: 480px;
-}
-.camera-container video {
-  width: 100%;
-  display: block;
-}
-.camera-controls {
+/* ステップ5の sub-action-row：2ボタン並び */
+.sub-action-row--step5 {
   display: flex;
   gap: 10px;
-  padding: 10px;
-  background: rgba(0,0,0,0.6);
   justify-content: center;
-}
-.btn-shutter {
-  padding: 10px 24px;
-  background: #e53935;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  font-size: 1em;
-  font-weight: 700;
-  cursor: pointer;
-}
-.btn-camera-cancel {
-  padding: 10px 20px;
-  background: #fff;
-  color: #333;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  font-size: 0.9em;
-  cursor: pointer;
-}
-
-/* ---- 写真サムネイルプレビュー ---- */
-.photo-preview-area {
-  display: flex;
   flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 8px;
 }
-.photo-thumb {
-  position: relative;
-  width: 90px;
-  height: 90px;
-  border-radius: 8px;
-  overflow: hidden;
-  border: 1.5px solid #ccc;
-  background: #f5f5f5;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.photo-thumb img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-.photo-thumb-label {
-  font-size: 0.68em;
-  color: #555;
-  padding: 4px;
+
+/* ===== 終了画面 ===== */
+.end-screen {
+  display: none; max-width: 680px; margin: 0 auto;
+  padding: 60px 24px;
   text-align: center;
-  word-break: break-all;
+  animation: stepIn .4s ease;
 }
-.photo-thumb-del {
-  position: absolute;
-  top: 3px;
-  right: 3px;
-  width: 20px;
-  height: 20px;
-  background: rgba(0,0,0,0.55);
-  color: #fff;
-  border: none;
-  border-radius: 50%;
-  font-size: 11px;
-  cursor: pointer;
+.end-screen.active { display: block; }
+.end-inner {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  padding: 48px 32px;
+  box-shadow: var(--shadow-md);
+}
+.end-icon { font-size: 4em; margin-bottom: 20px; }
+.end-title { font-size: 1.6em; font-weight: 700; color: var(--green-dark); margin-bottom: 14px; }
+.end-body {
+  font-size: .95em; color: var(--text-sub);
+  line-height: 2; margin-bottom: 32px;
+}
+.end-body strong { color: var(--green-mid); }
+.btn-restart {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--green-pale); color: var(--green-dark);
+  border: 2px solid var(--green-mid);
+  padding: 12px 28px; border-radius: var(--radius-sm);
+  font-family: inherit; font-size: .95em; font-weight: 700;
+  cursor: pointer; transition: all var(--transition);
+}
+.btn-restart:hover { background: var(--green-border); }
+
+/* ===== モーダル共通 ===== */
+.modal-overlay {
+  display: none; position: fixed;
+  inset: 0; background: rgba(0,0,0,.5);
+  z-index: 1000; align-items: center; justify-content: center;
+  padding: 16px;
+}
+.modal-overlay.active { display: flex; }
+.modal {
+  background: white; border-radius: var(--radius-lg);
+  padding: 28px; max-width: 640px; width: 100%;
+  max-height: 88vh; overflow-y: auto;
+  box-shadow: var(--shadow-md);
+  animation: stepIn .3s ease;
+}
+.modal h2 { color: var(--green-dark); margin-bottom: 10px; font-size: 1.1em; }
+.modal pre {
+  background: #f4f8f6; padding: 14px; border-radius: 8px;
+  font-size: .80em; white-space: pre-wrap; line-height: 1.75;
+  font-family: 'Courier New', monospace; border: 1px solid var(--green-border);
+  max-height: 320px; overflow-y: auto;
+}
+.modal-btn-row { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+.btn-mail  { background: var(--green-mid); color: white; padding: 12px 20px; border: none; border-radius: 8px; font-family: inherit; font-size: .95em; font-weight: 700; cursor: pointer; }
+.btn-close { background: #6b8c7a; color: white; padding: 12px 20px; border: none; border-radius: 8px; font-family: inherit; font-size: .95em; font-weight: 700; cursor: pointer; }
+.btn-mail:hover  { background: var(--green-dark); }
+.btn-close:hover { background: #4a6b58; }
+
+/* メールモーダル内のデフォルト送信先表示 */
+.mail-default-info {
   display: flex;
   align-items: center;
-  justify-content: center;
-  padding: 0;
-}
-
-/* ---- アクションボタングリッド ---- */
-.modal-action-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  margin-top: 16px;
-}
-.btn-action {
-  padding: 12px 8px;
-  border: none;
-  border-radius: 10px;
-  font-size: 0.84em;
-  font-weight: 600;
-  cursor: pointer;
-  transition: opacity 0.15s, transform 0.1s;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  line-height: 1.3;
-}
-.btn-action:active { transform: scale(0.96); }
-.btn-copy    { background: #e3f2fd; color: #1565c0; }
-.btn-save    { background: #e8f5e9; color: #2e7d32; }
-.btn-mail    { background: #fff3e0; color: #e65100; }
-.btn-pdf     { background: #fce4ec; color: #880e4f; }
-.btn-analyze { background: #f3e5f5; color: #6a1b9a; }
-
-/* ---- メール送信モーダル（小型） ---- */
-.modal--small {
-  max-width: 420px !important;
-}
-
-/* ---- モバイル対応 ---- */
-@media (max-width: 520px) {
-  .modal-action-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  .photo-thumb { width: 72px; height: 72px; }
-}
-
-/* ---- 終了ボタン ---- */
-.btn-end { background: #eceff1; color: #455a64; }
-
-/* ============================================================
-   idea_form_3 v3.2 追加スタイル
-   ============================================================ */
-
-/* ---- テキストエリア＋マイクラッパー ---- */
-.textarea-mic-wrap {
-  position: relative;
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-}
-.textarea-mic-wrap textarea {
-  flex: 1;
-  min-width: 0;
-}
-
-/* ---- マイクボタン ---- */
-.btn-mic {
-  flex-shrink: 0;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  border: 1.5px solid #4caf88;
-  background: #fff;
-  color: #2e7d58;
-  font-size: 18px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.15s, box-shadow 0.15s;
-  margin-top: 4px;
-}
-.btn-mic:hover  { background: #edf7f2; }
-.btn-mic--active {
-  background: #e53935 !important;
-  border-color: #e53935 !important;
-  color: #fff !important;
-  animation: mic-pulse 1s ease-in-out infinite;
-}
-@keyframes mic-pulse {
-  0%,100% { box-shadow: 0 0 0 0 rgba(229,57,53,0.4); }
-  50%      { box-shadow: 0 0 0 8px rgba(229,57,53,0); }
-}
-
-/* ---- 音声入力ステータスバー ---- */
-.voice-status {
-  position: fixed;
-  bottom: 80px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(30,30,30,0.88);
-  color: #fff;
-  padding: 10px 22px;
-  border-radius: 24px;
+  gap: 6px;
+  background: var(--green-pale);
+  border: 1px solid var(--green-border);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
   font-size: 0.88em;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  z-index: 9999;
-  cursor: pointer;
-  backdrop-filter: blur(4px);
 }
-.voice-dot {
-  width: 10px;
-  height: 10px;
-  background: #e53935;
-  border-radius: 50%;
-  animation: mic-pulse 1s ease-in-out infinite;
-}
+.mail-default-label { color: var(--text-sub); font-weight: 500; white-space: nowrap; }
+.mail-default-addr  { color: var(--green-dark); font-weight: 700; word-break: break-all; }
 
-/* ---- モーダル フッター行（戻る・終了） ---- */
-.modal-footer-row {
-  display: flex;
-  gap: 10px;
-  margin-top: 12px;
-  justify-content: space-between;
+/* ===== アンケートモーダル ===== */
+.survey-modal-overlay {
+  display: none; position: fixed;
+  inset: 0; background: rgba(0,0,0,.5);
+  z-index: 1500; align-items: center; justify-content: center;
+  padding: 16px;
 }
+.survey-modal-overlay.active { display: flex; }
+.survey-modal {
+  background: white; border-radius: var(--radius-lg);
+  padding: 28px; max-width: 640px; width: 100%;
+  max-height: 88vh; overflow-y: auto;
+  box-shadow: var(--shadow-md);
+  animation: stepIn .3s ease;
+}
+.survey-modal h2 { color: var(--green-dark); margin-bottom: 8px; font-size: 1.1em; }
 
-/* ---- 戻るボタン（アクティブ色） ---- */
-.btn-back-active {
-  flex: 1;
-  padding: 12px 18px;
-  background: #4caf88;
-  color: #fff;
-  border: none;
-  border-radius: 10px;
-  font-size: 0.92em;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.15s, transform 0.1s;
+/* アンケート内の設問（変更なし互換） */
+.q-block { margin-bottom: 22px; }
+.q-label { display: block; font-size: .93em; font-weight: 700; margin-bottom: 6px; color: #2c3e50; }
+.q-hint  { font-size: .79em; color: #888; margin-bottom: 8px; }
+.radio-group, .check-group { display: flex; flex-direction: column; gap: 7px; }
+.radio-group label, .check-group label {
+  display: flex; align-items: flex-start; gap: 10px;
+  font-size: .89em; cursor: pointer;
+  padding: 9px 13px;
+  border: 1.5px solid var(--green-border); border-radius: 7px;
+  transition: all .2s; background: #fdfefe;
 }
-.btn-back-active:hover  { background: #3d9c76; }
-.btn-back-active:active { transform: scale(0.97); }
+.radio-group label:hover, .check-group label:hover { background: var(--green-pale); border-color: var(--green-light); }
+.radio-group label.selected, .check-group label.selected {
+  background: var(--green-pale); border-color: var(--green-mid);
+  box-shadow: 0 0 0 2px rgba(76,175,136,.18);
+}
+.radio-group input, .check-group input { margin-top: 2px; accent-color: var(--green-mid); flex-shrink: 0; }
 
-/* ---- 終了ボタン（フッター用） ---- */
-.btn-end-footer {
-  flex: 1;
-  padding: 12px 18px;
-  background: #eceff1;
-  color: #455a64;
-  border: none;
-  border-radius: 10px;
-  font-size: 0.92em;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.15s, transform 0.1s;
+/* SUSセクション */
+.sus-section {
+  margin-top: 28px; padding: 18px;
+  background: #f0f9f4; border: 2px solid var(--green-mid); border-radius: 10px;
 }
-.btn-end-footer:hover  { background: #cfd8dc; }
-.btn-end-footer:active { transform: scale(0.97); }
-
-/* ---- モバイル対応 ---- */
-@media (max-width: 520px) {
-  .modal-footer-row { flex-direction: column; }
-  .btn-mic { width: 36px; height: 36px; font-size: 16px; }
-}
+.sus-section-title { font-size: 1em; font-weight: 700; color: var(--green-dark); margin-bottom: 6px; }
+.sus-section-desc  { font-size: .82em; color: #666; margin-bottom: 16px; line-height: 1.7; }
+.sus-row label { padding: 7px 12px; font-size: .87em; }
 
 /* ============================================================
-   MIT アイデア提案フォーム v2 — style.css
-   （ここまでは添付ファイル idea_form_3_style_css_0515.txt の内容を
-    そのままコピーしてください。内容省略）
+   追加スタイル（パズル入力向けの軽い説明強化）
 ============================================================ */
 
-/* …………（元の CSS 全文）………… */
-
-/* ============================================================
-   idea_form_3 追加スタイル
-   ============================================================ */
-
-/* ---- ステップ説明メモ ---- */
 .step-note {
   font-size: 0.83em;
   color: #777;
@@ -667,9 +712,4 @@ textarea { resize: vertical; min-height: 90px; }
   padding: 6px 10px;
   background: #f5f5f5;
   border-radius: 6px;
-}
-
-/* メモセクション少し余白調整 */
-#memoSection {
-  margin-top: 18px;
 }
