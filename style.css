@@ -403,22 +403,6 @@ textarea { resize: vertical; min-height: 90px; }
   flex-shrink: 0;
   animation: checkPop .25s cubic-bezier(.175,.885,.32,1.275);
 }
-/* 選択中カードの右上にチェックマークを表示 */
-.freq-card.selected::after {
-  content: '✓';
-  position: absolute;
-  top: 6px;
-  right: 8px;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: var(--green-mid);
-  color: #fff;
-  font-size: 0.75em;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
 
 /* ===== カード式チェックボックス ===== */
 .card-check-group {
