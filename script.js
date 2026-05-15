@@ -1,12 +1,9 @@
 // ============================================================
-// MIT ヒアリングフォーム v3.6 — script.js（レポート概要 + AIサマリー対応版）
+// MIT ヒアリングフォーム v3.6 — script.js（レポート概要対応版）
 // ============================================================
 
 // デフォルト送信先
 const DEFAULT_MAIL_TO = 'ns.morizo@gmail.com';
-
-// GAS エンドポイント（※実際の URL に差し替え）
-const GAS_URL = 'https://script.google.com/macros/XXXXXXXXXX';
 
 let startTime = null;
 
@@ -525,7 +522,7 @@ function buildSummary() {
 }
 
 // ============================================================
-// PICO 全体のテキスト（メール等用）
+// プレビュー用テキスト生成（全文）
 // ============================================================
 function buildText() {
   const q6v = getQ6Values();
@@ -773,91 +770,6 @@ function restartFromEnd() {
 }
 
 // ============================================================
-// サマリー生成用ペイロード（PICO 全体）
-// ============================================================
-function buildReportPayloadForSummary() {
-  const payload = {
-    // 基本情報
-    name: getVal('q2'),
-    dept: getVal('q1'),
-    email: getVal('q2b'),
-    role: getQ3Value(),
-
-    // P：困りごと
-    target: getQ4Value(),
-    freq: getRadio('q5'),
-    problems: getQ6Values(),
-    scene: getVal('q7'),
-    memo_p: getVal('memo_p'),
-
-    // C：今の対応
-    current_care: getVal('q8'),
-    current_issues: getQ9Values(),
-    memo_c: getVal('memo_c'),
-
-    // I：アイデア
-    idea_text: getVal('q10'),
-    idea_types: getIdeaTypes(),
-    idea_detail: getVal('q10_detail'),
-    idea_ref: getVal('q10_ref'),
-    idea_concern: getVal('q10_concern'),
-    memo_i: getVal('memo_i'),
-
-    // O：期待効果
-    expected_effects: getQ12Values(),
-    expected_impact: getVal('q13'),
-    memo_o: getVal('memo_o')
-  };
-
-  return payload;
-}
-
-// ============================================================
-// サマリー生成（GAS 経由で AI 要約）
-// ============================================================
-async function generateSummary() {
-  try {
-    const payload = buildReportPayloadForSummary();
-
-    const summaryArea = document.getElementById('summaryOutput');
-    if (summaryArea) {
-      summaryArea.textContent = 'サマリーを生成中です…（数秒お待ちください）';
-    }
-
-    const res = await fetch(GAS_URL, {
-      method: 'POST',
-      mode: 'cors',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        action: 'generateSummary',
-        report: payload
-      })
-    });
-
-    if (!res.ok) {
-      throw new Error('サーバーエラー: ' + res.status);
-    }
-
-    const data = await res.json();
-
-    if (data.summary) {
-      if (summaryArea) {
-        summaryArea.textContent = data.summary;
-      } else {
-        alert(data.summary);
-      }
-    } else {
-      throw new Error('サマリーが取得できませんでした');
-    }
-  } catch (e) {
-    console.error(e);
-    alert('サマリー生成に失敗しました：' + e.message);
-  }
-}
-
-// ============================================================
 // 初期化
 // ============================================================
 document.addEventListener('DOMContentLoaded', () => {
@@ -870,19 +782,15 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // 中央パネルメニューからも移動（data-step のあるボタンだけ）
-  document
-    .querySelectorAll('.panel-main, .panel-item')
-    .forEach((btn) => {
-      const stepAttr = btn.getAttribute('data-step');
-      if (stepAttr === null || stepAttr === '') return;
-
-      btn.addEventListener('click', () => {
-        const step = parseInt(stepAttr, 10);
-        if (!isNaN(step)) showStep(step);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      });
+  // 中央パネルメニューからも移動
+  document.querySelectorAll('.panel-main, .panel-item').forEach((btn) => {
+    if (!btn.hasAttribute('data-step')) return;
+    btn.addEventListener('click', () => {
+      const step = parseInt(btn.getAttribute('data-step'), 10);
+      if (!isNaN(step)) showStep(step);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     });
+  });
 
   // 初期状態同期
   syncCardRadio('q3');
