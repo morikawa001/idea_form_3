@@ -388,20 +388,22 @@ textarea { resize: vertical; min-height: 90px; }
   color: var(--green-dark); font-weight: 700;
   box-shadow: 0 0 0 3px rgba(46,139,95,.12);
 }
-/* 発生頻度カード選択時のチェックマーク */
+/* 発生頻度カード選択時のチェックマーク（左上固定） */
 .freq-card.selected::before {
   content: '✓';
-  display: inline-flex;
-  width: 22px;
-  height: 22px;
+  position: absolute;
+  top: 6px;
+  left: 8px;
+  width: 20px;
+  height: 20px;
   background: var(--green-mid);
   color: #fff;
-  font-size: .85em;
+  font-size: 0.85em;
   border-radius: 50%;
+  display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
-  animation: checkPop .25s cubic-bezier(.175,.885,.32,1.275);
+  z-index: 1;
 }
 
 /* ===== カード式チェックボックス ===== */
