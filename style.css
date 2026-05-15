@@ -1,747 +1,1459 @@
-// ============================================================
-// MIT ヒアリングフォーム v3.6 — script.js
-// q4「主にこまっているのは？」・q5「発生頻度」修正版
-// ============================================================
+/* ============================================================
+   MIT アイデア提案フォーム v2 — style.css
+   設計思想：
+   ・大きなタップ領域 / 高コントラスト / 読みやすいフォント
+   ・PICOの流れが一目でわかるロードマップ
+   ・トグル不使用・常時フラット表示
+============================================================ */
 
-// デフォルト送信先
-const DEFAULT_MAIL_TO = 'ns.morizo@gmail.com';
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-let startTime = null;
+:root {
+  --green-dark:   #1b6b4a;
+  --green-mid:    #2e8b5f;
+  --green-light:  #4caf88;
+  --green-pale:   #e8f7f0;
+  --green-border: #b6ddc9;
+  --accent:       #00a86b;
+  --text-main:    #1a2a22;
+  --text-sub:     #4a5c52;
+  --text-muted:   #7a9080;
+  --bg-page:      #f4faf7;
+  --bg-card:      #ffffff;
+  --radius-sm:    8px;
+  --radius-md:    12px;
+  --radius-lg:    16px;
+  --shadow-sm:    0 1px 4px rgba(0,0,0,.08);
+  --shadow-md:    0 4px 16px rgba(0,0,0,.10);
+  --transition:   0.2s ease;
+}
 
-// ============================================================
-// 音声入力（Web Speech API）
-// ============================================================
-let currentRecognition = null;
-let currentMicBtn = null;
-let currentTargetId = null;
-let interimSpan = null;
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Noto Sans JP', 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
+  background: var(--bg-page);
+  color: var(--text-main);
+  font-size: 16px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
 
-function startVoice(targetId) {
-  const SpeechRecognition =
-    window.SpeechRecognition || window.webkitSpeechRecognition;
+/* ===== サイトヘッダー ===== */
+.site-header {
+  background: linear-gradient(135deg, var(--green-dark) 0%, var(--green-mid) 60%, var(--green-light) 100%);
+  color: #fff;
+  padding: 14px 16px 16px;
+  position: relative;
+  overflow: hidden;
+}
+.site-header::before {
+  content: '';
+  position: absolute;
+  top: -40px; right: -40px;
+  width: 140px; height: 140px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.07);
+  pointer-events: none;
+}
+.header-inner { max-width: 680px; margin: 0 auto; }
+.header-brand {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 8px;
+}
+/* ロゴ: タイトル+サブタイトルの高さに自動追従 */
+.brand-logo {
+  flex-shrink: 0;
+  width: auto;
+  height: auto;
+  align-self: stretch;
+  max-height: 72px;
+}
+.brand-title {
+  font-size: 2.4em; font-weight: 700;
+  letter-spacing: .02em;
+  line-height: 1.3;
+}
+.brand-sub { font-size: 1.24em; opacity: .75; margin-top: 1px; }
+.header-desc {
+  font-size: 0.78em;
+  line-height: 1.65;
+  background: rgba(255,255,255,.15);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  border: 1px solid rgba(255,255,255,.2);
+}
 
-  if (!SpeechRecognition) {
-    alert('このブラウザは音声入力に対応していません。\nChrome または Edge をお使いください。');
-    return;
+/* ===== PICOロードマップ ===== */
+.pico-roadmap {
+  background: var(--bg-card);
+  border-bottom: 2px solid var(--green-border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 8px rgba(0,0,0,.06);
+}
+.roadmap-inner {
+  max-width: 680px; margin: 0 auto;
+  display: flex; align-items: center;
+  padding: 12px 16px; gap: 0;
+  overflow-x: auto;
+}
+.roadmap-step {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 4px; flex: 1; min-width: 52px;
+  cursor: pointer;
+  opacity: .45;
+  transition: opacity var(--transition), transform var(--transition);
+  -webkit-tap-highlight-color: transparent;
+}
+.roadmap-step:hover   { opacity: .75; transform: translateY(-1px); }
+.roadmap-step:active  { transform: scale(.95); }
+.roadmap-step.active  { opacity: 1; }
+.roadmap-step.done    { opacity: .75; }
+.rm-icon {
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--green-pale);
+  border-radius: 50%;
+  font-size: 1.1em;
+  border: 2px solid transparent;
+  transition: all var(--transition);
+}
+.roadmap-step.active .rm-icon {
+  background: var(--green-mid);
+  border-color: var(--green-light);
+  font-size: 1.15em;
+  box-shadow: 0 0 0 4px rgba(76,175,136,.2);
+}
+.roadmap-step.done .rm-icon {
+  background: var(--green-pale);
+  border-color: var(--green-light);
+}
+.rm-label {
+  font-size: 0.60em; font-weight: 500;
+  color: var(--text-sub); text-align: center;
+  display: flex; align-items: center; gap: 3px;
+  white-space: nowrap;
+}
+.roadmap-step.active .rm-label { color: var(--green-dark); font-weight: 700; }
+.pico-tag {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 16px; height: 16px;
+  background: var(--green-light);
+  color: white; font-size: 0.75em; font-weight: 700;
+  border-radius: 4px;
+}
+.roadmap-line {
+  height: 2px; background: var(--green-border);
+  flex: 0 0 20px; border-radius: 1px;
+  transition: background var(--transition);
+}
+.roadmap-line.done { background: var(--green-light); }
+
+/* ===== プログレスバー ===== */
+.progress-wrap {
+  background: var(--bg-card);
+  padding: 10px 20px;
+  border-bottom: 1px solid var(--green-border);
+  max-width: 100%;
+}
+.progress-wrap > div.progress-text {
+  display: flex; justify-content: space-between;
+  font-size: 0.78em; color: var(--text-muted);
+  margin-bottom: 6px;
+}
+#progress-pct { font-weight: 700; color: var(--green-mid); }
+.progress-track {
+  height: 6px; background: var(--green-border);
+  border-radius: 3px; overflow: hidden;
+}
+.progress-fill {
+  height: 100%; width: 0%;
+  background: linear-gradient(90deg, var(--green-mid), var(--green-light));
+  border-radius: 3px;
+  transition: width .5s cubic-bezier(.4,0,.2,1);
+}
+
+/* ===== ガイドバー ===== */
+.guide-bar {
+  display: flex; align-items: flex-start; gap: 12px;
+  background: var(--green-pale);
+  border-bottom: 1px solid var(--green-border);
+  padding: 14px 20px;
+}
+.guide-avatar { font-size: 1.5em; flex-shrink: 0; }
+.guide-text {
+  font-size: 0.88em; color: var(--green-dark);
+  line-height: 1.65;
+  padding-top: 2px;
+}
+.guide-text strong { color: var(--green-dark); }
+
+/* ===== メインラップ ===== */
+.main-wrap { max-width: 680px; margin: 0 auto; padding: 0 16px 60px; }
+
+/* ===== ステップセクション ===== */
+.step-section {
+  display: none;
+  animation: stepIn .35s cubic-bezier(.4,0,.2,1);
+}
+.step-section.active { display: block; }
+@keyframes stepIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ステップヘッダー */
+.step-header {
+  padding: 28px 0 20px;
+  border-bottom: 1px solid var(--green-border);
+  margin-bottom: 24px;
+}
+.step-num {
+  font-size: 0.75em; font-weight: 700;
+  color: var(--green-mid);
+  letter-spacing: .05em;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+.step-title {
+  font-size: 1.25em; font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 6px;
+}
+.pico-label-large {
+  font-size: 1.2em; font-weight: 700;
+  color: var(--text-main);
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 6px;
+}
+.pico-tag-large {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 30px; height: 30px;
+  background: var(--green-mid);
+  color: white; font-size: 1em; font-weight: 700;
+  border-radius: 8px;
+}
+.step-desc { font-size: 0.88em; color: var(--text-sub); }
+
+/* ===== フィールドブロック ===== */
+.field-block {
+  margin-bottom: 28px;
+}
+.field-label {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 8px;
+  font-size: 0.97em; font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 6px;
+}
+.field-note {
+  font-size: 0.82em; color: var(--text-muted);
+  margin-bottom: 10px;
+  line-height: 1.6;
+}
+.req-badge {
+  display: inline-flex; align-items: center;
+  background: #fce4e4; color: #c0392b;
+  font-size: 0.72em; font-weight: 700;
+  padding: 2px 8px; border-radius: 4px;
+}
+.opt-badge {
+  display: inline-flex; align-items: center;
+  background: #e8f0fe; color: #3d6bc7;
+  font-size: 0.72em; font-weight: 600;
+  padding: 2px 8px; border-radius: 4px;
+}
+.multi-tag {
+  display: inline-flex; align-items: center;
+  background: #fff3cd; color: #856404;
+  font-size: 0.70em; font-weight: 600;
+  padding: 2px 8px; border-radius: 4px;
+}
+
+/* テキスト入力・セレクト・テキストエリア */
+select, input[type="text"], input[type="email"], textarea {
+  width: 100%;
+  padding: 13px 16px;
+  border: 2px solid var(--green-border);
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: 1em;
+  color: var(--text-main);
+  background: var(--bg-card);
+  transition: border var(--transition), box-shadow var(--transition), background var(--transition);
+  -webkit-appearance: none;
+  appearance: none;
+}
+select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 20 20' fill='%234a5c52'%3E%3Cpath d='M5 7l5 5 5-5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 40px;
+  cursor: pointer;
+}
+select:focus, input:focus, textarea:focus {
+  outline: none;
+  border-color: var(--green-mid);
+  background: var(--green-pale);
+  box-shadow: 0 0 0 3px rgba(46,139,95,.15);
+}
+textarea { resize: vertical; min-height: 90px; }
+
+/* ===== カード式ラジオボタン ===== */
+.card-radio-group {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 10px;
+}
+.card-radio-group--vertical {
+  grid-template-columns: 1fr;
+}
+.card-radio {
+  display: flex; align-items: center;
+  background: var(--bg-card);
+  border: 2px solid var(--green-border);
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+  cursor: pointer;
+  font-size: 0.92em; font-weight: 500;
+  transition: all var(--transition);
+  min-height: 52px;
+  gap: 10px;
+}
+.card-radio input[type="radio"] { display: none; }
+.card-radio span { color: var(--text-main); line-height: 1.4; }
+.card-radio:hover {
+  background: var(--green-pale);
+  border-color: var(--green-light);
+}
+.card-radio.selected {
+  background: var(--green-pale);
+  border-color: var(--green-mid);
+  box-shadow: 0 0 0 3px rgba(46,139,95,.15);
+}
+.card-radio.selected::before {
+  content: '✓';
+  display: inline-flex;
+  width: 22px; height: 22px;
+  background: var(--green-mid);
+  color: white; font-size: .85em;
+  border-radius: 50%;
+  align-items: center; justify-content: center;
+  flex-shrink: 0;
+  animation: checkPop .25s cubic-bezier(.175,.885,.32,1.275);
+}
+@keyframes checkPop {
+  0%   { transform: scale(0); }
+  80%  { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+.card-radio--wide { min-width: 100%; }
+
+/* ===== 頻度カード ===== */
+.freq-group {
+  display: flex; flex-wrap: wrap; gap: 10px;
+}
+.freq-card {
+  position: relative;                /* 追加：チェックマーク表示用 */
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  background: var(--bg-card);
+  border: 2px solid var(--green-border);
+  border-radius: var(--radius-sm);
+  padding: 14px 12px;
+  cursor: pointer; text-align: center;
+  flex: 1; min-width: 90px;
+  font-size: 0.84em; font-weight: 500;
+  color: var(--text-sub);
+  transition: all var(--transition);
+}
+.freq-card input { display: none; }
+.freq-dot {
+  width: 14px; height: 14px; border-radius: 50%;
+  border: 2px solid #ccc;
+}
+.freq-dot--5   { background: #e53935; border-color: #e53935; }
+.freq-dot--4   { background: #fb8c00; border-color: #fb8c00; }
+.freq-dot--3   { background: #fdd835; border-color: #fdd835; }
+.freq-dot--2   { background: #43a047; border-color: #43a047; }
+.freq-dot--alert { background: #7b1fa2; border-color: #7b1fa2; }
+
+.freq-card:hover  {
+  background: var(--green-pale);
+  border-color: var(--green-light);
+}
+
+.freq-card.selected {
+  background: var(--green-pale);
+  border-color: var(--green-mid);
+  color: var(--green-dark); font-weight: 700;
+  box-shadow: 0 0 0 3px rgba(46,139,95,.12);
+}
+/* 発生頻度カード選択時のチェックマーク（左上固定） */
+.freq-card.selected::before {
+  content: '✓';
+  position: absolute;
+  top: 6px;
+  left: 8px;
+  width: 20px;
+  height: 20px;
+  background: var(--green-mid);
+  color: #fff;
+  font-size: 0.85em;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}
+
+/* ===== カード式チェックボックス ===== */
+.card-check-group {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
+}
+.card-check {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--bg-card);
+  border: 2px solid var(--green-border);
+  border-radius: var(--radius-sm);
+  padding: 13px 16px;
+  cursor: pointer;
+  font-size: 0.92em; font-weight: 500;
+  transition: all var(--transition);
+  min-height: 52px;
+}
+.card-check input[type="checkbox"] { display: none; }
+.card-check span { color: var(--text-main); line-height: 1.4; }
+.card-check:hover {
+  background: var(--green-pale);
+  border-color: var(--green-light);
+}
+.card-check.selected {
+  background: var(--green-pale);
+  border-color: var(--green-mid);
+  box-shadow: 0 0 0 3px rgba(46,139,95,.12);
+}
+.card-check.selected::before {
+  content: '✓';
+  display: inline-flex;
+  width: 22px; height: 22px;
+  background: var(--green-mid);
+  color: white; font-size: .85em;
+  border-radius: 50%;
+  align-items: center; justify-content: center;
+  flex-shrink: 0;
+  animation: checkPop .25s cubic-bezier(.175,.885,.32,1.275);
+}
+
+/* ===== その他入力欄 ===== */
+.other-input-wrap {
+  display: none;
+  margin-top: 12px;
+  animation: stepIn .25s ease;
+}
+.other-input-wrap.show { display: block; }
+.other-input-wrap textarea { min-height: 70px; }
+
+/* ===== アイデア入力（メイン）===== */
+.idea-main-block {
+  background: var(--green-pale);
+  border: 2px solid var(--green-border);
+  border-radius: var(--radius-md);
+  padding: 20px;
+}
+.idea-textarea {
+  border-color: var(--green-border) !important;
+  background: white !important;
+  font-size: 1.02em;
+  min-height: 120px;
+}
+.idea-char-count {
+  font-size: 0.75em; color: var(--text-muted);
+  text-align: right; margin-top: 5px;
+}
+
+/* ===== アイコン付きチェック（Q10_type）===== */
+.icon-check-group {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 10px;
+}
+.icon-check {
+  border: 2px solid var(--green-border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-card);
+  cursor: pointer;
+  transition: all var(--transition);
+  overflow: hidden;
+}
+.icon-check input { display: none; }
+.icon-check-inner {
+  padding: 14px 12px;
+  display: flex; flex-direction: column; align-items: center;
+  gap: 6px; text-align: center;
+}
+.ic-emoji { font-size: 1.6em; }
+.ic-text {
+  font-size: 0.80em; font-weight: 500;
+  color: var(--text-sub); line-height: 1.3;
+}
+.icon-check:hover {
+  background: var(--green-pale);
+  border-color: var(--green-light);
+}
+.icon-check.selected {
+  background: var(--green-pale);
+  border-color: var(--green-mid);
+  box-shadow: 0 0 0 3px rgba(46,139,95,.12);
+}
+.icon-check.selected .ic-text { color: var(--green-dark); font-weight: 700; }
+
+/* ===== 添付資料案内 ===== */
+.attach-note-block {
+  display: flex; align-items: flex-start; gap: 14px;
+  background: #f8f5ff;
+  border: 2px dashed #c5b8e8;
+  border-radius: var(--radius-sm);
+  padding: 16px 18px;
+}
+.attach-note-icon { font-size: 1.8em; flex-shrink: 0; }
+
+/* ===== フィードバック ===== */
+.field-fb {
+  margin-top: 8px;
+  font-size: 0.82em; border-radius: 6px;
+  padding: 0; height: 0; overflow: hidden;
+  transition: all .3s;
+}
+.field-fb.show {
+  padding: 8px 12px;
+  height: auto;
+}
+.field-fb.fb-good    { background: #e8f7f0; color: var(--green-dark); border-left: 3px solid var(--green-light); }
+.field-fb.fb-warn    { background: #fff8e1; color: #7c5700; border-left: 3px solid #ffc107; }
+.field-fb.fb-tip     { background: var(--green-pale); color: var(--green-dark); border-left: 3px solid var(--green-mid); }
+
+/* ===== ナビゲーションボタン ===== */
+.step-nav {
+  display: flex; gap: 12px;
+  margin-top: 36px; flex-wrap: wrap;
+}
+.btn-next, .btn-prev, .btn-preview {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 14px 24px;
+  border: none; border-radius: var(--radius-sm);
+  font-family: inherit; font-size: 0.97em; font-weight: 700;
+  cursor: pointer; transition: all var(--transition);
+  line-height: 1;
+}
+.btn-next {
+  background: var(--green-mid); color: white;
+  flex: 1;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(46,139,95,.3);
+}
+.btn-next:hover   { background: var(--green-dark); box-shadow: 0 6px 18px rgba(46,139,95,.35); }
+.btn-next:active  { transform: scale(.97); }
+.btn-prev {
+  background: #e8f0eb; color: var(--text-sub);
+  min-width: 100px;
+}
+.btn-prev:hover  { background: var(--green-border); }
+.btn-preview {
+  background: var(--green-dark); color: white;
+  flex: 1; justify-content: center;
+  box-shadow: 0 4px 12px rgba(27,107,74,.3);
+}
+.btn-preview:hover  { opacity: .88; }
+.btn-preview:active { transform: scale(.97); }
+
+.sub-action-row {
+  display: flex; gap: 12px;
+  justify-content: center; flex-wrap: wrap;
+  margin-top: 16px;
+}
+.btn-secondary {
+  background: #ecf3ef; color: var(--text-sub);
+  border: 1.5px solid var(--green-border);
+  padding: 10px 20px; border-radius: var(--radius-sm);
+  font-family: inherit; font-size: 0.88em; font-weight: 600;
+  cursor: pointer; transition: all var(--transition);
+}
+.btn-secondary:hover { background: var(--green-pale); border-color: var(--green-mid); }
+
+/* 入力クリアボタン */
+.btn-clear-step {
+  background: var(--bg-card);
+  color: #7a5c52;
+  border: 1.5px solid #ddc9c4;
+  border-radius: var(--radius-sm);
+  padding: 10px 18px;
+  font-family: inherit;
+  font-size: 0.88em;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background var(--transition), border-color var(--transition), color var(--transition);
+}
+.btn-clear-step:hover  { background: #fdf0ed; border-color: #c0897a; color: #5a3a2e; }
+.btn-clear-step:active { transform: scale(.97); }
+
+/* ステップ5の sub-action-row：2ボタン並び */
+.sub-action-row--step5 {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* ===== 終了画面 ===== */
+.end-screen {
+  display: none; max-width: 680px; margin: 0 auto;
+  padding: 60px 24px;
+  text-align: center;
+  animation: stepIn .4s ease;
+}
+.end-screen.active { display: block; }
+.end-inner {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  padding: 48px 32px;
+  box-shadow: var(--shadow-md);
+}
+.end-icon { font-size: 4em; margin-bottom: 20px; }
+.end-title { font-size: 1.6em; font-weight: 700; color: var(--green-dark); margin-bottom: 14px; }
+.end-body {
+  font-size: .95em; color: var(--text-sub);
+  line-height: 2; margin-bottom: 32px;
+}
+.end-body strong { color: var(--green-mid); }
+.btn-restart {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--green-pale); color: var(--green-dark);
+  border: 2px solid var(--green-mid);
+  padding: 12px 28px; border-radius: var(--radius-sm);
+  font-family: inherit; font-size: .95em; font-weight: 700;
+  cursor: pointer; transition: all var(--transition);
+}
+.btn-restart:hover { background: var(--green-border); }
+
+/* ===== モーダル共通 ===== */
+.modal-overlay {
+  display: none; position: fixed;
+  inset: 0; background: rgba(0,0,0,.5);
+  z-index: 1000; align-items: center; justify-content: center;
+  padding: 16px;
+}
+.modal-overlay.active { display: flex; }
+.modal {
+  background: white; border-radius: var(--radius-lg);
+  padding: 28px; max-width: 640px; width: 100%;
+  max-height: 88vh; overflow-y: auto;
+  box-shadow: var(--shadow-md);
+  animation: stepIn .3s ease;
+}
+.modal h2 { color: var(--green-dark); margin-bottom: 10px; font-size: 1.1em; }
+.modal pre {
+  background: #f4f8f6; padding: 14px; border-radius: 8px;
+  font-size: .80em; white-space: pre-wrap; line-height: 1.75;
+  font-family: 'Courier New', monospace; border: 1px solid var(--green-border);
+  max-height: 320px; overflow-y: auto;
+}
+.modal-btn-row { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+.btn-mail  { background: var(--green-mid); color: white; padding: 12px 20px; border: none; border-radius: 8px; font-family: inherit; font-size: .95em; font-weight: 700; cursor: pointer; }
+.btn-close { background: #6b8c7a; color: white; padding: 12px 20px; border: none; border-radius: 8px; font-family: inherit; font-size: .95em; font-weight: 700; cursor: pointer; }
+.btn-mail:hover  { background: var(--green-dark); }
+.btn-close:hover { background: #4a6b58; }
+
+/* メールモーダル内のデフォルト送信先表示 */
+.mail-default-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--green-pale);
+  border: 1px solid var(--green-border);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  font-size: 0.88em;
+}
+.mail-default-label { color: var(--text-sub); font-weight: 500; white-space: nowrap; }
+.mail-default-addr  { color: var(--green-dark); font-weight: 700; word-break: break-all; }
+
+/* ===== アンケートモーダル ===== */
+.survey-modal-overlay {
+  display: none; position: fixed;
+  inset: 0; background: rgba(0,0,0,.5);
+  z-index: 1500; align-items: center; justify-content: center;
+  padding: 16px;
+}
+.survey-modal-overlay.active { display: flex; }
+.survey-modal {
+  background: white; border-radius: var(--radius-lg);
+  padding: 28px; max-width: 640px; width: 100%;
+  max-height: 88vh; overflow-y: auto;
+  box-shadow: var(--shadow-md);
+  animation: stepIn .3s ease;
+}
+.survey-modal h2 { color: var(--green-dark); margin-bottom: 8px; font-size: 1.1em; }
+
+/* アンケート内の設問（変更なし互換） */
+.q-block { margin-bottom: 22px; }
+.q-label { display: block; font-size: .93em; font-weight: 700; margin-bottom: 6px; color: #2c3e50; }
+.q-hint  { font-size: .79em; color: #888; margin-bottom: 8px; }
+.radio-group, .check-group { display: flex; flex-direction: column; gap: 7px; }
+.radio-group label, .check-group label {
+  display: flex; align-items: flex-start; gap: 10px;
+  font-size: .89em; cursor: pointer;
+  padding: 9px 13px;
+  border: 1.5px solid var(--green-border); border-radius: 7px;
+  transition: all .2s; background: #fdfefe;
+}
+.radio-group label:hover, .check-group label:hover { background: var(--green-pale); border-color: var(--green-light); }
+.radio-group label.selected, .check-group label.selected {
+  background: var(--green-pale); border-color: var(--green-mid);
+  box-shadow: 0 0 0 2px rgba(76,175,136,.18);
+}
+.radio-group input, .check-group input { margin-top: 2px; accent-color: var(--green-mid); flex-shrink: 0; }
+
+/* SUSセクション */
+.sus-section {
+  margin-top: 28px; padding: 18px;
+  background: #f0f9f4; border: 2px solid var(--green-mid); border-radius: 10px;
+}
+.sus-section-title { font-size: 1em; font-weight: 700; color: var(--green-dark); margin-bottom: 6px; }
+.sus-section-desc  { font-size: .82em; color: #666; margin-bottom: 16px; line-height: 1.7; }
+.sus-row label { padding: 7px 12px; font-size: .87em; }
+
+/* ===== 感謝モーダル ===== */
+.thank-modal-overlay {
+  display: none; position: fixed;
+  inset: 0; background: rgba(0,0,0,.55);
+  z-index: 2000; align-items: center; justify-content: center;
+  padding: 16px;
+}
+.thank-modal-overlay.active { display: flex; }
+.thank-modal {
+  background: white; border-radius: 20px;
+  padding: 44px 32px; max-width: 440px; width: 100%;
+  text-align: center;
+  box-shadow: 0 12px 48px rgba(0,0,0,.2);
+  animation: thankPop .5s cubic-bezier(.175,.885,.32,1.275);
+}
+@keyframes thankPop {
+  0%   { opacity: 0; transform: scale(.7); }
+  80%  { transform: scale(1.04); }
+  100% { opacity: 1; transform: scale(1); }
+}
+.thank-icon  { font-size: 4em; margin-bottom: 16px; }
+.thank-title { font-size: 1.4em; font-weight: 700; color: var(--green-dark); margin-bottom: 12px; }
+.thank-body  { font-size: .92em; color: #555; line-height: 1.9; margin-bottom: 16px; }
+.thank-body strong { color: var(--green-mid); }
+.thank-reply-box {
+  background: var(--green-pale); border-left: 4px solid var(--green-mid);
+  border-radius: 8px; padding: 12px 16px;
+  margin: 0 0 22px; font-size: .88em; color: var(--green-dark);
+  text-align: left; line-height: 1.7;
+}
+.thank-reply-box .reply-email { font-weight: 700; word-break: break-all; color: var(--green-dark); }
+.thank-btn-row { display: flex; flex-direction: column; gap: 10px; }
+.btn-new-idea {
+  background: linear-gradient(135deg, var(--green-dark), var(--green-light));
+  color: white; padding: 13px 20px;
+  border: none; border-radius: 10px;
+  font-size: .95em; font-weight: 700;
+  cursor: pointer; font-family: inherit;
+  transition: opacity .2s;
+}
+.btn-new-idea:hover { opacity: .88; }
+.btn-just-close {
+  background: #ecf0f1; color: #777;
+  padding: 10px 20px;
+  border: none; border-radius: 10px;
+  font-size: .88em; cursor: pointer; font-family: inherit;
+}
+.btn-just-close:hover { opacity: .75; }
+
+/* ===== レスポンシブ ===== */
+
+/* ---- iPad / タブレット (601px〜1024px) ---- */
+@media (min-width: 601px) and (max-width: 1024px) {
+  .main-wrap { max-width: 720px; padding: 0 24px 60px; }
+  .card-radio-group { grid-template-columns: repeat(3, 1fr); }
+  .card-check-group { grid-template-columns: repeat(2, 1fr); }
+  .icon-check-group { grid-template-columns: repeat(4, 1fr); }
+  .freq-group { gap: 8px; }
+  .site-header { padding: 12px 20px 14px; }
+  .roadmap-inner { padding: 10px 16px; }
+}
+
+/* ---- スマートフォン (〜600px) ---- */
+@media (max-width: 600px) {
+  .site-header { padding: 10px 12px 12px; }
+  .header-brand { gap: 6px; }
+  .brand-logo { max-height: 48px; }
+  .brand-title { font-size: 1.55em; }
+  .brand-sub   { font-size: 0.78em; }
+  .header-desc { font-size: 0.74em; padding: 7px 10px; }
+
+  .roadmap-inner { padding: 8px 6px; gap: 0; }
+  .rm-icon  { width: 28px; height: 28px; font-size: .85em; }
+  .rm-label { font-size: 0.50em; }
+  .roadmap-line { flex: 0 0 12px; }
+
+  .main-wrap { padding: 0 10px 60px; }
+  .step-header { padding: 20px 0 14px; }
+  .step-title  { font-size: 1.1em; }
+  .pico-label-large { font-size: 1.05em; }
+  .pico-tag-large { width: 26px; height: 26px; font-size: .9em; }
+
+  select, input[type="text"], input[type="email"], textarea {
+    font-size: 16px;
+    padding: 12px 14px;
   }
 
-  if (currentRecognition) {
-    stopVoice();
-    return;
+  .card-radio-group { grid-template-columns: 1fr 1fr; }
+  .card-radio { padding: 10px 12px; font-size: .88em; min-height: 46px; }
+  .card-check-group { grid-template-columns: 1fr; }
+  .card-check { padding: 11px 14px; }
+  .icon-check-group { grid-template-columns: repeat(3, 1fr); }
+  .icon-check-inner { padding: 10px 8px; }
+  .ic-emoji { font-size: 1.3em; }
+  .ic-text  { font-size: .72em; }
+
+  .freq-group { flex-wrap: wrap; gap: 7px; }
+  .freq-card  { min-width: 70px; padding: 10px 8px; font-size: .80em; }
+
+  .step-nav { flex-direction: column; gap: 10px; }
+  .btn-next, .btn-prev, .btn-preview {
+    width: 100%; justify-content: center;
+    padding: 14px 16px;
   }
+  .sub-action-row { flex-direction: column; gap: 8px; }
+  .btn-secondary { width: 100%; text-align: center; }
+  .btn-clear-step { width: 100%; text-align: center; }
+  .sub-action-row--step5 { flex-direction: column; }
 
-  const ta = document.getElementById(targetId);
-  const btn =
-    document.querySelector(`[data-mic-target="${targetId}"]`) ||
-    document.querySelector(`button[onclick*="startVoice('${targetId}')"]`) ||
-    document.querySelector(`button[onclick*='startVoice("${targetId}")']`);
+  .modal, .survey-modal { padding: 18px 14px; border-radius: 12px; }
+  .modal pre { font-size: .74em; }
+  .thank-modal { padding: 28px 16px; border-radius: 16px; }
+  .thank-title { font-size: 1.2em; }
+  .thank-body  { font-size: .86em; }
+  .btn-mail, .btn-close { padding: 12px 16px; font-size: .88em; width: 100%; }
+  .modal-btn-row { flex-direction: column; gap: 8px; }
+  .mail-default-info { flex-direction: column; align-items: flex-start; gap: 2px; }
+  .end-inner { padding: 32px 18px; }
+}
 
-  const status = document.getElementById('voiceStatus');
+/* ---- 極小端末 (〜380px) ---- */
+@media (max-width: 380px) {
+  .icon-check-group { grid-template-columns: repeat(2, 1fr); }
+  .card-radio-group { grid-template-columns: 1fr; }
+  .freq-card { min-width: 60px; font-size: .75em; }
+}
 
-  const recognition = new SpeechRecognition();
-  recognition.lang = 'ja-JP';
-  recognition.interimResults = true;
-  recognition.continuous = true;
-  recognition.maxAlternatives = 1;
+/* ---- 送信後の「入力内容を確認する」ボタン グレーアウト ---- */
+.btn-preview:disabled,
+.btn-preview.btn-grayed {
+  background: #9e9e9e !important;
+  cursor: not-allowed;
+  box-shadow: none;
+  opacity: 0.6;
+  pointer-events: none;
+}
 
-  currentRecognition = recognition;
-  currentMicBtn = btn;
-  currentTargetId = targetId;
+/* ---- ステップ説明メモ ---- */
+.step-note {
+  font-size: 0.83em;
+  color: #777;
+  margin: -6px 0 14px;
+  padding: 6px 10px;
+  background: #f5f5f5;
+  border-radius: 6px;
+}
 
-  if (btn) btn.classList.add('btn-mic--active');
-  if (status) status.style.display = 'flex';
+/* ---- テキストエリア＋マイクラッパー ---- */
+.textarea-mic-wrap {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.textarea-mic-wrap textarea {
+  flex: 1;
+  min-width: 0;
+}
 
-  if (ta) {
-    if (interimSpan) interimSpan.remove();
-    interimSpan = document.createElement('div');
-    interimSpan.id = 'voiceInterim';
-    interimSpan.style.cssText =
-      'font-size:0.8em;color:#888;min-height:1.2em;padding:2px 4px;margin-top:2px;';
-    const wrap = ta.parentNode;
-    wrap.parentNode.insertBefore(interimSpan, wrap.nextSibling);
+/* ---- マイクボタン ---- */
+.btn-mic {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1.5px solid #4caf88;
+  background: #fff;
+  color: #2e7d58;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, box-shadow 0.15s;
+  margin-top: 4px;
+}
+.btn-mic:hover  { background: #edf7f2; }
+.btn-mic--active {
+  background: #e53935 !important;
+  border-color: #e53935 !important;
+  color: #fff !important;
+  animation: mic-pulse 1s ease-in-out infinite;
+}
+@keyframes mic-pulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(229,57,53,0.4); }
+  50%      { box-shadow: 0 0 0 8px rgba(229,57,53,0); }
+}
+
+/* ---- 音声入力ステータスバー ---- */
+.voice-status {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(30,30,30,0.88);
+  color: #fff;
+  padding: 10px 22px;
+  border-radius: 24px;
+  font-size: 0.88em;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 9999;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+}
+.voice-dot {
+  width: 10px;
+  height: 10px;
+  background: #e53935;
+  border-radius: 50%;
+  animation: mic-pulse 1s ease-in-out infinite;
+}
+
+/* ---- モーダル フッター行（戻る・終了） ---- */
+.modal-footer-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+  justify-content: space-between;
+}
+.btn-back-active {
+  flex: 1;
+  padding: 12px 18px;
+  background: #4caf88;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.92em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+}
+.btn-back-active:hover  { background: #3d9c76; }
+.btn-back-active:active { transform: scale(0.97); }
+.btn-end-footer {
+  flex: 1;
+  padding: 12px 18px;
+  background: #eceff1;
+  color: #455a64;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.92em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+}
+.btn-end-footer:hover  { background: #cfd8dc; }
+.btn-end-footer:active { transform: scale(0.97); }
+
+@media (max-width: 520px) {
+  .modal-footer-row { flex-direction: column; }
+  .btn-mic { width: 36px; height: 36px; font-size: 16px; }
+}
+
+/* 既存の変数・ベーススタイルなどはそのまま */
+
+/* ============================================================
+   中央パネルメニュー（基本情報＋P/C/I/O）
+============================================================ */
+
+.puzzle-menu-wrap {
+  max-width: 680px;
+  margin: 24px auto 12px;
+  padding: 16px 16px 8px;
+}
+
+/* 上部：横長メインパネル（基本情報） */
+.panel-main {
+  width: 100%;
+  border-radius: 16px;
+  border: 2px solid var(--green-mid);
+  background: var(--green-pale);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(46,139,95,.25);
+  transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+}
+
+.panel-main-emoji {
+  font-size: 2.0em;
+  flex-shrink: 0;
+}
+
+.panel-main-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.panel-main-title {
+  font-size: 0.98em;
+  font-weight: 700;
+  color: var(--green-dark);
+}
+
+.panel-main-sub {
+  font-size: 0.80em;
+  color: var(--text-sub);
+}
+
+.panel-main:hover {
+  background: #e0f7ec;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(46,139,95,.35);
+}
+.panel-main:active {
+  transform: scale(.97);
+}
+
+/* 下段：P/C/I/O 2×2 グリッド */
+.panel-grid {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.panel-item {
+  border-radius: 14px;
+  border: 2px solid var(--green-border);
+  background: #ffffff;
+  padding: 10px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,.06);
+  transition: transform .15s ease, box-shadow .15s ease, background .15s ease, border-color .15s ease;
+}
+
+.panel-emoji {
+  font-size: 1.3em;
+}
+
+.panel-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.86em;
+  color: var(--text-main);
+  font-weight: 600;
+}
+
+.panel-desc {
+  font-size: 0.75em;
+  color: var(--text-muted);
+}
+
+.panel-item:hover {
+  background: var(--green-pale);
+  border-color: var(--green-mid);
+  box-shadow: 0 4px 12px rgba(46,139,95,.18);
+  transform: translateY(-1px);
+}
+.panel-item:active {
+  transform: scale(.97);
+}
+
+/* 中央パネルメニュー（基本情報＋P/C/I/O） */
+/* ...既存の panel-main, panel-item などはそのまま... */
+
+/* パネル内の進捗表示 */
+.panel-main-progress {
+  margin-top: 4px;
+  font-size: 0.75em;
+  color: var(--green-dark);
+  font-weight: 600;
+}
+
+.panel-item-progress {
+  margin-top: 4px;
+  font-size: 0.72em;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+/* ステップごとの「その場メモ」ふせん */
+.step-memo {
+  position: relative;
+  background: #fff9c4;
+  border-radius: 10px 10px 12px 10px;
+  padding: 8px 10px 10px;
+  box-shadow: 0 3px 6px rgba(0,0,0,.12);
+  border: 1px solid #f0e2a0;
+  margin-top: 6px;
+}
+
+.step-memo::before {
+  content: '';
+  position: absolute;
+  top: -7px;
+  left: 14px;
+  width: 40px;
+  height: 14px;
+  background: rgba(255,255,255,.6);
+  border-radius: 7px;
+  box-shadow: 0 2px 4px rgba(0,0,0,.15);
+}
+
+.step-memo-label {
+  font-size: 0.78em;
+  font-weight: 600;
+  color: #6d5e10;
+  margin-bottom: 4px;
+}
+
+.step-memo-textarea {
+  width: 100%;
+  border: none;
+  background: transparent;
+  resize: vertical;
+  min-height: 46px;
+  max-height: 120px;
+  font-family: inherit;
+  font-size: 0.85em;
+  line-height: 1.6;
+  color: var(--text-main);
+  padding: 2px 1px 0;
+}
+
+.step-memo-textarea:focus {
+  outline: none;
+}
+
+/* テキストエリア＋マイクラッパー */
+.textarea-mic-wrap {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.textarea-mic-wrap textarea {
+  flex: 1;
+  min-width: 0;
+}
+
+/* マイクボタン */
+.btn-mic {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1.5px solid #4caf88;
+  background: #fff;
+  color: #2e7d58;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, box-shadow 0.15s;
+  margin-top: 4px;
+}
+.btn-mic:hover  { background: #edf7f2; }
+.btn-mic--active {
+  background: #e53935 !important;
+  border-color: #e53935 !important;
+  color: #fff !important;
+  animation: mic-pulse 1s ease-in-out infinite;
+}
+@keyframes mic-pulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(229,57,53,0.4); }
+  50%      { box-shadow: 0 0 0 8px rgba(229,57,53,0); }
+}
+
+/* 音声入力ステータス */
+#voiceStatus {
+  position: fixed;
+  left: 50%;
+  bottom: 16px;
+  transform: translateX(-50%);
+  background: #333;
+  color: #fff;
+  font-size: 0.82em;
+  padding: 8px 14px;
+  border-radius: 20px;
+  box-shadow: 0 3px 8px rgba(0,0,0,.35);
+  cursor: pointer;
+  display: none;
+  z-index: 2000;
+}
+#voiceStatus span {
+  white-space: nowrap;
+}
+
+/* メニュー下説明テキスト */
+.puzzle-hint {
+  margin-top: 14px;
+  font-size: 0.80em;
+  color: var(--text-muted);
+  line-height: 1.7;
+}
+
+/* スマホ向け微調整 */
+@media (max-width: 480px) {
+  .puzzle-menu-wrap {
+    margin: 18px auto 6px;
+    padding: 12px 10px 6px;
   }
-
-  const baseText = ta ? ta.value : '';
-
-  recognition.onresult = (e) => {
-    let interim = '';
-    let finalText = '';
-
-    for (let i = e.resultIndex; i < e.results.length; i++) {
-      const transcript = e.results[i][0].transcript;
-      if (e.results[i].isFinal) {
-        finalText += transcript;
-      } else {
-        interim += transcript;
-      }
-    }
-
-    if (interimSpan) {
-      interimSpan.textContent = interim ? `🎤 ${interim}` : '';
-    }
-
-    if (finalText && ta) {
-      ta.value = baseText + (ta.value.slice(baseText.length) || '') + finalText;
-      if (interimSpan) interimSpan.textContent = '';
-      updateProgress();
-      ta.dispatchEvent(new Event('input', { bubbles: true }));
-    }
-  };
-
-  recognition.onerror = (e) => {
-    if (e.error === 'aborted') return;
-
-    if (e.error === 'no-speech') {
-      try { recognition.stop(); } catch (_) {}
-      return;
-    }
-
-    if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
-      alert('マイクへのアクセスが拒否されています。\nブラウザのアドレスバー左のマイクアイコンから許可してください。');
-    } else {
-      alert('音声認識エラー：' + e.error);
-    }
-
-    if (currentRecognition === recognition) stopVoiceUI();
-  };
-
-  recognition.onend = () => {
-    if (currentRecognition !== recognition) return;
-    try {
-      recognition.start();
-    } catch (_) {
-      stopVoiceUI();
-    }
-  };
-
-  if (status) status.onclick = stopVoice;
-
-  try {
-    recognition.start();
-  } catch (e) {
-    alert('音声認識を開始できませんでした：' + e.message);
-    stopVoiceUI();
+  .panel-main {
+    padding: 12px 12px;
+    border-radius: 14px;
   }
-}
-
-function stopVoice() {
-  const rec = currentRecognition;
-  stopVoiceUI();
-  if (rec) {
-    try { rec.abort(); } catch (_) {}
+  .panel-main-emoji {
+    font-size: 1.6em;
   }
-}
-
-function stopVoiceUI() {
-  currentRecognition = null;
-  currentTargetId = null;
-
-  if (currentMicBtn) {
-    currentMicBtn.classList.remove('btn-mic--active');
-    currentMicBtn = null;
+  .panel-main-title {
+    font-size: 0.92em;
   }
-
-  if (interimSpan) {
-    interimSpan.remove();
-    interimSpan = null;
+  .panel-main-sub {
+    font-size: 0.74em;
   }
-
-  const status = document.getElementById('voiceStatus');
-  if (status) {
-    status.style.display = 'none';
-    status.onclick = null;
+  .panel-grid {
+    gap: 8px;
   }
-}
-
-// ============================================================
-// UI ヘルパー
-// ============================================================
-const FORM_UI_IDS = ['picoRoadmap', 'progressWrap', 'navigator', 'ideaForm'];
-
-function hideFormUI() {
-  FORM_UI_IDS.forEach((id) => {
-    const el = document.getElementById(id);
-    if (el) el.style.display = 'none';
-  });
-}
-
-function showFormUI() {
-  FORM_UI_IDS.forEach((id) => {
-    const el = document.getElementById(id);
-    if (el) el.style.display = '';
-  });
-}
-
-// ============================================================
-// ステップ管理
-// ============================================================
-let currentStep = 0;
-const TOTAL_STEPS = 5;
-
-const NAV_MESSAGES = [
-  '発案者の基本情報を確認・入力してください（すべて任意）。',
-  '誰が・どのような場面で困っているかを発案者から聞き取り、記録してください。',
-  '現在どのように対応しているかを発案者から聞き取り、記録してください。',
-  '発案者のアイデアを聞き取り、できるだけ原文に忠実に記録してください。',
-  'このアイデアで何が変わりそうかを発案者と一緒に確認してください。'
-];
-
-function showStep(step) {
-  stopVoice();
-
-  document.querySelectorAll('.step-section').forEach((section, i) => {
-    section.classList.toggle('active', i === step);
-  });
-
-  for (let i = 0; i < TOTAL_STEPS; i++) {
-    const rm = document.getElementById(`rm${i}`);
-    if (!rm) continue;
-
-    rm.className = 'roadmap-step';
-    if (i < step) rm.classList.add('done');
-    if (i === step) rm.classList.add('active');
-
-    if (i < TOTAL_STEPS - 1) {
-      const line = document.getElementById(`rml${i}`);
-      if (line) line.className = 'roadmap-line' + (i < step ? ' done' : '');
-    }
+  .panel-item {
+    padding: 9px 8px;
   }
-
-  const bubble = document.getElementById('navBubble');
-  if (bubble) bubble.innerHTML = NAV_MESSAGES[step];
-
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-  currentStep = step;
-}
-
-// 任意入力なので必須チェックはなし
-const STEP_REQUIRED = [() => [], () => [], () => [], () => [], () => []];
-
-function goNext(step) {
-  const errs = STEP_REQUIRED[step]();
-  if (errs.length > 0) {
-    alert('入力内容を確認してください：\n\n' + errs.join('\n'));
-    return;
+  .panel-label {
+    font-size: 0.80em;
   }
-  if (step < TOTAL_STEPS - 1) showStep(step + 1);
-}
-
-function goPrev(step) {
-  if (step > 0) showStep(step - 1);
-}
-
-// ============================================================
-// ユーティリティ
-// ============================================================
-function getVal(id) {
-  return (document.getElementById(id) || { value: '' }).value.trim();
-}
-
-function getRadio(name) {
-  const el = document.querySelector(`input[name="${name}"]:checked`);
-  return el ? el.value : '';
-}
-
-function getChecks(name) {
-  return [...document.querySelectorAll(`input[name="${name}"]:checked`)].map((e) => e.value);
-}
-
-function getQ3Value() {
-  const v = getRadio('q3');
-  return v === 'その他' ? `その他（${getVal('q3-other-text')}）` : (v || '');
-}
-
-function getQ4Value() {
-  const v = getRadio('q4');
-  return v === 'その他' ? `その他（${getVal('q4-other-text')}）` : (v || '');
-}
-
-function getQ6Values() {
-  return getChecks('q6').map((v) =>
-    v === 'その他' ? `その他（${getVal('q6-other-text')}）` : v
-  );
-}
-
-function getQ9Values() {
-  return getChecks('q9').map((v) =>
-    v === 'その他' ? `その他（${getVal('q9-other-text')}）` : v
-  );
-}
-
-function getQ12Values() {
-  return getChecks('q12').map((v) =>
-    v === 'その他' ? `その他（${getVal('q12-other-text')}）` : v
-  );
-}
-
-function getIdeaTypes() {
-  return getChecks('q10_type');
-}
-
-// ============================================================
-// ステップ別進捗対象の定義
-// ============================================================
-const STEP_ITEMS = {
-  0: [
-    () => getVal('q1'),
-    () => getVal('q2'),
-    () => getVal('q2b'),
-    () => getQ3Value()
-  ],
-  1: [
-    () => getQ4Value(),
-    () => getRadio('q5'),
-    () => (getQ6Values().length > 0 ? '1' : ''),
-    () => getVal('q7')
-  ],
-  2: [
-    () => getVal('q8'),
-    () => (getQ9Values().length > 0 ? '1' : '')
-  ],
-  3: [
-    () => getVal('q10'),
-    () => (getIdeaTypes().length > 0 ? '1' : ''),
-    () => getVal('q10_detail'),
-    () => getVal('q10_ref'),
-    () => getVal('q10_concern')
-  ],
-  4: [
-    () => (getQ12Values().length > 0 ? '1' : ''),
-    () => getVal('q13')
-  ]
-};
-
-// ============================================================
-// プログレスバー
-// ============================================================
-function updateProgress() {
-  if (!startTime) startTime = new Date();
-
-  const items = [
-    getVal('q1'),
-    getVal('q2'),
-    getVal('q2b'),
-    getQ3Value(),
-    getQ4Value(),
-    getRadio('q5'),
-    getChecks('q6').length > 0 ? '1' : '',
-    getVal('q7'),
-    getVal('q8'),
-    getQ9Values().length > 0 ? '1' : '',
-    getVal('q10'),
-    getChecks('q12').length > 0 ? '1' : '',
-    getVal('q13')
-  ];
-
-  const filled = items.filter((v) => v !== '').length;
-  const pct = Math.round((filled / items.length) * 100);
-
-  const label = document.getElementById('progress-label');
-  const pctEl = document.getElementById('progress-pct');
-  const fill = document.getElementById('progressFill');
-
-  if (label) {
-    label.textContent =
-      filled === 0
-        ? '書きやすいところから少しずつ記録を始めてください'
-        : `フォーム全体の ${filled} / ${items.length} ピースが記録済みです`;
-  }
-  if (pctEl) pctEl.textContent = `${pct}%`;
-  if (fill) fill.style.width = `${pct}%`;
-
-  for (let step = 0; step <= 4; step++) {
-    const defs = STEP_ITEMS[step];
-    if (!defs) continue;
-
-    const vals = defs.map((fn) => fn()).filter((v) => v !== '');
-    const stepPct = Math.round((vals.length / defs.length) * 100);
-    const panelEl = document.getElementById(`panelProgress${step}`);
-
-    if (panelEl) {
-      panelEl.textContent = `${stepPct}%`;
-    }
-  }
-}
-
-// ============================================================
-// 入力イベント
-// ============================================================
-function showFieldFb(id, text, cls) {
-  const el = document.getElementById(`fb-${id}`);
-  if (!el) return;
-
-  el.textContent = text || '';
-  el.className = 'field-fb';
-
-  if (text) {
-    el.classList.add('show');
-    if (cls) el.classList.add(cls);
-  }
-}
-
-function onSelectChange() {
-  updateProgress();
-}
-
-function onTextInput() {
-  updateProgress();
-}
-
-function onEmailInput() {
-  updateProgress();
-}
-
-function onTextareaInput() {
-  updateProgress();
-}
-
-function onIdeaInput() {
-  updateProgress();
-  updateIdeaCharCount();
-}
-
-// ============================================================
-// ラジオ・チェックUI同期
-// ============================================================
-function onRadioChange(groupName) {
-  if (groupName === 'q3') {
-    syncCardRadio('q3');
-    toggleOtherInputRadio('q3-other-check', 'q3-other-wrap');
-  } else if (groupName === 'q4') {
-    syncCardRadio('q4');
-    toggleOtherInputRadio('q4-other-check', 'q4-other-wrap');
-  } else if (groupName === 'q5') {
-    syncFreqCards();
-  }
-
-  updateProgress();
-}
-
-function onCheckChange(groupId) {
-  updateProgress();
-  syncCardCheck(groupId);
-
-  if (groupId === 'q6') {
-    toggleOtherInput('q6-other-check', 'q6-other-wrap');
-  } else if (groupId === 'q9') {
-    toggleOtherInput('q9-other-check', 'q9-other-wrap');
-  } else if (groupId === 'q12') {
-    toggleOtherInput('q12-other-check', 'q12-other-wrap');
-  }
-}
-
-function syncCardRadio(groupId) {
-  const wrap = document.getElementById(groupId);
-  if (!wrap) return;
-
-  wrap.querySelectorAll('.card-radio').forEach((label) => {
-    const input = label.querySelector('input[type="radio"]');
-    label.classList.toggle('selected', !!input && input.checked);
-  });
-}
-
-function syncCardCheck(groupId) {
-  const wrap = document.getElementById(groupId);
-  if (!wrap) return;
-
-  wrap.querySelectorAll('.card-check').forEach((label) => {
-    const input = label.querySelector('input[type="checkbox"]');
-    label.classList.toggle('selected', !!input && input.checked);
-  });
-}
-
-function syncFreqCards() {
-  const group = document.getElementById('q5');
-  if (!group) return;
-
-  group.querySelectorAll('.freq-card').forEach((label) => {
-    const input = label.querySelector('input[type="radio"]');
-    label.classList.toggle('selected', !!input && input.checked);
-  });
-}
-
-function toggleOtherInput(checkId, wrapId) {
-  const chk = document.getElementById(checkId);
-  const wrap = document.getElementById(wrapId);
-  if (!chk || !wrap) return;
-  wrap.classList.toggle('show', chk.checked);
-}
-
-function toggleOtherInputRadio(checkId, wrapId) {
-  const chk = document.getElementById(checkId);
-  const wrap = document.getElementById(wrapId);
-  if (!chk || !wrap) return;
-  wrap.classList.toggle('show', chk.checked);
-}
-
-function highlightChecked(groupName) {
-  const wrap = document.getElementById(groupName);
-  if (!wrap) return;
-
-  wrap.querySelectorAll('.icon-check').forEach((label) => {
-    const input = label.querySelector('input[type="checkbox"]');
-    label.classList.toggle('selected', !!input && input.checked);
-  });
-
-  updateProgress();
-}
-
-function updateIdeaCharCount() {
-  const ta = document.getElementById('q10');
-  const cnt = document.getElementById('ideaCharCount');
-  if (!ta || !cnt) return;
-
-  const len = ta.value.length;
-  cnt.textContent = `${len}文字`;
-}
-
-// ============================================================
-// プレビュー用テキスト生成
-// ============================================================
-function buildText() {
-  const q6v = getQ6Values();
-  const q9v = getQ9Values();
-  const q12v = getQ12Values();
-  const ideaTypes = getIdeaTypes();
-
-  const memoP = getVal('memo_p');
-  const memoC = getVal('memo_c');
-  const memoI = getVal('memo_i');
-  const memoO = getVal('memo_o');
-
-  const endTime = new Date();
-  const diffMs = startTime ? endTime - startTime : 0;
-  const elapsed = startTime
-    ? `${Math.floor(diffMs / 60000)}分${Math.floor((diffMs % 60000) / 1000)}秒`
-    : '不明';
-
-  return [
-    '━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
-    '　Medical Innovation Triage — ヒアリング記録　',
-    '━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
-    '',
-    '【発案者情報】',
-    `所属部署　　　：${getVal('q1') || '（未記入）'}`,
-    `氏　　名　　　：${getVal('q2') || '（未記入）'}`,
-    `メールアドレス：${getVal('q2b') || '（未記入）'}`,
-    `職　　種　　　：${getQ3Value() || '（未選択）'}`,
-    '',
-    '【P：現場の困りごと・背景】',
-    `困っている対象：${getQ4Value() || '（未選択）'}`,
-    `発生頻度　　　：${getRadio('q5') || '（未選択）'}`,
-    `困りごと・影響：${q6v.join(' / ') || '（未選択）'}`,
-    `具体的な場面　：${getVal('q7') || '（未記入）'}`,
-    `Pに関するメモ：${memoP || '（なし）'}`,
-    '',
-    '【C：今の対応とその限界】',
-    `現在の対応　　　　：${getVal('q8') || '（未記入）'}`,
-    `うまくいっていない点：${q9v.length ? q9v.join(' / ') : '特になし'}`,
-    `Cに関するメモ：${memoC || '（なし）'}`,
-    '',
-    '【I：アイデア・ひらめき】',
-    `アイデア内容　：${getVal('q10') || '（未記入）'}`,
-    `アイデアの形　：${ideaTypes.length ? ideaTypes.join(' / ') : '（未選択）'}`,
-    `具体イメージ　：${getVal('q10_detail') || '（未記入）'}`,
-    `参考にしたもの：${getVal('q10_ref') || '（未記入）'}`,
-    `懸念・課題　　：${getVal('q10_concern') || '（未記入）'}`,
-    `Iに関するメモ：${memoI || '（なし）'}`,
-    '',
-    '【O：期待できる効果】',
-    `期待される改善：${q12v.join(' / ') || '（未選択）'}`,
-    `改善の規模感　：${getVal('q13') || '（未記入）'}`,
-    `Oに関するメモ：${memoO || '（なし）'}`,
-    '',
-    '━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
-    `記録日時　　　　　：${endTime.toLocaleString('ja-JP')}`,
-    `ヒアリング所要時間：${elapsed}`,
-    '━━━━━━━━━━━━━━━━━━━━━━━━━━━━'
-  ].join('\n');
-}
-
-// ============================================================
-// プレビュー・各種アクション
-// ============================================================
-function showPreview() {
-  const previewModal = document.getElementById('previewModal');
-  const previewText = document.getElementById('previewText');
-  if (!previewModal || !previewText) return;
-
-  previewText.textContent = buildText();
-  previewModal.classList.add('active');
-}
-
-function closePreviewModal() {
-  const previewModal = document.getElementById('previewModal');
-  if (previewModal) previewModal.classList.remove('active');
-}
-
-function actionSendMail() {
-  const mailModal = document.getElementById('mailModal');
-  const defDisp = document.getElementById('mailDefaultDisplay');
-
-  if (mailModal && defDisp) {
-    defDisp.textContent = DEFAULT_MAIL_TO;
-    mailModal.classList.add('active');
+  .panel-desc {
+    font-size: 0.72em;
   }
 }
 
-function closeMailModal() {
-  const mailModal = document.getElementById('mailModal');
-  if (mailModal) mailModal.classList.remove('active');
+/* それ以外の .step-header などは 0517-3 のまま */
+
+/* ============================================================
+   ヒアリング内容確認モーダル：アクションボタンレイアウト
+============================================================ */
+
+.modal-action-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 16px;
 }
 
-function onMailToInput() {
+/* 共通ボタンスタイル */
+.btn-action {
+  padding: 12px 10px;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.84em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s, box-shadow 0.15s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  line-height: 1.3;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  white-space: nowrap;
+}
+.btn-action:active {
+  transform: scale(0.96);
 }
 
-function doSendMail() {
-  const extra = getVal('mailTo');
-  const to = extra || DEFAULT_MAIL_TO;
-  const body = encodeURIComponent(buildText());
-  const subj = encodeURIComponent('MIT ヒアリング記録');
-  const addr = encodeURIComponent(to);
-
-  const url = `mailto:${addr}?subject=${subj}&body=${body}`;
-  window.location.href = url;
+/* 個別カラー */
+.btn-copy {
+  background: #e3f2fd;
+  color: #1565c0;
+}
+.btn-save {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+.btn-mail {
+  background: #fff3e0;
+  color: #e65100;
+}
+.btn-pdf {
+  background: #fce4ec;
+  color: #880e4f;
+}
+.btn-analyze {
+  background: #f3e5f5;
+  color: #6a1b9a;
 }
 
-function actionSaveToFolder() {
-  alert('テキスト保存機能は、現状ブラウザ上ではクリップボードコピー等で代替してください。');
+/* ホバー時の軽い強調 */
+.btn-action:hover {
+  opacity: 0.92;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.12);
 }
 
-function actionSavePDF() {
-  window.print();
-}
-
-function actionAnalyze() {
-  alert('分析ページ連携は未実装です。');
-}
-
-// ============================================================
-// ステップクリア・再スタート
-// ============================================================
-function clearStep(step) {
-  if (!confirm('このステップの入力内容をクリアしますか？')) return;
-
-  switch (step) {
-    case 0:
-      ['q1', 'q2', 'q2b'].forEach((id) => {
-        const el = document.getElementById(id);
-        if (el) el.value = '';
-      });
-      document.querySelectorAll('input[name="q3"]').forEach((el) => {
-        el.checked = false;
-      });
-      {
-        const otherText = document.getElementById('q3-other-text');
-        const otherWrap = document.getElementById('q3-other-wrap');
-        if (otherText) otherText.value = '';
-        if (otherWrap) otherWrap.classList.remove('show');
-      }
-      break;
-
-    case 1:
-      ['q4-other-text', 'q6-other-text', 'q7', 'memo_p'].forEach((id) => {
-        const el = document.getElementById(id);
-        if (el) el.value = '';
-      });
-      ['q4', 'q5', 'q6'].forEach((name) => {
-        document.querySelectorAll(`input[name="${name}"]`).forEach((el) => {
-          el.checked = false;
-        });
-      });
-      ['q4-other-wrap', 'q6-other-wrap'].forEach((id) => {
-        const el = document.getElementById(id);
-        if (el) el.classList.remove('show');
-      });
-      break;
-
-    case 2:
-      ['q8', 'q9-other-text', 'memo_c'].forEach((id) => {
-        const el = document.getElementById(id);
-        if (el) el.value = '';
-      });
-      document.querySelectorAll('input[name="q9"]').forEach((el) => {
-        el.checked = false;
-      });
-      {
-        const w9 = document.getElementById('q9-other-wrap');
-        if (w9) w9.classList.remove('show');
-      }
-      break;
-
-    case 3:
-      ['q10', 'q10_detail', 'q10_ref', 'q10_concern', 'memo_i'].forEach((id) => {
-        const el = document.getElementById(id);
-        if (el) el.value = '';
-      });
-      document.querySelectorAll('input[name="q10_type"]').forEach((el) => {
-        el.checked = false;
-      });
-      break;
-
-    case 4:
-      ['q12-other-text', 'q13', 'memo_o'].forEach((id) => {
-        const el = document.getElementById(id);
-        if (el) el.value = '';
-      });
-      document.querySelectorAll('input[name="q12"]').forEach((el) => {
-        el.checked = false;
-      });
-      {
-        const w12 = document.getElementById('q12-other-wrap');
-        if (w12) w12.classList.remove('show');
-      }
-      break;
+/* モバイル時：2列にして詰まりすぎを防ぐ */
+@media (max-width: 520px) {
+  .modal-action-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
   }
-
-  syncCardRadio('q3');
-  syncCardRadio('q4');
-  syncFreqCards();
-  syncCardCheck('q6');
-  syncCardCheck('q9');
-  syncCardCheck('q12');
-  highlightChecked('q10type');
-
-  updateProgress();
+  .btn-action {
+    font-size: 0.80em;
+    padding: 10px 8px;
+    white-space: normal;
+  }
 }
 
-function restartFromEnd() {
-  const end = document.getElementById('endScreen');
-  if (end) end.classList.remove('active');
+/* ・・・既存のCSSはそのまま・・・ */
 
-  showFormUI();
-  showStep(0);
-  updateProgress();
+/* ===== ステップごとの「その場メモ」ふせん ===== */
+.step-memo {
+  position: relative;
+  background: #fff9c4;
+  border-radius: 10px 10px 12px 10px;
+  padding: 8px 10px 10px;
+  box-shadow: 0 3px 6px rgba(0,0,0,.12);
+  border: 1px solid #f0e2a0;
+  margin-top: 6px;
 }
 
-// ============================================================
-// 初期化
-// ============================================================
-document.addEventListener('DOMContentLoaded', () => {
-  document.querySelectorAll('.roadmap-step').forEach((stepEl) => {
-    stepEl.style.cursor = 'pointer';
-    stepEl.addEventListener('click', () => {
-      const target = parseInt(stepEl.getAttribute('data-step'), 10);
-      if (!isNaN(target)) showStep(target);
-    });
-  });
+.step-memo::before {
+  content: '';
+  position: absolute;
+  top: -7px;
+  left: 14px;
+  width: 40px;
+  height: 14px;
+  background: rgba(255,255,255,.6);
+  border-radius: 7px;
+  box-shadow: 0 2px 4px rgba(0,0,0,.15);
+}
 
-  document.querySelectorAll('.panel-main, .panel-item').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const step = parseInt(btn.getAttribute('data-step'), 10);
-      if (!isNaN(step)) showStep(step);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-  });
+.step-memo-label {
+  font-size: 0.78em;
+  font-weight: 600;
+  color: #6d5e10;
+  margin-bottom: 4px;
+}
 
-  syncCardRadio('q3');
-  syncCardRadio('q4');
-  syncFreqCards();
-  syncCardCheck('q6');
-  syncCardCheck('q9');
-  syncCardCheck('q12');
-  highlightChecked('q10type');
+.step-memo-textarea {
+  width: 100%;
+  border: none;
+  background: transparent;
+  resize: vertical;
+  min-height: 46px;
+  max-height: 120px;
+  font-family: inherit;
+  font-size: 0.85em;
+  line-height: 1.6;
+  color: var(--text-main);
+  padding: 2px 1px 0;
+}
 
-  updateProgress();
-  showStep(0);
-});
+.step-memo-textarea:focus {
+  outline: none;
+}
+
+/* 音声入力ステータス */
+#voiceStatus {
+  position: fixed;
+  left: 50%;
+  bottom: 16px;
+  transform: translateX(-50%);
+  background: #333;
+  color: #fff;
+  font-size: 0.82em;
+  padding: 8px 14px;
+  border-radius: 20px;
+  box-shadow: 0 3px 8px rgba(0,0,0,.35);
+  cursor: pointer;
+  display: none;          /* ← これが重要 */
+  z-index: 2000;
+}
+#voiceStatus span {
+  white-space: nowrap;
+}
+
+/* ===== レポート概要ビュー ===== */
+.report-section {
+  display: none;
+  margin-top: 20px;
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  padding: 20px 18px 22px;
+}
+
+.report-section.active {
+  display: block;
+}
+
+.report-header {
+  margin-bottom: 12px;
+}
+
+.report-title {
+  font-size: 1.2em;
+  font-weight: 700;
+  color: var(--green-dark);
+  margin-bottom: 4px;
+}
+
+.report-sub {
+  font-size: 0.85em;
+  color: var(--text-sub);
+  line-height: 1.7;
+}
+
+.report-body {
+  margin-top: 10px;
+  border-radius: 10px;
+  background: #f4f8f6;
+  border: 1px solid var(--green-border);
+  padding: 12px 12px 14px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.report-body pre {
+  margin: 0;
+  font-family: "Courier New", monospace;
+  font-size: 0.80em;
+  line-height: 1.7;
+  white-space: pre-wrap;
+}
+
+.report-footer {
+  margin-top: 14px;
+  display: flex;
+  justify-content: flex-end;
+}
