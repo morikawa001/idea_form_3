@@ -61,7 +61,7 @@
 <!-- ===== プログレスバー ===== -->
 <div class="progress-wrap" id="progressWrap">
   <div class="progress-text">
-    <span id="progress-label">ヒアリングを開始してください</span>
+    <span id="progress-label">書きやすいところから少しずつ記録を始めてください</span>
     <span id="progress-pct">0%</span>
   </div>
   <div class="progress-track">
@@ -73,7 +73,7 @@
 <div class="guide-bar" id="navigator">
   <div class="guide-avatar">💬</div>
   <div class="guide-text" id="navBubble">
-    まず<strong>発案者の基本情報</strong>を確認・入力してください（すべて任意）。
+    まず<strong>書きやすいところから</strong>で構いません。あとで行き来しながら整理できます。
   </div>
 </div>
 
@@ -81,15 +81,40 @@
 <main class="main-wrap">
 <form id="ideaForm" novalidate>
 
+  <!-- ===== 共通メモ・備考（パズルの余りピース用） ===== -->
+  <section class="step-section active" id="memoSection">
+    <div class="step-header">
+      <div class="step-num">メモ</div>
+      <h2 class="step-title">メモ・備考・気になること</h2>
+    </div>
+    <p class="step-note">
+      どの項目にも当てはまらない情報や、後で確認したいこと、懸念点などを自由に書いてください。
+      ヒアリング中に思いついた断片をひとまずここに置いておいても構いません。
+    </p>
+
+    <div class="field-block">
+      <div class="textarea-mic-wrap">
+        <textarea id="memo" rows="4"
+          placeholder="例：ヒアリング中に出た別の課題、関係者の名前、検討が必要そうな点 など"
+          oninput="onTextareaInput('memo')"></textarea>
+        <button type="button" class="btn-mic" data-mic-target="memo"
+          onclick="startVoice('memo')" title="音声入力">🎤</button>
+      </div>
+      <div class="field-fb" id="fb-memo"></div>
+    </div>
+  </section>
+
   <!-- ==============================
        STEP 1: 基本情報（すべて任意）
   =============================== -->
-  <section class="step-section active" id="step0">
+  <section class="step-section" id="step0">
     <div class="step-header">
       <div class="step-num">1 / 5</div>
       <h2 class="step-title">基本情報</h2>
     </div>
-    <p class="step-note">すべての項目は任意です。未入力でも次へ進めます。</p>
+    <p class="step-note">
+      すべての項目は任意です。発案者の情報は、あとから思い出したタイミングで追記・修正しても構いません。
+    </p>
 
     <div class="field-block">
       <label class="field-label" for="q1">所属部署 <span class="opt-badge">任意</span></label>
@@ -146,7 +171,7 @@
 
     <div class="step-nav">
       <button type="button" class="btn-next" onclick="goNext(0)">
-        次へ：困りごとを確認する
+        別の観点（困りごと）も聞いてみる
         <svg viewBox="0 0 20 20" width="18" fill="currentColor"><path d="M7 4l6 6-6 6"/></svg>
       </button>
     </div>
@@ -233,7 +258,7 @@
         戻る
       </button>
       <button type="button" class="btn-next" onclick="goNext(1)">
-        次へ：今の対応を確認する
+        今の対応も聞いてみる
         <svg viewBox="0 0 20 20" width="18" fill="currentColor"><path d="M7 4l6 6-6 6"/></svg>
       </button>
     </div>
@@ -285,7 +310,7 @@
         戻る
       </button>
       <button type="button" class="btn-next" onclick="goNext(2)">
-        次へ：アイデアを記録する
+        アイデアの内容を聞いてみる
         <svg viewBox="0 0 20 20" width="18" fill="currentColor"><path d="M7 4l6 6-6 6"/></svg>
       </button>
     </div>
@@ -372,7 +397,7 @@
         戻る
       </button>
       <button type="button" class="btn-next" onclick="goNext(3)">
-        次へ：期待できる効果
+        期待される効果も整理してみる
         <svg viewBox="0 0 20 20" width="18" fill="currentColor"><path d="M7 4l6 6-6 6"/></svg>
       </button>
     </div>
@@ -418,7 +443,6 @@
       <div class="field-fb" id="fb-q13"></div>
     </div>
 
-    <!-- Q14: 写真・資料（任意） -->
     <div class="field-block">
       <label class="field-label">写真・資料があれば <span class="opt-badge">任意</span></label>
       <p class="field-note">写真や資料がある場合は、メール送信時にメーラーから添付してください。</p>
@@ -430,7 +454,7 @@
         戻る
       </button>
       <button type="button" class="btn-preview" onclick="showPreview()">
-        👁 入力内容を確認する
+        👁 パズルを整理して確認する
       </button>
     </div>
 
@@ -458,9 +482,7 @@
   </div>
 </div>
 
-<!-- =====================================================
-     プレビュー＆アクションモーダル
-====================================================== -->
+<!-- プレビュー＆アクションモーダル（元のまま） -->
 <div class="modal-overlay" id="previewModal">
   <div class="modal">
     <h2>📋 ヒアリング内容の確認</h2>
@@ -473,7 +495,6 @@
       <span id="picoContent"></span>
     </div>
 
-    <!-- アクションボタン群 -->
     <div class="modal-action-grid">
       <button class="btn-action btn-copy"    onclick="actionCopy()">📋 内容をコピー</button>
       <button class="btn-action btn-save"    onclick="actionSaveToFolder()">💾 フォルダに保存</button>
@@ -481,7 +502,6 @@
       <button class="btn-action btn-pdf"     onclick="actionSavePDF()">🖨️ PDFで保存</button>
       <button class="btn-action btn-analyze" onclick="actionAnalyze()">🔬 分析</button>
     </div>
-    <!-- 戻る（アクティブ色）・終了 -->
     <div class="modal-footer-row">
       <button class="btn-back-active" onclick="closePreviewModal()">← 戻る</button>
       <button class="btn-end-footer"  onclick="actionEnd()">🔚 終了</button>
@@ -489,9 +509,7 @@
   </div>
 </div>
 
-<!-- =====================================================
-     メール送信先入力モーダル
-====================================================== -->
+<!-- メール送信モーダル（元のまま） -->
 <div class="modal-overlay" id="mailModal">
   <div class="modal modal--small">
     <h2>✉️ メールで送信</h2>
