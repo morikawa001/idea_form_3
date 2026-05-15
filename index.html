@@ -954,25 +954,55 @@
 
   </form>
 
-  <!-- ===== レポート概要ビュー ===== -->
-  <section class="report-section" id="reportView">
-    <div class="report-header">
-      <div class="report-title">レポート概要</div>
-      <div class="report-sub">
-        これまでに入力された内容を、P / C / I / O の流れに沿って一覧できます。
+ <!-- ===== レポート概要ビュー ===== -->
+<section class="report-section" id="reportView">
+  <div class="report-layout">
+    <!-- 左：レポート概要 -->
+    <div class="report-main">
+      <div class="report-header">
+        <div class="report-title">レポート概要</div>
+        <div class="report-sub">
+          これまでに入力された内容を、P / C / I / O の流れに沿って一覧できます。
+        </div>
+      </div>
+
+      <div class="report-body">
+        <pre id="reportSummary"></pre>
+      </div>
+
+      <div class="report-footer">
+        <button type="button" class="btn-prev" onclick="hideReportView()">
+          入力画面に戻る
+        </button>
       </div>
     </div>
 
-    <div class="report-body">
-      <pre id="reportSummary"></pre>
-    </div>
+    <!-- 右：サマリ生成カード -->
+    <aside class="summary-card">
+      <div class="summary-card-header">
+        <div class="summary-card-title">AIサマリ</div>
+        <div class="summary-card-sub">
+          クリックすると、入力内容をもとに<br>
+          短い要約案を生成します（試験運用）。
+        </div>
+      </div>
 
-    <div class="report-footer">
-      <button type="button" class="btn-prev" onclick="hideReportView()">
-        入力画面に戻る
+      <button type="button" class="summary-generate-btn" onclick="onClickSummaryCard()">
+        <span class="summary-generate-icon">✨</span>
+        <span class="summary-generate-text">
+          サマリ案を生成する
+          <span class="summary-generate-note">※AIの案なので、必ず内容をご確認ください</span>
+        </span>
       </button>
-    </div>
-  </section>
+
+      <div class="summary-result" id="summaryResult">
+        <div class="summary-result-placeholder">
+          ここにサマリ案が表示されます。
+        </div>
+      </div>
+    </aside>
+  </div>
+</section>
 </main>
 
 <!-- ===== プレビュー用モーダル ===== -->
