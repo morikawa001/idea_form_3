@@ -981,121 +981,91 @@ textarea { resize: vertical; min-height: 90px; }
 
 /* 既存の変数・ベーススタイルなどはそのまま */
 
-/* ============================================================
-   中央パネルメニュー（基本情報＋P/C/I/O）
-============================================================ */
-
+/* ===== 中央パネルメニュー ===== */
 .puzzle-menu-wrap {
   max-width: 680px;
-  margin: 24px auto 12px;
-  padding: 16px 16px 8px;
+  margin: 22px auto 12px;
+  padding: 14px 14px 10px;
+  background: var(--bg-card);
+  border-radius: 16px;
+  box-shadow: var(--shadow-md);
 }
 
-/* 上部：横長メインパネル（基本情報） */
+/* 基本情報の横長パネル */
 .panel-main {
-  width: 100%;
-  border-radius: 16px;
-  border: 2px solid var(--green-mid);
-  background: var(--green-pale);
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   padding: 14px 16px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #e8f7f0, #ffffff);
+  border: 2px solid var(--green-border);
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(46,139,95,.25);
-  transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+  transition: transform var(--transition), box-shadow var(--transition), border var(--transition);
 }
-
 .panel-main-emoji {
-  font-size: 2.0em;
-  flex-shrink: 0;
+  font-size: 2.1em;          /* ← ここを 1.8em 前後から少し大きく */
 }
-
 .panel-main-text {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 2px;
+  flex: 1;
 }
-
 .panel-main-title {
-  font-size: 0.98em;
+  font-size: 1.02em;         /* ← 0.9〜0.95em くらいから少しアップ */
   font-weight: 700;
-  color: var(--green-dark);
+  color: var(--text-main);
+  margin-bottom: 2px;
 }
-
 .panel-main-sub {
-  font-size: 0.80em;
+  font-size: 0.86em;         /* ← 0.78em 前後からアップ */
   color: var(--text-sub);
 }
-
-.panel-main:hover {
-  background: #e0f7ec;
-  transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(46,139,95,.35);
-}
-.panel-main:active {
-  transform: scale(.97);
-}
-
-/* 下段：P/C/I/O 2×2 グリッド */
-.panel-grid {
-  margin-top: 12px;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
-}
-
-.panel-item {
-  border-radius: 14px;
-  border: 2px solid var(--green-border);
-  background: #ffffff;
-  padding: 10px 10px;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 4px;
-  cursor: pointer;
-  box-shadow: 0 2px 6px rgba(0,0,0,.06);
-  transition: transform .15s ease, box-shadow .15s ease, background .15s ease, border-color .15s ease;
-}
-
-.panel-emoji {
-  font-size: 1.3em;
-}
-
-.panel-label {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 0.86em;
-  color: var(--text-main);
+.panel-main-progress {
+  margin-top: 3px;
+  font-size: 0.80em;         /* ← 0.72〜0.75em からアップ */
+  color: var(--green-mid);
   font-weight: 600;
 }
 
+/* 下の P / C / I / O + レポート のカード */
+.panel-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.panel-item {
+  background: var(--bg-card);
+  border-radius: 14px;
+  border: 2px solid var(--green-border);
+  padding: 12px 10px;
+  text-align: left;
+  cursor: pointer;
+  transition: transform var(--transition), box-shadow var(--transition), border var(--transition), background var(--transition);
+}
+.panel-item .panel-emoji {
+  font-size: 1.7em;          /* ← 1.4〜1.5em くらいからアップ */
+  margin-bottom: 4px;
+}
+.panel-label {
+  font-size: 0.98em;         /* ← 0.86〜0.9em からアップ */
+  font-weight: 700;
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 2px;
+}
 .panel-desc {
-  font-size: 0.75em;
-  color: var(--text-muted);
+  font-size: 0.85em;         /* ← 0.76〜0.8em からアップ */
+  color: var(--text-sub);
+  line-height: 1.5;
+  min-height: 2.2em;
 }
-
-.panel-item:hover {
-  background: var(--green-pale);
-  border-color: var(--green-mid);
-  box-shadow: 0 4px 12px rgba(46,139,95,.18);
-  transform: translateY(-1px);
-}
-.panel-item:active {
-  transform: scale(.97);
-}
-
-/* 中央パネルメニュー（基本情報＋P/C/I/O） */
-/* ...既存の panel-main, panel-item などはそのまま... */
-
-/* パネル内の進捗表示 */
-.panel-main-progress {
+.panel-item-progress {
   margin-top: 4px;
-  font-size: 0.75em;
-  color: var(--green-dark);
+  font-size: 0.80em;         /* ← 0.72〜0.75em からアップ */
+  color: var(--green-mid);
   font-weight: 600;
 }
 
@@ -1237,22 +1207,18 @@ textarea { resize: vertical; min-height: 90px; }
     font-size: 1.6em;
   }
   .panel-main-title {
-    font-size: 0.92em;
+@media (max-width: 480px) {
+  .panel-main-title {
+    font-size: 1.0em;   /* 0.92em → 1.0em など */
   }
   .panel-main-sub {
-    font-size: 0.74em;
-  }
-  .panel-grid {
-    gap: 8px;
-  }
-  .panel-item {
-    padding: 9px 8px;
+    font-size: 0.82em;  /* 0.74em → 0.82em など */
   }
   .panel-label {
-    font-size: 0.80em;
+    font-size: 0.90em;  /* 0.80em → 0.90em など */
   }
   .panel-desc {
-    font-size: 0.72em;
+    font-size: 0.80em;  /* 0.72em → 0.80em など */
   }
 }
 
