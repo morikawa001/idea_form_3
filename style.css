@@ -66,7 +66,7 @@ body {
   width: auto;
   height: auto;
   align-self: stretch;
-  max-height: 72px; /* 上限設定 */
+  max-height: 72px;
 }
 .brand-title {
   font-size: 2.4em; font-weight: 700;
@@ -767,7 +767,7 @@ textarea { resize: vertical; min-height: 90px; }
 @media (max-width: 600px) {
   .site-header { padding: 10px 12px 12px; }
   .header-brand { gap: 6px; }
-  .brand-logo { max-height: 48px; } /* SP向け上限小さめ */
+  .brand-logo { max-height: 48px; }
   .brand-title { font-size: 1.55em; }
   .brand-sub   { font-size: 0.78em; }
   .header-desc { font-size: 0.74em; padding: 7px 10px; }
@@ -783,13 +783,11 @@ textarea { resize: vertical; min-height: 90px; }
   .pico-label-large { font-size: 1.05em; }
   .pico-tag-large { width: 26px; height: 26px; font-size: .9em; }
 
-  /* フィールド */
   select, input[type="text"], input[type="email"], textarea {
-    font-size: 16px; /* iOS zoom防止 */
+    font-size: 16px;
     padding: 12px 14px;
   }
 
-  /* カードUI */
   .card-radio-group { grid-template-columns: 1fr 1fr; }
   .card-radio { padding: 10px 12px; font-size: .88em; min-height: 46px; }
   .card-check-group { grid-template-columns: 1fr; }
@@ -799,11 +797,9 @@ textarea { resize: vertical; min-height: 90px; }
   .ic-emoji { font-size: 1.3em; }
   .ic-text  { font-size: .72em; }
 
-  /* 頻度カード */
   .freq-group { flex-wrap: wrap; gap: 7px; }
   .freq-card  { min-width: 70px; padding: 10px 8px; font-size: .80em; }
 
-  /* ナビボタン */
   .step-nav { flex-direction: column; gap: 10px; }
   .btn-next, .btn-prev, .btn-preview {
     width: 100%; justify-content: center;
@@ -814,7 +810,6 @@ textarea { resize: vertical; min-height: 90px; }
   .btn-clear-step { width: 100%; text-align: center; }
   .sub-action-row--step5 { flex-direction: column; }
 
-  /* モーダル */
   .modal, .survey-modal { padding: 18px 14px; border-radius: 12px; }
   .modal pre { font-size: .74em; }
   .thank-modal { padding: 28px 16px; border-radius: 16px; }
@@ -843,10 +838,6 @@ textarea { resize: vertical; min-height: 90px; }
   pointer-events: none;
 }
 
-/* ============================================================
-   idea_form_3 追加スタイル
-   ============================================================ */
-
 /* ---- ステップ説明メモ ---- */
 .step-note {
   font-size: 0.83em;
@@ -856,169 +847,6 @@ textarea { resize: vertical; min-height: 90px; }
   background: #f5f5f5;
   border-radius: 6px;
 }
-
-/* ---- 写真アップロードエリア ---- */
-.photo-upload-area {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin-bottom: 12px;
-}
-.btn-camera,
-.btn-file-label {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 9px 16px;
-  border-radius: 8px;
-  font-size: 0.88em;
-  font-weight: 500;
-  cursor: pointer;
-  border: 1.5px solid #4caf88;
-  background: #fff;
-  color: #2e7d58;
-  transition: background 0.15s;
-}
-.btn-camera:hover,
-.btn-file-label:hover {
-  background: #edf7f2;
-}
-
-/* ---- カメラビューファインダー ---- */
-.camera-container {
-  margin-top: 10px;
-  border-radius: 10px;
-  overflow: hidden;
-  background: #000;
-  max-width: 480px;
-}
-.camera-container video {
-  width: 100%;
-  display: block;
-}
-.camera-controls {
-  display: flex;
-  gap: 10px;
-  padding: 10px;
-  background: rgba(0,0,0,0.6);
-  justify-content: center;
-}
-.btn-shutter {
-  padding: 10px 24px;
-  background: #e53935;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  font-size: 1em;
-  font-weight: 700;
-  cursor: pointer;
-}
-.btn-camera-cancel {
-  padding: 10px 20px;
-  background: #fff;
-  color: #333;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  font-size: 0.9em;
-  cursor: pointer;
-}
-
-/* ---- 写真サムネイルプレビュー ---- */
-.photo-preview-area {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 8px;
-}
-.photo-thumb {
-  position: relative;
-  width: 90px;
-  height: 90px;
-  border-radius: 8px;
-  overflow: hidden;
-  border: 1.5px solid #ccc;
-  background: #f5f5f5;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.photo-thumb img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-.photo-thumb-label {
-  font-size: 0.68em;
-  color: #555;
-  padding: 4px;
-  text-align: center;
-  word-break: break-all;
-}
-.photo-thumb-del {
-  position: absolute;
-  top: 3px;
-  right: 3px;
-  width: 20px;
-  height: 20px;
-  background: rgba(0,0,0,0.55);
-  color: #fff;
-  border: none;
-  border-radius: 50%;
-  font-size: 11px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-}
-
-/* ---- アクションボタングリッド ---- */
-.modal-action-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  margin-top: 16px;
-}
-.btn-action {
-  padding: 12px 8px;
-  border: none;
-  border-radius: 10px;
-  font-size: 0.84em;
-  font-weight: 600;
-  cursor: pointer;
-  transition: opacity 0.15s, transform 0.1s;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  line-height: 1.3;
-}
-.btn-action:active { transform: scale(0.96); }
-.btn-copy    { background: #e3f2fd; color: #1565c0; }
-.btn-save    { background: #e8f5e9; color: #2e7d32; }
-.btn-mail    { background: #fff3e0; color: #e65100; }
-.btn-pdf     { background: #fce4ec; color: #880e4f; }
-.btn-analyze { background: #f3e5f5; color: #6a1b9a; }
-
-/* ---- メール送信モーダル（小型） ---- */
-.modal--small {
-  max-width: 420px !important;
-}
-
-/* ---- モバイル対応 ---- */
-@media (max-width: 520px) {
-  .modal-action-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  .photo-thumb { width: 72px; height: 72px; }
-}
-
-/* ---- 終了ボタン ---- */
-.btn-end { background: #eceff1; color: #455a64; }
-
-/* ============================================================
-   idea_form_3 v3.2 追加スタイル
-   ============================================================ */
 
 /* ---- テキストエリア＋マイクラッパー ---- */
 .textarea-mic-wrap {
@@ -1094,8 +922,6 @@ textarea { resize: vertical; min-height: 90px; }
   margin-top: 12px;
   justify-content: space-between;
 }
-
-/* ---- 戻るボタン（アクティブ色） ---- */
 .btn-back-active {
   flex: 1;
   padding: 12px 18px;
@@ -1110,8 +936,6 @@ textarea { resize: vertical; min-height: 90px; }
 }
 .btn-back-active:hover  { background: #3d9c76; }
 .btn-back-active:active { transform: scale(0.97); }
-
-/* ---- 終了ボタン（フッター用） ---- */
 .btn-end-footer {
   flex: 1;
   padding: 12px 18px;
@@ -1127,7 +951,6 @@ textarea { resize: vertical; min-height: 90px; }
 .btn-end-footer:hover  { background: #cfd8dc; }
 .btn-end-footer:active { transform: scale(0.97); }
 
-/* ---- モバイル対応 ---- */
 @media (max-width: 520px) {
   .modal-footer-row { flex-direction: column; }
   .btn-mic { width: 36px; height: 36px; font-size: 16px; }
@@ -1155,7 +978,7 @@ textarea { resize: vertical; min-height: 90px; }
   gap: 8px;
 }
 
-/* 基本情報（中央ピース） */
+/* 中央ピース：基本情報 */
 .puzzle-center {
   grid-column: 2 / 3;
   grid-row: 2 / 3;
@@ -1190,7 +1013,7 @@ textarea { resize: vertical; min-height: 90px; }
   transform: scale(.97);
 }
 
-/* 周囲のピース（P / C / I / O） */
+/* 周囲のピース：P / C / I / O */
 .puzzle-item {
   border-radius: 14px;
   border: 2px solid var(--green-border);
@@ -1220,7 +1043,7 @@ textarea { resize: vertical; min-height: 90px; }
   font-size: 0.72em;
 }
 
-/* 位置指定：十字ではなく、周囲四隅＋中央でパズルっぽく */
+/* 配置：上左右・下左右＋中央 */
 .puzzle-item-top-left {
   grid-column: 1 / 2;
   grid-row: 1 / 2;
@@ -1256,7 +1079,6 @@ textarea { resize: vertical; min-height: 90px; }
   line-height: 1.7;
 }
 
-/* スマホ向け（幅が狭い場合） */
 @media (max-width: 480px) {
   .puzzle-menu {
     grid-template-rows: repeat(3, 80px);
@@ -1269,5 +1091,3 @@ textarea { resize: vertical; min-height: 90px; }
     font-size: 0.78em;
   }
 }
-
-/* すでにある .step-note はそのまま利用 */
