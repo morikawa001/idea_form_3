@@ -1402,3 +1402,58 @@ textarea { resize: vertical; min-height: 90px; }
 #voiceStatus span {
   white-space: nowrap;
 }
+
+/* ===== レポート概要ビュー ===== */
+.report-section {
+  display: none;
+  margin-top: 20px;
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  padding: 20px 18px 22px;
+}
+
+.report-section.active {
+  display: block;
+}
+
+.report-header {
+  margin-bottom: 12px;
+}
+
+.report-title {
+  font-size: 1.2em;
+  font-weight: 700;
+  color: var(--green-dark);
+  margin-bottom: 4px;
+}
+
+.report-sub {
+  font-size: 0.85em;
+  color: var(--text-sub);
+  line-height: 1.7;
+}
+
+.report-body {
+  margin-top: 10px;
+  border-radius: 10px;
+  background: #f4f8f6;
+  border: 1px solid var(--green-border);
+  padding: 12px 12px 14px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.report-body pre {
+  margin: 0;
+  font-family: "Courier New", monospace;
+  font-size: 0.80em;
+  line-height: 1.7;
+  white-space: pre-wrap;
+}
+
+.report-footer {
+  margin-top: 14px;
+  display: flex;
+  justify-content: flex-end;
+}
