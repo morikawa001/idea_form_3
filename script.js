@@ -657,7 +657,7 @@ function actionAnalyze() {
 // ここより上はそのまま
 
 // ============================================================
-// サマリー生成（GAS: doPostの type === 'summary' を呼ぶ）
+// サマリー生成（プリフライト回避版）
 // ============================================================
 async function generateSummary() {
   const baseText = buildSummary();  // レポート概要テキスト
@@ -670,9 +670,10 @@ async function generateSummary() {
   }
 
   try {
+    // ★ ポイント：余計なヘッダを付けず、text/plain として送る
     const res = await fetch(GAS_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify({
         type: 'summary',
         text: baseText
@@ -690,7 +691,6 @@ async function generateSummary() {
 
     const summaryText = json.summary;
 
-    // プレビュー画面表示
     showPreview();
 
     const picoBox = document.getElementById('picoBox');
