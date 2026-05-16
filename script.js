@@ -654,52 +654,28 @@ function actionAnalyze() {
 // ============================================================
 // サマリー生成（GAS + summary type）
 // ============================================================
-async function generateSummary() {
-  const baseText = buildSummary();  // レポート概要テキスト
+// ここより上はそのまま
 
+// ============================================================
+// サマリー生成（ここをテスト版で上書き）
+// ============================================================
+async function generateSummary() {
   const summaryBtn = document.querySelector('.panel-item--summary');
   if (summaryBtn) {
     summaryBtn.disabled = true;
     summaryBtn.dataset.originalLabel = summaryBtn.innerHTML;
-    summaryBtn.innerHTML = '🧾 サマリー生成中…';
+    summaryBtn.innerHTML = '🧾 サマリー通信テスト中…';
   }
 
   try {
     const res = await fetch(GAS_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        type: 'summary',
-        text: baseText
-      })
+      method: 'GET'  // まずはGETだけ
     });
 
-    if (!res.ok) {
-      throw new Error('GAS 呼び出しに失敗しました（HTTP ' + res.status + '）');
-    }
-
-    const json = await res.json().catch(() => null);
-    if (!json || !json.summary) {
-      throw new Error('サマリーが取得できませんでした。');
-    }
-
-    const summaryText = json.summary;
-
-    // プレビュー画面に表示（picoBox利用）
-    showPreview();
-
-    const picoBox = document.getElementById('picoBox');
-    const picoContent = document.getElementById('picoContent');
-    if (picoBox && picoContent) {
-      picoBox.style.display = 'block';
-      picoContent.textContent = summaryText;
-    } else {
-      alert('サマリー:\n\n' + summaryText);
-    }
+    alert('通信結果: status=' + res.status);
 
   } catch (e) {
-    console.error(e);
-    alert('サマリー生成中にエラーが発生しました：' + e.message);
+    alert('通信テストでエラー: ' + e.message);
   } finally {
     if (summaryBtn) {
       summaryBtn.disabled = false;
@@ -708,6 +684,7 @@ async function generateSummary() {
   }
 }
 
+// ここより下もそのまま
 // ============================================================
 // ステップクリア・再スタート
 // ============================================================
