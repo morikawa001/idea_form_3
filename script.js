@@ -657,25 +657,54 @@ function actionAnalyze() {
 // ここより上はそのまま
 
 // ============================================================
-// サマリー生成（ここをテスト版で上書き）
+// サマリー生成（GAS: doPostの type === 'summary' を呼ぶ）
 // ============================================================
 async function generateSummary() {
+  const baseText = buildSummary();  // レポート概要テキスト
+
   const summaryBtn = document.querySelector('.panel-item--summary');
   if (summaryBtn) {
     summaryBtn.disabled = true;
     summaryBtn.dataset.originalLabel = summaryBtn.innerHTML;
-    summaryBtn.innerHTML = '🧾 サマリー通信テスト中…';
+    summaryBtn.innerHTML = '🧾 サマリー生成中…';
   }
 
   try {
     const res = await fetch(GAS_URL, {
-      method: 'GET'  // まずはGETだけ
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type: 'summary',
+        text: baseText
+      })
     });
 
-    alert('通信結果: status=' + res.status);
+    if (!res.ok) {
+      throw new Error('GAS 呼び出しに失敗しました（HTTP ' + res.status + '）');
+    }
+
+    const json = await res.json().catch(() => null);
+    if (!json || !json.summary) {
+      throw new Error('サマリーが取得できませんでした。');
+    }
+
+    const summaryText = json.summary;
+
+    // プレビュー画面表示
+    showPreview();
+
+    const picoBox = document.getElementById('picoBox');
+    const picoContent = document.getElementById('picoContent');
+    if (picoBox && picoContent) {
+      picoBox.style.display = 'block';
+      picoContent.textContent = summaryText;
+    } else {
+      alert('サマリー:\n\n' + summaryText);
+    }
 
   } catch (e) {
-    alert('通信テストでエラー: ' + e.message);
+    console.error(e);
+    alert('サマリー生成中にエラーが発生しました：' + e.message);
   } finally {
     if (summaryBtn) {
       summaryBtn.disabled = false;
@@ -683,8 +712,6 @@ async function generateSummary() {
     }
   }
 }
-
-// ここより下もそのまま
 // ============================================================
 // ステップクリア・再スタート
 // ============================================================
