@@ -1092,18 +1092,28 @@ textarea { resize: vertical; min-height: 90px; }
 /* ...既存の panel-main, panel-item などはそのまま... */
 
 /* パネル内の進捗表示 */
+/* 進捗ラベル（メインカード） */
 .panel-main-progress {
   margin-top: 4px;
   font-size: 0.75em;
   color: var(--green-dark);
   font-weight: 600;
+
+  /* ここから追加・変更 */
+  margin-left: auto;      /* 右寄せ */
+  align-self: flex-end;   /* 親がflexのとき右端に寄せる */
 }
 
+/* 進捗ラベル（P/C/I/Oカード） */
 .panel-item-progress {
   margin-top: 4px;
   font-size: 0.72em;
   color: var(--text-muted);
   font-weight: 600;
+
+  /* ここから追加・変更 */
+  margin-left: auto;
+  align-self: flex-end;
 }
 
 /* ステップごとの「その場メモ」ふせん */
