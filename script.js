@@ -563,9 +563,12 @@ function buildText() {
   ].join('\n');
 }
 
-// ★ レポート概要にスクロールする関数
+// ============================================================
+// レポート概要ビュー
+// ============================================================
+
 function showReportView() {
-  showFormUI(); // 念のためフォームUIを表示
+  showFormUI(); // フォームUIを表示
 
   const pre = document.getElementById('reportSummary');
   if (pre) pre.textContent = buildSummary();
@@ -591,6 +594,9 @@ function hideReportView() {
   showStep(currentStep);
 }
 
+// ============================================================
+// プレビュー
+// ============================================================
 function showPreview() {
   const previewModal = document.getElementById('previewModal');
   const previewText = document.getElementById('previewText');
