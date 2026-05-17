@@ -48,7 +48,7 @@
     </div>
   </button>
 
-  <!-- 下：P / C / I / O を 2×2 + レポート で配置 -->
+  <!-- 下：P / C / I / O を 2×2 + レポート + サマリーで配置 -->
   <div class="panel-grid">
     <button class="panel-item" data-step="1" type="button">
       <div class="panel-emoji">🔍</div>
@@ -97,7 +97,7 @@
       <div class="panel-desc">これまでの入力内容を一目で確認できます</div>
     </button>
 
-    <!-- サマリー生成カード（既存通りでもOKだが、統一のため onclick は外してもよい） -->
+    <!-- サマリー生成カード（onclick は JS 側でバインド） -->
     <button class="panel-item panel-item--summary" type="button">
       <div class="panel-emoji">🧾</div>
       <div class="panel-label">サマリー生成</div>
@@ -962,24 +962,24 @@
   </form>
 
   <!-- ===== レポート概要ビュー ===== -->
-<section class="report-section" id="reportView">
-  <div class="report-header">
-    <div class="report-title">レポート概要</div>
-    <div class="report-sub">
-      これまでに入力された内容を、P / C / I / O の流れに沿って一覧できます。
+  <section class="report-section" id="reportView">
+    <div class="report-header">
+      <div class="report-title">レポート概要</div>
+      <div class="report-sub">
+        これまでに入力された内容を、P / C / I / O の流れに沿って一覧できます。
+      </div>
     </div>
-  </div>
 
-  <div class="report-body">
-    <pre id="reportSummary"></pre>
-  </div>
+    <div class="report-body">
+      <pre id="reportSummary"></pre>
+    </div>
 
-  <div class="report-footer">
-    <button type="button" class="btn-prev" onclick="hideReportView()">
-      入力画面に戻る
-    </button>
-  </div>
-</section>
+    <div class="report-footer">
+      <button type="button" class="btn-prev" onclick="hideReportView()">
+        入力画面に戻る
+      </button>
+    </div>
+  </section>
 </main>
 
 <!-- ===== プレビュー用モーダル ===== -->
