@@ -473,7 +473,7 @@ function updateIdeaCharCount() {
   const ta = document.getElementById('q10');
   const cnt = document.getElementById('ideaCharCount');
   if (!ta || !cnt) return;
-  cnt.textContent = ta.value.length;
+  cnt.textContent = ta.value.length + '文字';
 }
 
 // ============================================================
@@ -563,23 +563,32 @@ function buildText() {
   ].join('\n');
 }
 
+// ★ ここを変更：レポート概要にスクロール
 function showReportView() {
-  const form = document.getElementById('ideaForm');
-  const report = document.getElementById('reportView');
-  const pre = document.getElementById('reportSummary');
+  showFormUI(); // 念のためフォームUIを表示
 
-  if (form) form.style.display = 'none';
-  if (report) report.classList.add('active');
+  const pre = document.getElementById('reportSummary');
   if (pre) pre.textContent = buildSummary();
 
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  // レポート概要セクションへスムーススクロール
+  setTimeout(() => {
+    const section = document.getElementById('reportView');
+    if (section) {
+      const stickyHeight =
+        (document.getElementById('picoRoadmap')?.offsetHeight || 0) +
+        (document.getElementById('progressWrap')?.offsetHeight || 0);
+      const top =
+        section.getBoundingClientRect().top +
+        window.pageYOffset -
+        stickyHeight -
+        8;
+      window.scrollTo({ top, behavior: 'smooth' });
+    }
+  }, 50);
 }
 
 function hideReportView() {
-  const form = document.getElementById('ideaForm');
-  const report = document.getElementById('reportView');
-  if (report) report.classList.remove('active');
-  if (form) form.style.display = '';
+  // 旧仕様（別画面切り替え）からの簡易互換：フォームはそのまま
   showStep(currentStep);
 }
 
