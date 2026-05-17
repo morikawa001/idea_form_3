@@ -572,7 +572,24 @@ function showReportView() {
   if (report) report.classList.add('active');
   if (pre) pre.textContent = buildSummary();
 
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  // ここからスクロール処理
+  if (report) {
+    // sticky のロードマップ＋プログレス分を引いて位置補正
+    const stickyHeight =
+      (document.getElementById('picoRoadmap')?.offsetHeight || 0) +
+      (document.getElementById('progressWrap')?.offsetHeight || 0) +
+      8; // 少し余白
+
+    const top =
+      report.getBoundingClientRect().top +
+      window.pageYOffset -
+      stickyHeight;
+
+    window.scrollTo({
+      top,
+      behavior: 'smooth',
+    });
+  }
 }
 
 function hideReportView() {
