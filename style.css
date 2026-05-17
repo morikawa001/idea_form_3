@@ -354,7 +354,7 @@ textarea { resize: vertical; min-height: 90px; }
   display: flex; flex-wrap: wrap; gap: 10px;
 }
 .freq-card {
-  position: relative;                /* 追加：チェックマーク表示用 */
+  position: relative;
   display: flex; flex-direction: column; align-items: center; gap: 6px;
   background: var(--bg-card);
   border: 2px solid var(--green-border);
@@ -883,289 +883,6 @@ textarea { resize: vertical; min-height: 90px; }
   min-width: 0;
 }
 
-/* ---- マイクボタン ---- */
-.btn-mic {
-  flex-shrink: 0;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  border: 1.5px solid #4caf88;
-  background: #fff;
-  color: #2e7d58;
-  font-size: 18px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.15s, box-shadow 0.15s;
-  margin-top: 4px;
-}
-.btn-mic:hover  { background: #edf7f2; }
-.btn-mic--active {
-  background: #e53935 !important;
-  border-color: #e53935 !important;
-  color: #fff !important;
-  animation: mic-pulse 1s ease-in-out infinite;
-}
-@keyframes mic-pulse {
-  0%,100% { box-shadow: 0 0 0 0 rgba(229,57,53,0.4); }
-  50%      { box-shadow: 0 0 0 8px rgba(229,57,53,0); }
-}
-
-/* ---- 音声入力ステータスバー ---- */
-.voice-status {
-  position: fixed;
-  bottom: 80px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(30,30,30,0.88);
-  color: #fff;
-  padding: 10px 22px;
-  border-radius: 24px;
-  font-size: 0.88em;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  z-index: 9999;
-  cursor: pointer;
-  backdrop-filter: blur(4px);
-}
-.voice-dot {
-  width: 10px;
-  height: 10px;
-  background: #e53935;
-  border-radius: 50%;
-  animation: mic-pulse 1s ease-in-out infinite;
-}
-
-/* ---- モーダル フッター行（戻る・終了） ---- */
-.modal-footer-row {
-  display: flex;
-  gap: 10px;
-  margin-top: 12px;
-  justify-content: space-between;
-}
-.btn-back-active {
-  flex: 1;
-  padding: 12px 18px;
-  background: #4caf88;
-  color: #fff;
-  border: none;
-  border-radius: 10px;
-  font-size: 0.92em;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.15s, transform 0.1s;
-}
-.btn-back-active:hover  { background: #3d9c76; }
-.btn-back-active:active { transform: scale(0.97); }
-.btn-end-footer {
-  flex: 1;
-  padding: 12px 18px;
-  background: #eceff1;
-  color: #455a64;
-  border: none;
-  border-radius: 10px;
-  font-size: 0.92em;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.15s, transform 0.1s;
-}
-.btn-end-footer:hover  { background: #cfd8dc; }
-.btn-end-footer:active { transform: scale(0.97); }
-
-@media (max-width: 520px) {
-  .modal-footer-row { flex-direction: column; }
-  .btn-mic { width: 36px; height: 36px; font-size: 16px; }
-}
-
-/* 既存の変数・ベーススタイルなどはそのまま */
-
-/* ============================================================
-   中央パネルメニュー（基本情報＋P/C/I/O）
-============================================================ */
-
-.puzzle-menu-wrap {
-  max-width: 680px;
-  margin: 24px auto 12px;
-  padding: 16px 16px 8px;
-}
-
-/* 上部：横長メインパネル（基本情報） */
-.panel-main {
-  width: 100%;
-  border-radius: 16px;
-  border: 2px solid var(--green-mid);
-  background: var(--green-pale);
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 14px 16px;
-  cursor: pointer;
-  box-shadow: 0 4px 12px rgba(46,139,95,.25);
-  transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
-}
-
-.panel-main-emoji {
-  font-size: 2.0em;
-  flex-shrink: 0;
-}
-
-.panel-main-text {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 2px;
-}
-
-.panel-main-title {
-  font-size: 0.98em;
-  font-weight: 700;
-  color: var(--green-dark);
-}
-
-.panel-main-sub {
-  font-size: 0.80em;
-  color: var(--text-sub);
-}
-
-.panel-main:hover {
-  background: #e0f7ec;
-  transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(46,139,95,.35);
-}
-.panel-main:active {
-  transform: scale(.97);
-}
-
-/* 下段：P/C/I/O 2×2 グリッド */
-.panel-grid {
-  margin-top: 12px;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
-}
-
-.panel-item {
-  border-radius: 14px;
-  border: 2px solid var(--green-border);
-  background: #ffffff;
-  padding: 10px 10px;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 4px;
-  cursor: pointer;
-  box-shadow: 0 2px 6px rgba(0,0,0,.06);
-  transition: transform .15s ease, box-shadow .15s ease, background .15s ease, border-color .15s ease;
-}
-
-.panel-emoji {
-  font-size: 1.3em;
-}
-
-.panel-label {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 0.86em;
-  color: var(--text-main);
-  font-weight: 600;
-}
-
-.panel-desc {
-  font-size: 0.75em;
-  color: var(--text-muted);
-}
-
-.panel-item:hover {
-  background: var(--green-pale);
-  border-color: var(--green-mid);
-  box-shadow: 0 4px 12px rgba(46,139,95,.18);
-  transform: translateY(-1px);
-}
-.panel-item:active {
-  transform: scale(.97);
-}
-
-/* 中央パネルメニュー（基本情報＋P/C/I/O） */
-/* ...既存の panel-main, panel-item などはそのまま... */
-
-/* パネル内の進捗表示 */
-.panel-main-progress {
-  margin-top: 4px;
-  font-size: 0.75em;
-  color: var(--green-dark);
-  font-weight: 600;
-}
-
-.panel-item-progress {
-  margin-top: 4px;
-  font-size: 0.72em;
-  color: var(--text-muted);
-  font-weight: 600;
-}
-
-/* ステップごとの「その場メモ」ふせん */
-.step-memo {
-  position: relative;
-  background: #fff9c4;
-  border-radius: 10px 10px 12px 10px;
-  padding: 8px 10px 10px;
-  box-shadow: 0 3px 6px rgba(0,0,0,.12);
-  border: 1px solid #f0e2a0;
-  margin-top: 6px;
-}
-
-.step-memo::before {
-  content: '';
-  position: absolute;
-  top: -7px;
-  left: 14px;
-  width: 40px;
-  height: 14px;
-  background: rgba(255,255,255,.6);
-  border-radius: 7px;
-  box-shadow: 0 2px 4px rgba(0,0,0,.15);
-}
-
-.step-memo-label {
-  font-size: 0.78em;
-  font-weight: 600;
-  color: #6d5e10;
-  margin-bottom: 4px;
-}
-
-.step-memo-textarea {
-  width: 100%;
-  border: none;
-  background: transparent;
-  resize: vertical;
-  min-height: 46px;
-  max-height: 120px;
-  font-family: inherit;
-  font-size: 0.85em;
-  line-height: 1.6;
-  color: var(--text-main);
-  padding: 2px 1px 0;
-}
-
-.step-memo-textarea:focus {
-  outline: none;
-}
-
-/* テキストエリア＋マイクラッパー */
-.textarea-mic-wrap {
-  position: relative;
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-}
-.textarea-mic-wrap textarea {
-  flex: 1;
-  min-width: 0;
-}
-
 /* マイクボタン */
 .btn-mic {
   flex-shrink: 0;
@@ -1223,299 +940,6 @@ textarea { resize: vertical; min-height: 90px; }
   line-height: 1.7;
 }
 
-/* スマホ向け微調整 */
-@media (max-width: 480px) {
- .puzzle-menu-wrap {
-  max-width: 680px;
-  margin: 24px auto 12px;
-  padding: 16px 16px 8px;
-}
-
-.panel-main,
-.panel-item {
-  position: relative;
-  display: grid;
-  grid-template-columns: 1fr 64px;
-  align-items: stretch;
-  column-gap: 12px;
-  min-height: 92px;
-}
-
-.panel-main {
-  width: 100%;
-  border-radius: 16px;
-  border: 2px solid var(--green-mid);
-  background: var(--green-pale);
-  padding: 0;
-  cursor: pointer;
-  box-shadow: 0 4px 12px rgba(46,139,95,.25);
-  transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
-}
-
-.panel-item {
-  border-radius: 14px;
-  border: 2px solid var(--green-border);
-  background: #fff;
-  padding: 0;
-  cursor: pointer;
-  box-shadow: 0 2px 6px rgba(0,0,0,.06);
-  transition: transform .15s ease, box-shadow .15s ease, background .15s ease, border-color .15s ease;
-}
-
-.panel-main:hover,
-.panel-item:hover {
-  transform: translateY(-1px);
-}
-
-.panel-main > :not(.panel-main-progress),
-.panel-item > :not(.panel-item-progress) {
-  padding: 14px 14px 14px 16px;
-}
-
-.panel-main-emoji,
-.panel-emoji {
-  font-size: 1.5em;
-  align-self: start;
-}
-
-.panel-main-text {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: flex-start;
-  gap: 4px;
-}
-
-.panel-main-title {
-  font-size: 1.16em;
-  font-weight: 800;
-  line-height: 1.35;
-  color: var(--green-dark);
-}
-
-.panel-main-sub {
-  font-size: 0.92em;
-  line-height: 1.45;
-  color: var(--text-sub);
-}
-
-.panel-label {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 1.02em;
-  line-height: 1.35;
-  color: var(--text-main);
-  font-weight: 700;
-}
-
-.panel-desc {
-  font-size: 0.86em;
-  line-height: 1.45;
-  color: var(--text-muted);
-}
-
-.panel-main-progress,
-.panel-item-progress {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  align-self: stretch;
-  width: 64px;
-  height: 100%;
-  margin: 0;
-  border-left: 1px solid rgba(46,139,95,.18);
-  font-size: 1.02em;
-  font-weight: 800;
-  letter-spacing: .02em;
-  background: rgba(255,255,255,.55);
-}
-
-.panel-main-progress {
-  color: var(--green-dark);
-}
-
-.panel-item-progress {
-  color: var(--green-mid);
-}
-
-@media (max-width: 480px) {
-  .panel-main,
-  .panel-item {
-    grid-template-columns: 1fr 56px;
-    min-height: 84px;
-  }
-
-  .panel-main-title {
-    font-size: 1.05em;
-  }
-
-  .panel-main-sub {
-    font-size: 0.84em;
-  }
-
-  .panel-label {
-    font-size: 0.95em;
-  }
-
-  .panel-desc {
-    font-size: 0.80em;
-  }
-
-  .panel-main-progress,
-  .panel-item-progress {
-    width: 56px;
-    font-size: 0.94em;
-  }
-}
-
-/* それ以外の .step-header などは 0517-3 のまま */
-
-/* ============================================================
-   ヒアリング内容確認モーダル：アクションボタンレイアウト
-============================================================ */
-
-.modal-action-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  margin-top: 16px;
-}
-
-/* 共通ボタンスタイル */
-.btn-action {
-  padding: 12px 10px;
-  border: none;
-  border-radius: 10px;
-  font-size: 0.84em;
-  font-weight: 600;
-  cursor: pointer;
-  transition: opacity 0.15s, transform 0.1s, box-shadow 0.15s;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  line-height: 1.3;
-  text-align: center;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-  white-space: nowrap;
-}
-.btn-action:active {
-  transform: scale(0.96);
-}
-
-/* 個別カラー */
-.btn-copy {
-  background: #e3f2fd;
-  color: #1565c0;
-}
-.btn-save {
-  background: #e8f5e9;
-  color: #2e7d32;
-}
-.btn-mail {
-  background: #fff3e0;
-  color: #e65100;
-}
-.btn-pdf {
-  background: #fce4ec;
-  color: #880e4f;
-}
-.btn-analyze {
-  background: #f3e5f5;
-  color: #6a1b9a;
-}
-
-/* ホバー時の軽い強調 */
-.btn-action:hover {
-  opacity: 0.92;
-  box-shadow: 0 3px 10px rgba(0,0,0,0.12);
-}
-
-/* モバイル時：2列にして詰まりすぎを防ぐ */
-@media (max-width: 520px) {
-  .modal-action-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
-  }
-  .btn-action {
-    font-size: 0.80em;
-    padding: 10px 8px;
-    white-space: normal;
-  }
-}
-
-/* ・・・既存のCSSはそのまま・・・ */
-
-/* ===== ステップごとの「その場メモ」ふせん ===== */
-.step-memo {
-  position: relative;
-  background: #fff9c4;
-  border-radius: 10px 10px 12px 10px;
-  padding: 8px 10px 10px;
-  box-shadow: 0 3px 6px rgba(0,0,0,.12);
-  border: 1px solid #f0e2a0;
-  margin-top: 6px;
-}
-
-.step-memo::before {
-  content: '';
-  position: absolute;
-  top: -7px;
-  left: 14px;
-  width: 40px;
-  height: 14px;
-  background: rgba(255,255,255,.6);
-  border-radius: 7px;
-  box-shadow: 0 2px 4px rgba(0,0,0,.15);
-}
-
-.step-memo-label {
-  font-size: 0.78em;
-  font-weight: 600;
-  color: #6d5e10;
-  margin-bottom: 4px;
-}
-
-.step-memo-textarea {
-  width: 100%;
-  border: none;
-  background: transparent;
-  resize: vertical;
-  min-height: 46px;
-  max-height: 120px;
-  font-family: inherit;
-  font-size: 0.85em;
-  line-height: 1.6;
-  color: var(--text-main);
-  padding: 2px 1px 0;
-}
-
-.step-memo-textarea:focus {
-  outline: none;
-}
-
-/* 音声入力ステータス */
-#voiceStatus {
-  position: fixed;
-  left: 50%;
-  bottom: 16px;
-  transform: translateX(-50%);
-  background: #333;
-  color: #fff;
-  font-size: 0.82em;
-  padding: 8px 14px;
-  border-radius: 20px;
-  box-shadow: 0 3px 8px rgba(0,0,0,.35);
-  cursor: pointer;
-  display: none;          /* ← これが重要 */
-  z-index: 2000;
-}
-#voiceStatus span {
-  white-space: nowrap;
-}
-
 /* ===== レポート概要ビュー ===== */
 .report-section {
   display: none;
@@ -1525,28 +949,23 @@ textarea { resize: vertical; min-height: 90px; }
   box-shadow: var(--shadow-md);
   padding: 20px 18px 22px;
 }
-
 .report-section.active {
   display: block;
 }
-
 .report-header {
   margin-bottom: 12px;
 }
-
 .report-title {
   font-size: 1.2em;
   font-weight: 700;
   color: var(--green-dark);
   margin-bottom: 4px;
 }
-
 .report-sub {
   font-size: 0.85em;
   color: var(--text-sub);
   line-height: 1.7;
 }
-
 .report-body {
   margin-top: 10px;
   border-radius: 10px;
@@ -1556,7 +975,6 @@ textarea { resize: vertical; min-height: 90px; }
   max-height: 400px;
   overflow-y: auto;
 }
-
 .report-body pre {
   margin: 0;
   font-family: "Courier New", monospace;
@@ -1564,9 +982,282 @@ textarea { resize: vertical; min-height: 90px; }
   line-height: 1.7;
   white-space: pre-wrap;
 }
-
 .report-footer {
   margin-top: 14px;
   display: flex;
   justify-content: flex-end;
+}
+
+/* ============================================================
+   初期画面カード 見やすさ改善版（完成版）
+   - PCでカード見出しを大きく
+   - スマホでも右ズレしない
+   - 入力状況％をカード右側に縦配置
+   - 既存HTMLは変更不要
+============================================================ */
+
+/* 初期画面全体 */
+.puzzle-menu-wrap {
+  max-width: 680px;
+  margin: 24px auto 12px;
+  padding: 16px 16px 8px;
+}
+
+.panel-grid {
+  gap: 12px;
+}
+
+/* カード本体：既存レイアウトを活かしつつ、右側に進捗欄分の余白を確保 */
+.panel-main,
+.panel-item {
+  position: relative;
+  overflow: hidden;
+}
+
+/* メインカード */
+.panel-main {
+  padding: 16px 76px 16px 16px;
+  min-height: 92px;
+  border-radius: 16px;
+}
+
+/* 小カード */
+.panel-item {
+  padding: 13px 62px 13px 12px;
+  min-height: 84px;
+  border-radius: 14px;
+}
+
+/* 絵文字 */
+.panel-main-emoji {
+  font-size: 1.8em;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.panel-emoji {
+  font-size: 1.15em;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+/* テキスト領域 */
+.panel-main-text {
+  display: block;
+}
+
+/* 見出しを大きく */
+.panel-main-title {
+  font-size: 1.16em;
+  font-weight: 800;
+  line-height: 1.4;
+  color: var(--green-dark);
+  letter-spacing: 0.01em;
+}
+
+.panel-main-sub {
+  margin-top: 4px;
+  font-size: 0.93em;
+  line-height: 1.5;
+  color: var(--text-sub);
+}
+
+/* 小カードのラベルも大きく */
+.panel-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 1.02em;
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--text-main);
+}
+
+.panel-desc {
+  margin-top: 4px;
+  font-size: 0.84em;
+  line-height: 1.45;
+  color: var(--text-muted);
+}
+
+/* 進捗％を右側いっぱいに配置 */
+.panel-main-progress,
+.panel-item-progress {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  margin-top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-left: 1px solid rgba(46,139,95,.18);
+  background: rgba(255,255,255,.58);
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-align: center;
+}
+
+/* メインカード進捗 */
+.panel-main-progress {
+  width: 56px;
+  font-size: 0.92em;
+  color: var(--green-dark);
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+}
+
+/* 小カード進捗 */
+.panel-item-progress {
+  width: 50px;
+  font-size: 0.82em;
+  color: var(--green-mid);
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+}
+
+/* ホバー感を少しだけ整理 */
+.panel-main:hover,
+.panel-item:hover {
+  transform: translateY(-1px);
+}
+
+/* ============================================================
+   タブレット
+============================================================ */
+@media (min-width: 601px) and (max-width: 1024px) {
+  .panel-main {
+    padding: 15px 72px 15px 15px;
+    min-height: 88px;
+  }
+
+  .panel-item {
+    padding: 12px 58px 12px 12px;
+    min-height: 80px;
+  }
+
+  .panel-main-title {
+    font-size: 1.10em;
+  }
+
+  .panel-main-sub {
+    font-size: 0.89em;
+  }
+
+  .panel-label {
+    font-size: 0.98em;
+  }
+
+  .panel-desc {
+    font-size: 0.82em;
+  }
+}
+
+/* ============================================================
+   スマートフォン
+============================================================ */
+@media (max-width: 600px) {
+  .puzzle-menu-wrap {
+    margin: 18px auto 8px;
+    padding: 12px 10px 6px;
+  }
+
+  .panel-grid {
+    gap: 8px;
+  }
+
+  .panel-main {
+    padding: 14px 62px 14px 12px;
+    min-height: 82px;
+    border-radius: 14px;
+  }
+
+  .panel-item {
+    padding: 11px 50px 11px 10px;
+    min-height: 74px;
+    border-radius: 12px;
+  }
+
+  .panel-main-emoji {
+    font-size: 1.55em;
+    margin-bottom: 4px;
+  }
+
+  .panel-emoji {
+    font-size: 1.00em;
+  }
+
+  .panel-main-title {
+    font-size: 1.02em;
+    line-height: 1.35;
+  }
+
+  .panel-main-sub {
+    margin-top: 3px;
+    font-size: 0.82em;
+    line-height: 1.4;
+  }
+
+  .panel-label {
+    font-size: 0.92em;
+    line-height: 1.35;
+    gap: 4px;
+  }
+
+  .panel-desc {
+    margin-top: 3px;
+    font-size: 0.76em;
+    line-height: 1.35;
+  }
+
+  .panel-main-progress {
+    width: 46px;
+    font-size: 0.78em;
+  }
+
+  .panel-item-progress {
+    width: 42px;
+    font-size: 0.72em;
+  }
+}
+
+/* ============================================================
+   極小端末
+============================================================ */
+@media (max-width: 380px) {
+  .panel-main {
+    padding: 13px 56px 13px 10px;
+    min-height: 78px;
+  }
+
+  .panel-item {
+    padding: 10px 44px 10px 9px;
+    min-height: 70px;
+  }
+
+  .panel-main-title {
+    font-size: 0.96em;
+  }
+
+  .panel-main-sub {
+    font-size: 0.77em;
+  }
+
+  .panel-label {
+    font-size: 0.86em;
+  }
+
+  .panel-desc {
+    font-size: 0.72em;
+  }
+
+  .panel-main-progress {
+    width: 42px;
+    font-size: 0.72em;
+  }
+
+  .panel-item-progress {
+    width: 38px;
+    font-size: 0.68em;
+  }
 }
