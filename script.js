@@ -212,7 +212,7 @@ function showStep(step) {
   const bubble = document.getElementById('navBubble');
   if (bubble) bubble.innerHTML = NAV_MESSAGES[step];
 
-  // ▼▼▼ 修正: 対象ステップの <section> ヘッダー位置へスムーススクロール ▼▼▼
+  // 対象ステップの <section> ヘッダー位置へスムーススクロール
   const targetSection = document.getElementById('step' + step);
   if (targetSection) {
     const stickyHeight =
@@ -227,7 +227,6 @@ function showStep(step) {
   } else {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
-  // ▲▲▲ 修正ここまで ▲▲▲
 
   currentStep = step;
 }
@@ -799,8 +798,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!btn.hasAttribute('data-step')) return;
     btn.addEventListener('click', () => {
       const step = parseInt(btn.getAttribute('data-step'), 10);
-      if (!isNaN(step)) showStep(step);
-      // scrollTo は showStep() 内で処理するため削除
+      if (!isNaN(step)) {
+        showFormUI();   // フォームUIを表示してからステップへ移動
+        showStep(step);
+      }
     });
   });
 
@@ -813,5 +814,7 @@ document.addEventListener('DOMContentLoaded', () => {
   highlightChecked('q10_type');
 
   updateProgress();
-  showStep(0);
+
+  // 初期表示: フォームUIを非表示にしてトップカード画面のみ表示
+  hideFormUI();
 });
