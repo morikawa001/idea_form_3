@@ -212,7 +212,23 @@ function showStep(step) {
   const bubble = document.getElementById('navBubble');
   if (bubble) bubble.innerHTML = NAV_MESSAGES[step];
 
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  // ▼▼▼ 修正: 対象ステップの <section> ヘッダー位置へスムーススクロール ▼▼▼
+  const targetSection = document.getElementById('step' + step);
+  if (targetSection) {
+    const stickyHeight =
+      (document.getElementById('picoRoadmap')?.offsetHeight || 0) +
+      (document.getElementById('progressWrap')?.offsetHeight || 0);
+    const top =
+      targetSection.getBoundingClientRect().top +
+      window.pageYOffset -
+      stickyHeight -
+      8;
+    window.scrollTo({ top: top, behavior: 'smooth' });
+  } else {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  // ▲▲▲ 修正ここまで ▲▲▲
+
   currentStep = step;
 }
 
@@ -380,7 +396,7 @@ function onTextareaInput() { updateProgress(); }
 function onIdeaInput() { updateProgress(); updateIdeaCharCount(); }
 
 // ============================================================
-// ラジオ・チェックUI同期
+// ラジオ・チェックボックス同期
 // ============================================================
 function onRadioChange(groupName) {
   if (groupName === 'q3') {
@@ -391,50 +407,42 @@ function onRadioChange(groupName) {
     toggleOtherInputRadio('q4-other-check', 'q4-other-wrap');
   } else if (groupName === 'q5') {
     syncFreqCards();
+    updateProgress();
   }
-  updateProgress();
 }
 
 function onCheckChange(groupId) {
   updateProgress();
   syncCardCheck(groupId);
-
-  if (groupId === 'q6') {
-    toggleOtherInput('q6-other-check', 'q6-other-wrap');
-  } else if (groupId === 'q9') {
-    toggleOtherInput('q9-other-check', 'q9-other-wrap');
-  } else if (groupId === 'q12') {
-    toggleOtherInput('q12-other-check', 'q12-other-wrap');
-  }
+  if (groupId === 'q6') toggleOtherInput('q6-other-check', 'q6-other-wrap');
+  else if (groupId === 'q9') toggleOtherInput('q9-other-check', 'q9-other-wrap');
+  else if (groupId === 'q12') toggleOtherInput('q12-other-check', 'q12-other-wrap');
 }
 
 function syncCardRadio(groupId) {
   const wrap = document.getElementById(groupId);
   if (!wrap) return;
-
   wrap.querySelectorAll('.card-radio').forEach((label) => {
     const input = label.querySelector('input[type="radio"]');
-    label.classList.toggle('selected', !!input && input.checked);
+    label.classList.toggle('selected', !!(input && input.checked));
   });
 }
 
 function syncCardCheck(groupId) {
   const wrap = document.getElementById(groupId);
   if (!wrap) return;
-
   wrap.querySelectorAll('.card-check').forEach((label) => {
     const input = label.querySelector('input[type="checkbox"]');
-    label.classList.toggle('selected', !!input && input.checked);
+    label.classList.toggle('selected', !!(input && input.checked));
   });
 }
 
 function syncFreqCards() {
   const group = document.getElementById('q5');
   if (!group) return;
-
   group.querySelectorAll('.freq-card').forEach((label) => {
     const input = label.querySelector('input[type="radio"]');
-    label.classList.toggle('selected', !!input && input.checked);
+    label.classList.toggle('selected', !!(input && input.checked));
   });
 }
 
@@ -455,12 +463,10 @@ function toggleOtherInputRadio(checkId, wrapId) {
 function highlightChecked(groupName) {
   const wrap = document.getElementById(groupName);
   if (!wrap) return;
-
   wrap.querySelectorAll('.icon-check').forEach((label) => {
     const input = label.querySelector('input[type="checkbox"]');
-    label.classList.toggle('selected', !!input && input.checked);
+    label.classList.toggle('selected', !!(input && input.checked));
   });
-
   updateProgress();
 }
 
@@ -468,11 +474,11 @@ function updateIdeaCharCount() {
   const ta = document.getElementById('q10');
   const cnt = document.getElementById('ideaCharCount');
   if (!ta || !cnt) return;
-  cnt.textContent = `${ta.value.length}文字`;
+  cnt.textContent = ta.value.length;
 }
 
 // ============================================================
-// レポート概要用テキスト
+// サマリー / プレビュー
 // ============================================================
 function buildSummary() {
   const q6v = getQ6Values();
@@ -481,40 +487,32 @@ function buildSummary() {
   const ideaTypes = getIdeaTypes();
 
   return [
-    '【発案者情報】',
-    `所属部署：${getVal('q1') || '（未記入）'}`,
-    `氏名　　：${getVal('q2') || '（未記入）'}`,
-    `職種　　：${getQ3Value() || '（未選択）'}`,
+    '＝＝ 概要 ＝＝',
+    `部署：${getVal('q1')}`,
+    `発案者：${getVal('q2')}`,
+    `職種：${getQ3Value()}`,
     '',
-    '【P：困りごと】',
-    `対象　　：${getQ4Value() || '（未選択）'}`,
-    `頻度　　：${getRadio('q5') || '（未選択）'}`,
-    `影響　　：${q6v.join(' / ') || '（未選択）'}`,
-    `場面　　：${getVal('q7') || '（未記入）'}`,
+    `【P】患者/問題：${getQ4Value()}`,
+    `　頻度：${getRadio('q5')}`,
+    `　影響：${q6v.join('、')}`,
+    `　現状説明：${getVal('q7')}`,
     '',
-    '【C：今の対応】',
-    `対応内容：${getVal('q8') || '（未記入）'}`,
-    `問題点　：${q9v.length ? q9v.join(' / ') : '特になし'}`,
+    `【C】現在の対応：${getVal('q8')}`,
+    q9v.length ? `　課題：${q9v.join('、')}` : '',
     '',
-    '【I：アイデア】',
-    `内容　　：${getVal('q10') || '（未記入）'}`,
-    `アプローチ：${ideaTypes.length ? ideaTypes.join(' / ') : '（未選択）'}`,
+    `【I】アイデア：${getVal('q10')}`,
+    ideaTypes.length ? `　種別：${ideaTypes.join('、')}` : '',
     '',
-    '【O：期待効果】',
-    `改善点　：${q12v.join(' / ') || '（未選択）'}`,
-    `インパクト：${getVal('q13') || '（未記入）'}`
+    `【O】期待される成果：${q12v.join('、')}`,
+    `　測定方法：${getVal('q13')}`
   ].join('\n');
 }
 
-// ============================================================
-// プレビュー用テキスト生成（全文）
-// ============================================================
 function buildText() {
   const q6v = getQ6Values();
   const q9v = getQ9Values();
   const q12v = getQ12Values();
   const ideaTypes = getIdeaTypes();
-
   const memoP = getVal('memo_p');
   const memoC = getVal('memo_c');
   const memoI = getVal('memo_i');
@@ -527,51 +525,45 @@ function buildText() {
     : '不明';
 
   return [
-    '━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
-    '　Medical Innovation Triage — ヒアリング記録　',
-    '━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
+    '＝＝＝ Medical Innovation Triage ＝＝＝',
     '',
-    '【発案者情報】',
-    `所属部署　　　：${getVal('q1') || '（未記入）'}`,
-    `氏　　名　　　：${getVal('q2') || '（未記入）'}`,
-    `メールアドレス：${getVal('q2b') || '（未記入）'}`,
-    `職　　種　　　：${getQ3Value() || '（未選択）'}`,
+    '【基本情報】',
+    `部署：${getVal('q1')}`,
+    `発案者：${getVal('q2')}`,
+    `メール：${getVal('q2b')}`,
+    `職種：${getQ3Value()}`,
     '',
-    '【P：現場の困りごと・背景】',
-    `困っている対象：${getQ4Value() || '（未選択）'}`,
-    `発生頻度　　　：${getRadio('q5') || '（未選択）'}`,
-    `困りごと・影響：${q6v.join(' / ') || '（未選択）'}`,
-    `具体的な場面　：${getVal('q7') || '（未記入）'}`,
-    `Pに関するメモ：${memoP || '（なし）'}`,
+    '【P — Patient / Problem】',
+    `患者・問題：${getQ4Value()}`,
+    `頻度：${getRadio('q5')}`,
+    `影響範囲：${q6v.join('、')}`,
+    `現状説明：${getVal('q7')}`,
+    memoP ? `Pメモ：${memoP}` : '',
     '',
-    '【C：今の対応とその限界】',
-    `現在の対応　　　　：${getVal('q8') || '（未記入）'}`,
-    `うまくいっていない点：${q9v.length ? q9v.join(' / ') : '特になし'}`,
-    `Cに関するメモ：${memoC || '（なし）'}`,
+    '【C — Current Practice】',
+    `現在の対応：${getVal('q8')}`,
+    q9v.length ? `課題：${q9v.join('、')}` : '',
+    memoC ? `Cメモ：${memoC}` : '',
     '',
-    '【I：アイデア・ひらめき】',
-    `アイデア内容　：${getVal('q10') || '（未記入）'}`,
-    `アイデアの形　：${ideaTypes.length ? ideaTypes.join(' / ') : '（未選択）'}`,
-    `具体イメージ　：${getVal('q10_detail') || '（未記入）'}`,
-    `参考にしたもの：${getVal('q10_ref') || '（未記入）'}`,
-    `懸念・課題　　：${getVal('q10_concern') || '（未記入）'}`,
-    `Iに関するメモ：${memoI || '（なし）'}`,
+    '【I — Idea】',
+    `アイデア：${getVal('q10')}`,
+    ideaTypes.length ? `種別：${ideaTypes.join('、')}` : '',
+    getVal('q10_detail') ? `詳細：${getVal('q10_detail')}` : '',
+    getVal('q10_ref') ? `参考：${getVal('q10_ref')}` : '',
+    getVal('q10_concern') ? `懸念：${getVal('q10_concern')}` : '',
+    memoI ? `Iメモ：${memoI}` : '',
     '',
-    '【O：期待できる効果】',
-    `期待される改善：${q12v.join(' / ') || '（未選択）'}`,
-    `改善の規模感　：${getVal('q13') || '（未記入）'}`,
-    `Oに関するメモ：${memoO || '（なし）'}`,
+    '【O — Outcome】',
+    `期待される成果：${q12v.join('、')}`,
+    `測定方法：${getVal('q13')}`,
+    memoO ? `Oメモ：${memoO}` : '',
     '',
-    '━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
-    `記録日時　　　　　：${endTime.toLocaleString('ja-JP')}`,
-    `ヒアリング所要時間：${elapsed}`,
-    '━━━━━━━━━━━━━━━━━━━━━━━━━━━━'
+    '─────────────────────',
+    `記録日時：${endTime.toLocaleString('ja-JP')}`,
+    `所要時間：${elapsed}`
   ].join('\n');
 }
 
-// ============================================================
-// レポートビュー表示/非表示
-// ============================================================
 function showReportView() {
   const form = document.getElementById('ideaForm');
   const report = document.getElementById('reportView');
@@ -587,21 +579,15 @@ function showReportView() {
 function hideReportView() {
   const form = document.getElementById('ideaForm');
   const report = document.getElementById('reportView');
-
   if (report) report.classList.remove('active');
   if (form) form.style.display = '';
-
   showStep(currentStep);
 }
 
-// ============================================================
-// プレビュー・各種アクション
-// ============================================================
 function showPreview() {
   const previewModal = document.getElementById('previewModal');
   const previewText = document.getElementById('previewText');
   if (!previewModal || !previewText) return;
-
   previewText.textContent = buildText();
   previewModal.classList.add('active');
 }
@@ -611,14 +597,14 @@ function closePreviewModal() {
   if (previewModal) previewModal.classList.remove('active');
 }
 
+// ============================================================
+// メール送信
+// ============================================================
 function actionSendMail() {
   const mailModal = document.getElementById('mailModal');
   const defDisp = document.getElementById('mailDefaultDisplay');
-
-  if (mailModal && defDisp) {
-    defDisp.textContent = DEFAULT_MAIL_TO;
-    mailModal.classList.add('active');
-  }
+  if (mailModal && defDisp) defDisp.textContent = DEFAULT_MAIL_TO;
+  if (mailModal) mailModal.classList.add('active');
 }
 
 function closeMailModal() {
@@ -626,21 +612,23 @@ function closeMailModal() {
   if (mailModal) mailModal.classList.remove('active');
 }
 
-function onMailToInput() {}
+function onMailToInput() { /* 必要に応じてバリデーション */ }
 
 function doSendMail() {
   const extra = getVal('mailTo');
   const to = extra || DEFAULT_MAIL_TO;
   const body = encodeURIComponent(buildText());
-  const subj = encodeURIComponent('MIT ヒアリング記録');
+  const subj = encodeURIComponent('【MIT】アイデアヒアリング記録');
   const addr = encodeURIComponent(to);
-
   const url = `mailto:${addr}?subject=${subj}&body=${body}`;
   window.location.href = url;
 }
 
+// ============================================================
+// その他アクション
+// ============================================================
 function actionSaveToFolder() {
-  alert('テキスト保存機能は、現状ブラウザ上ではクリップボードコピー等で代替してください。');
+  alert('この機能は今後実装予定です。');
 }
 
 function actionSavePDF() {
@@ -648,43 +636,33 @@ function actionSavePDF() {
 }
 
 function actionAnalyze() {
-  alert('分析ページ連携は未実装です。');
+  alert('GAS連携のサマリー生成を使用してください。');
 }
 
 // ============================================================
-// サマリー生成（GAS + summary type）
-// ============================================================
-// ここより上はそのまま
-
-// ============================================================
-// サマリー生成（プリフライト回避版）
+// GAS サマリー生成
 // ============================================================
 async function generateSummary() {
-  const baseText = buildSummary();  // レポート概要テキスト
-
+  const baseText = buildSummary();
   const summaryBtn = document.querySelector('.panel-item--summary');
+
   if (summaryBtn) {
     summaryBtn.disabled = true;
     summaryBtn.dataset.originalLabel = summaryBtn.innerHTML;
-    summaryBtn.innerHTML = '🧾 サマリー生成中…';
+    summaryBtn.innerHTML = summaryBtn.innerHTML + '（生成中…）';
   }
 
   try {
-    // ★ ポイント：余計なヘッダを付けず、text/plain として送る
     const res = await fetch(GAS_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({
-        type: 'summary',
-        text: baseText
-      })
+      body: JSON.stringify({ type: 'summary', text: baseText })
     });
 
-    if (!res.ok) {
-      throw new Error('GAS 呼び出しに失敗しました（HTTP ' + res.status + '）');
-    }
+    if (!res.ok) throw new Error(`GAS HTTP エラー: ${res.status}`);
 
     const json = await res.json().catch(() => null);
+
     if (!json || !json.summary) {
       throw new Error('サマリーが取得できませんでした。');
     }
@@ -712,6 +690,7 @@ async function generateSummary() {
     }
   }
 }
+
 // ============================================================
 // ステップクリア・再スタート
 // ============================================================
@@ -821,7 +800,7 @@ document.addEventListener('DOMContentLoaded', () => {
     btn.addEventListener('click', () => {
       const step = parseInt(btn.getAttribute('data-step'), 10);
       if (!isNaN(step)) showStep(step);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      // scrollTo は showStep() 内で処理するため削除
     });
   });
 
