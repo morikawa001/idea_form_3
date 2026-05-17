@@ -473,7 +473,7 @@ function updateIdeaCharCount() {
   const ta = document.getElementById('q10');
   const cnt = document.getElementById('ideaCharCount');
   if (!ta || !cnt) return;
-  cnt.textContent = ta.value.length + '文字';
+  cnt.textContent = ta.value.length;
 }
 
 // ============================================================
@@ -563,40 +563,26 @@ function buildText() {
   ].join('\n');
 }
 
-// ============================================================
-// レポート概要ビュー
-// ============================================================
-
 function showReportView() {
-  showFormUI(); // フォームUIを表示
-
+  const form = document.getElementById('ideaForm');
+  const report = document.getElementById('reportView');
   const pre = document.getElementById('reportSummary');
+
+  if (form) form.style.display = 'none';
+  if (report) report.classList.add('active');
   if (pre) pre.textContent = buildSummary();
 
-  // レポート概要セクションへスムーススクロール
-  setTimeout(() => {
-    const section = document.getElementById('reportView');
-    if (section) {
-      const stickyHeight =
-        (document.getElementById('picoRoadmap')?.offsetHeight || 0) +
-        (document.getElementById('progressWrap')?.offsetHeight || 0);
-      const top =
-        section.getBoundingClientRect().top +
-        window.pageYOffset -
-        stickyHeight -
-        8;
-      window.scrollTo({ top, behavior: 'smooth' });
-    }
-  }, 50);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function hideReportView() {
+  const form = document.getElementById('ideaForm');
+  const report = document.getElementById('reportView');
+  if (report) report.classList.remove('active');
+  if (form) form.style.display = '';
   showStep(currentStep);
 }
 
-// ============================================================
-// プレビュー
-// ============================================================
 function showPreview() {
   const previewModal = document.getElementById('previewModal');
   const previewText = document.getElementById('previewText');
@@ -800,7 +786,6 @@ function restartFromEnd() {
 // 初期化
 // ============================================================
 document.addEventListener('DOMContentLoaded', () => {
-  // ロードマップクリック
   document.querySelectorAll('.roadmap-step').forEach((stepEl) => {
     stepEl.style.cursor = 'pointer';
     stepEl.addEventListener('click', () => {
@@ -809,30 +794,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // トップカードクリック
   document.querySelectorAll('.panel-main, .panel-item').forEach((btn) => {
-    // レポート概要カード
-    if (btn.classList.contains('panel-item--report')) {
-      btn.addEventListener('click', () => {
-        showReportView();
-      });
-      return;
-    }
-
-    // サマリー生成カード
-    if (btn.classList.contains('panel-item--summary')) {
-      btn.addEventListener('click', () => {
-        generateSummary();
-      });
-      return;
-    }
-
-    // 通常のステップカード
     if (!btn.hasAttribute('data-step')) return;
     btn.addEventListener('click', () => {
       const step = parseInt(btn.getAttribute('data-step'), 10);
       if (!isNaN(step)) {
-        showFormUI();
+        showFormUI();   // フォームUIを表示してからステップへ移動
         showStep(step);
       }
     });
