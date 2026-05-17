@@ -563,7 +563,7 @@ function buildText() {
   ].join('\n');
 }
 
-// ★ ここを変更：レポート概要にスクロール
+// ★ レポート概要にスクロールする関数
 function showReportView() {
   showFormUI(); // 念のためフォームUIを表示
 
@@ -588,7 +588,6 @@ function showReportView() {
 }
 
 function hideReportView() {
-  // 旧仕様（別画面切り替え）からの簡易互換：フォームはそのまま
   showStep(currentStep);
 }
 
@@ -795,6 +794,7 @@ function restartFromEnd() {
 // 初期化
 // ============================================================
 document.addEventListener('DOMContentLoaded', () => {
+  // ロードマップクリック
   document.querySelectorAll('.roadmap-step').forEach((stepEl) => {
     stepEl.style.cursor = 'pointer';
     stepEl.addEventListener('click', () => {
@@ -803,12 +803,30 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // トップカードクリック
   document.querySelectorAll('.panel-main, .panel-item').forEach((btn) => {
+    // レポート概要カード
+    if (btn.classList.contains('panel-item--report')) {
+      btn.addEventListener('click', () => {
+        showReportView();
+      });
+      return;
+    }
+
+    // サマリー生成カード
+    if (btn.classList.contains('panel-item--summary')) {
+      btn.addEventListener('click', () => {
+        generateSummary();
+      });
+      return;
+    }
+
+    // 通常のステップカード
     if (!btn.hasAttribute('data-step')) return;
     btn.addEventListener('click', () => {
       const step = parseInt(btn.getAttribute('data-step'), 10);
       if (!isNaN(step)) {
-        showFormUI();   // フォームUIを表示してからステップへ移動
+        showFormUI();
         showStep(step);
       }
     });
